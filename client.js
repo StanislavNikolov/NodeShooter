@@ -25,14 +25,7 @@ socket.on("initNewUser", function (data) // kogato nqkoi se logne, survara mi go
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	console.log("Received removeUser event!");
-	for(var i = 0;i < players.length;i ++) // gledam vs player-i
-	{
-		if(data.simpleid == players[i].simpleid) //ako go namera
-		{
-			players.splice(i, 1); // go reja ot masiva
-			return; // spiram za da ne se nalaga da doizciklqm
-		}
-	}
+	players.splice( indexOf(data.simpleid), 1 );
 });
 
 socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite me vijdat
