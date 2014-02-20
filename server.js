@@ -60,6 +60,12 @@ function removeUser(socket)
 	players.splice(indexOf(simpleid), 1);
 }
 
+function sendToAll(type, data)
+{
+	for(var i = 0;i < users.length;i ++)
+		users[i].emit(type, data);
+}
+
 io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 {
 	console.log("Connection from unknown user.");
@@ -76,13 +82,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
 
 			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
-
-			//prashtam noviq na lognalite se
-			for(var i = 0;i < users.length;i ++)
-			{
-				users[i].emit("initNewUser", {name: cp.name, pos: cp.pos, simpleid: cp.simpleid });
-				//socketGet(socket, "simpleid") = cp.simpleid
-			}
+			sendToAll("initNewUser", cp);
 
 			//prashtam lognalite se na noviq, no ne se samoprashtam
 			for(var i = 0;i < users.length;i ++)
@@ -90,12 +90,20 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 				if(socketGet(users[i], "simpleid") != socketGet(socket, "simpleid"))
 				{
 					var pts = players[ indexOf( socketGet(users[i], "simpleid") ) ]; //player to send, tozi do koito shte prashtam
-					socket.emit("initNewUser", cp );
+					socket.emit("initNewUser", pts );
 				}
 			}
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
 			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
+		}
+	});
+
+	socket.on("move", function (data)
+	{
+		if(data.direction == "up")
+		{
+			players[ indexOf(cp.simpleid) ].d.x += 0.1;
 		}
 	});
 
@@ -109,6 +117,19 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 		removeUser(socket);
 	});
 });
+
+function movePlayers()
+{
+	for(var i = 0;i < players.length;i ++)
+	{
+		players[i].pos.x += players[i].d.x;
+		players[i].pos.y += players[i].d.y;
+
+		sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
+	}
+}
+
+setInterval(movePlayers, 3000);
 
 function distanceBetween(one, two)
 {
@@ -138,4 +159,5 @@ function Player(p, n, sid)
 	this.name = n;
 	this.simpleid = sid;
 	this.size = new Vector(10, 10);
+	this.d = new Vector(0, 0);
 }
