@@ -43,10 +43,23 @@ window.addEventListener("keyup", function (args)
 
 function draw() // moje bi edinstvenoto koeto pravi game.js
 {	
+	context.clearRect(0,0,canvas.width,canvas.height);
+	for (var i =0 ;i < players.length ; i++){
+		if (players[i]!=undefined){
+			context.fillStyle = "red";
+			if (players[i].simpleid == myself.simpleid){
+				context.fillStyle = "blue";
+				console.log (i);
+			}
+			context.fillRect(players[i].pos.x*i*5, players[i].pos.y, 10, 10);
+		}
+	}
+	/*
 	if(myself != undefined) // samo ako znam koi sum az, s cel "anti-crash"
 	{
-		context.clearRect(0, 0, canvas.width, canvas.height);
+		context.fillRect(myself.pos.x*myself.simpleid, myself.pos.y, 10, 10);
 	}
+	*/
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
