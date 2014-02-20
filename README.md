@@ -1,5 +1,3 @@
-NodeShooter
-===========
 имам си server.js, client.js, game.js
 
 server.js  - сървара е написан тук, пази се кой къде се намира и т.н
