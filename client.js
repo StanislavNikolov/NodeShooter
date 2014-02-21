@@ -33,3 +33,17 @@ socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite m
 	console.log("Received joinGame event!");
 	myself = players[indexOf(data.simpleid)]; // za da imam referenciq kum sebesi
 });
+
+function sendMoveRequest()
+{
+	if(keys[87])
+		socket.emit("move", {direction: "up"});
+	if(keys[83])
+		socket.emit("move", {direction: "down"});
+	if(keys[65])
+		socket.emit("move", {direction: "left"});
+	if(keys[68])
+		socket.emit("move", {direction: "right"});
+}
+
+setInterval(sendMoveRequest, 50);
