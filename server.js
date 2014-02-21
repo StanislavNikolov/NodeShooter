@@ -49,6 +49,7 @@ function addUser(socket, name)
 function removeUser(socket)
 {
 	var simpleid = socketGet(socket, "simpleid");
+	players.splice(indexOf(simpleid), 1);
 	for(var i = 0;i < users.length;i ++)
 	{
 		if(socketGet(users[i], "simpleid") == simpleid)
@@ -57,7 +58,6 @@ function removeUser(socket)
 			return;
 		}
 	}
-	players.splice(indexOf(simpleid), 1);
 }
 
 function sendToAll(type, data)
@@ -102,9 +102,17 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	socket.on("move", function (data)
 	{
 		if(data.direction == "up")
-		{
-			players[ indexOf(cp.simpleid) ].d.x += 0.1;
-		}
+			cp.d.y -= 0.2;
+
+		if(data.direction == "down")
+			cp.d.y += 0.2;
+
+		if(data.direction == "left")
+			cp.d.x -= 0.2;
+		
+		if(data.direction == "right")
+			cp.d.x += 0.2;
+		
 	});
 
 	socket.on("disconnect", function (data)
@@ -122,14 +130,19 @@ function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
-		players[i].pos.x += players[i].d.x;
-		players[i].pos.y += players[i].d.y;
+		if(players[i].d.x > 0.1 || players[i].d.x < -0.1 || players[i].d.y > 0.1 || players[i].d.y < -0.1)
+		{
+			players[i].pos.x += players[i].d.x;
+			players[i].pos.y += players[i].d.y;
 
-		sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
+			players[i].d.x *= 0.97; players[i].d.y *= 0.97;
+
+			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
+		}
 	}
 }
 
-setInterval(movePlayers, 3000);
+setInterval(movePlayers, 20);
 
 function distanceBetween(one, two)
 {
