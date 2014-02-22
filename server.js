@@ -166,6 +166,13 @@ function Vector(x, y)
 	this.y = y;
 }
 
+function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
+{
+	this.pos = new Vector(x, y);
+	this.radius = {iner:inerRadius, outer:outerRadius};
+	this.angle = {start:startAngle, finish:finishAngle};
+}
+
 function Player(p, n, sid)
 {
 	this.pos = p;

@@ -44,25 +44,25 @@ function drawWall(current){
 	
 	context.fillStyle = "green";
 	context.beginPath();
-	context.moveTo(current.x+Math.cos(current.startAngle)*current.inerRadius,current.y+Math.sin(i+current.startAngle)*current.inerRadius);
-	for (var i = current.startAngle ; i <= current.finishAngle;i += Math.abs(current.finishAngle-current.startAngle)/50) {
-		context.lineTo(current.x+Math.cos(i)*current.inerRadius,current.y+Math.sin(i)*current.inerRadius);
+	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.iner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.iner);
+	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/50) {
+		context.lineTo(current.pos.x+Math.cos(i)*current.radius.iner,current.pos.y+Math.sin(i)*current.radius.iner);
 	}
-	for (var i = current.finishAngle ; i >= current.startAngle;i -= Math.abs(current.finishAngle-current.startAngle)/50) {
-		context.lineTo(current.x+Math.cos(i)*current.outerRadius,current.y+Math.sin(i)*current.outerRadius);
+	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/50) {
+		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
 	}
 	context.closePath();
 	context.fill();
 	context.beginPath();
-	context.arc(current.x+(Math.cos(current.startAngle)*(Math.abs(current.outerRadius-current.inerRadius)/2+current.inerRadius)),
-						current.y+Math.sin(current.startAngle)*(Math.abs(current.outerRadius-current.inerRadius)/2+current.inerRadius),
-									Math.abs(current.outerRadius-current.inerRadius)/2,0,2*Math.PI);
+	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
+						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
+									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
 	context.beginPath();
-	context.arc(current.x+(Math.cos(current.finishAngle)*(Math.abs(current.outerRadius-current.inerRadius)/2+current.inerRadius)),
-						current.y+Math.sin(current.finishAngle)*(Math.abs(current.outerRadius-current.inerRadius)/2+current.inerRadius),
-									Math.abs(current.outerRadius-current.inerRadius)/2,0,2*Math.PI);
+	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
+						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
+									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
 	
@@ -84,7 +84,7 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 	
 	i = undefined;
 	
-	testWall = {startAngle:Math.PI/2,finishAngle:Math.PI*3/2,inerRadius:30,outerRadius:50,x:400,y:400}
+	testWall = {angle:{start:Math.PI*0.1,finish:Math.PI*2},radius:{iner:30,outer:50},pos:{x:400,y:400}}
 	drawWall(testWall);
 	
 	
