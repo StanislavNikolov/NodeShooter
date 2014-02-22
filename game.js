@@ -67,6 +67,8 @@ function drawWall(current){
 	context.fill();
 	
 }
+var testWall = {angle:{start:Math.PI,finish:Math.PI*2},radius:{iner:30,outer:50},pos:{x:400,y:400}};
+	
 function draw() // moje bi edinstvenoto koeto pravi game.js
 {	
 	context.clearRect(0,0,canvas.width,canvas.height);
@@ -78,13 +80,14 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 			context.fillStyle = "red";
 			if (players[i].simpleid == myself.simpleid)
 				context.fillStyle = "blue";
-			context.fillRect(players[i].pos.x, players[i].pos.y, 10, 10);
+			context.beginPath();
+			context.arc(players[i].pos.x, players[i].pos.y, players[i].size.x, 0 , Math.PI*2);
+			context.closePath();
+			context.fill();
 		}
 	}
 	
 	i = undefined;
-	
-	testWall = {angle:{start:Math.PI*0.1,finish:Math.PI*2},radius:{iner:30,outer:50},pos:{x:400,y:400}}
 	drawWall(testWall);
 	
 	
