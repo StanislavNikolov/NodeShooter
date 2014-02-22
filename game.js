@@ -67,7 +67,6 @@ function drawWall(current){
 	context.fill();
 	
 }
-var testWall = {angle:{start:Math.PI,finish:Math.PI*2},radius:{iner:30,outer:50},pos:{x:400,y:400}};
 	
 function draw() // moje bi edinstvenoto koeto pravi game.js
 {	
@@ -88,8 +87,11 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 	}
 	
 	i = undefined;
-	drawWall(testWall);
-	
+	//drawWall(testWall);
+	for (var i = 0 ; i < walls.length ; i ++)
+	{
+		drawWall(walls[i]);
+	}
 	
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }

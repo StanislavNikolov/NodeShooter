@@ -21,7 +21,10 @@ socket.on("initNewUser", function (data) // kogato nqkoi se logne, survara mi go
 	console.log("Received initNewUser event!");
 	players.push(data);
 });
-
+socket.on("setWall", function (data)
+{
+	walls.push(data);
+});
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	console.log("Received removeUser event!");

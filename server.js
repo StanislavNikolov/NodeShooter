@@ -20,6 +20,13 @@ app.get('/game.js', function (req, res)
 var users = []; // masiv s SOCKET-ite
 var nextIndex = 0; // s tova se zadava simpleid-to
 var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
+var walls = [];// masiv s stenite
+function generateTerrain()
+{
+	walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
+}
+generateTerrain();// slagat se stenite
+
 
 //ima golqma razlika m/u user i player
 
@@ -73,14 +80,14 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	var sid; //simple id-to na player-a i socketa
 	var cp; //copy na player-a s tozi socket
-
+	
 	socket.on("login", function (data) 
 	{
 		if(socketGet(socket, "logged") == false) // ako reshi da me spami s "login"-i da ne dobavqm user-i kat poburkan
 		{
 			addUser(socket, data.name); sid = socketGet(socket, "simpleid");
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
-
+			
 			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
 			sendToAll("initNewUser", cp);
 
@@ -92,6 +99,10 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 					var pts = players[ indexOf( socketGet(users[i], "simpleid") ) ]; //player to send, tozi do koito shte prashtam
 					socket.emit("initNewUser", pts );
 				}
+			}
+			for (var i = 0 ; i < walls.length ; i ++)
+			{
+				socket.emit("setWall",walls[i]);
 			}
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
