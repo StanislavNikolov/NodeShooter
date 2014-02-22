@@ -88,7 +88,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			addUser(socket, data.name); sid = socketGet(socket, "simpleid");
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
 			
-			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
+			cp = players[indexOf(sid)]; // walls[j]Player - tozi ot socketa
 			sendToAll("initNewUser", cp);
 
 			//prashtam lognalite se na noviq, no ne se samoprashtam
@@ -147,7 +147,41 @@ function movePlayers()
 			players[i].pos.y += players[i].d.y;
 
 			players[i].d.x *= 0.97; players[i].d.y *= 0.97;
-
+			
+			for (var j = 0 ; j < walls.length ; j ++)
+			{
+				if (distanceBetween(walls[j].pos,players[i].pos)<players[i].radius+walls[j].radius.outer && distanceBetween(walls[j].pos,players[i].pos)+players[i].radius>walls[j].radius.iner)
+				{
+					var angle = Math.acos((walls[j].pos.x-players[i].pos.x)/distanceBetween(walls[j].pos,players[i].pos))+(players[i].pos.y<walls[j].pos.y)*Math.PI;
+					if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
+					{
+						players[i].pos.x = 10;
+					}
+					else 
+					{
+					//walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner))
+					//walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)
+						
+						var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+							walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
+						var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+						walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
+						//console.log ("center:", center1.x, center1.y, "player:", players[i].pos.x, players[i].pos.y);
+						
+						var col1 = distanceBetween(players[i].pos,center1)<players[i].radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
+						var col2 = distanceBetween(players[i].pos,center2)<players[i].radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
+					
+						if (col1 || col2)
+						{
+							players[i].d.x = -players[i].d.x;
+							players[i].d.y = -players[i].d.y;
+						}
+					}
+				}
+			}
+			
+			
+			
 			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
 		}
 	}
@@ -189,6 +223,6 @@ function Player(p, n, sid)
 	this.pos = p;
 	this.name = n;
 	this.simpleid = sid;
-	this.size = new Vector(10, 10);
+	this.radius = 10;
 	this.d = new Vector(0, 0);
 }

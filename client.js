@@ -50,3 +50,5 @@ function sendMoveRequest()
 }
 
 setInterval(sendMoveRequest, 50);
+
+//git push origin devViktor
