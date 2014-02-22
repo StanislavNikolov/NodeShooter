@@ -17,7 +17,7 @@ function Player(p, n, sid)
 	this.pos = p;
 	this.name = n;
 	this.simpleid = sid;
-	this.size = new Vector(10, 10);
+	this.radius = 10;
 }
 
 function indexOf(simpleid) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
@@ -80,7 +80,7 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 			if (players[i].simpleid == myself.simpleid)
 				context.fillStyle = "blue";
 			context.beginPath();
-			context.arc(players[i].pos.x, players[i].pos.y, players[i].size.x, 0 , Math.PI*2);
+			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, 0 , Math.PI*2);
 			context.closePath();
 			context.fill();
 		}
