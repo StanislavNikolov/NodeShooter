@@ -140,7 +140,7 @@ function inWall(p)
 		{
 			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
 			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-				return true;
+				return {index: j};
 			else 
 			{	
 				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
@@ -152,10 +152,11 @@ function inWall(p)
 				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
 			
 				if (col1 || col2)
-					return true;
+					return {index: j};
 			}
 		}
 	}
+	return {index: -1};
 }
 
 function movePlayers()
@@ -164,7 +165,7 @@ function movePlayers()
 	{
 		if(players[i].d.x > 0.1 || players[i].d.x < -0.1 || players[i].d.y > 0.1 || players[i].d.y < -0.1)
 		{	
-			if(inWall(players[i]) != undefined)
+			if(inWall(players[i]).index != -1)
 			{
 				players[i].d.x = -players[i].d.x;
 				players[i].d.y = -players[i].d.y;
