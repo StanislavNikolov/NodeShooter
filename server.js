@@ -20,11 +20,8 @@ app.get('/game.js', function (req, res)
 var users = []; // masiv s SOCKET-ite
 var nextIndex = 0; // s tova se zadava simpleid-to
 var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
-var walls = [];// masiv s stenite
 
-walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
-
-//walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
+//ima golqma razlika m/u user i player
 
 function socketGet(socket, item)
 {
@@ -76,15 +73,15 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	var sid; //simple id-to na player-a i socketa
 	var cp; //copy na player-a s tozi socket
-	
+
 	socket.on("login", function (data) 
 	{
 		if(socketGet(socket, "logged") == false) // ako reshi da me spami s "login"-i da ne dobavqm user-i kat poburkan
 		{
 			addUser(socket, data.name); sid = socketGet(socket, "simpleid");
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
-			
-			cp = players[indexOf(sid)]; // walls[j]Player - tozi ot socketa
+
+			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
 			sendToAll("initNewUser", cp);
 
 			//prashtam lognalite se na noviq, no ne se samoprashtam
@@ -96,9 +93,6 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 					socket.emit("initNewUser", pts );
 				}
 			}
-
-			for (var i = 0 ; i < walls.length ; i ++)
-				socket.emit("initNewWall", walls[i]);
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
 			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
@@ -132,52 +126,17 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	});
 });
 
-function inWall(p)
-{
-	for (var j = 0 ; j < walls.length ; j ++)
-	{
-		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.iner)
-		{
-			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
-			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-				return {index: j};
-			else 
-			{	
-				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
-					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
-				var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
-				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
-				
-				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
-				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
-			
-				if (col1 || col2)
-					return {index: j};
-			}
-		}
-	}
-	return {index: -1};
-}
-
 function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
 		if(players[i].d.x > 0.1 || players[i].d.x < -0.1 || players[i].d.y > 0.1 || players[i].d.y < -0.1)
-		{	
-			if(inWall(players[i]).index != -1)
-			{
-				players[i].d.x = -players[i].d.x;
-				players[i].d.y = -players[i].d.y;
-			}
-			else
-			{
-				players[i].d.x *= 0.97; players[i].d.y *= 0.97;
-			}
-
+		{
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
-			
+
+			players[i].d.x *= 0.97; players[i].d.y *= 0.97;
+
 			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
 		}
 	}
@@ -207,18 +166,11 @@ function Vector(x, y)
 	this.y = y;
 }
 
-function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
-{
-	this.pos = new Vector(x, y);
-	this.radius = {iner:inerRadius, outer:outerRadius};
-	this.angle = {start:startAngle, finish:finishAngle};
-}
-
 function Player(p, n, sid)
 {
 	this.pos = p;
 	this.name = n;
 	this.simpleid = sid;
-	this.radius = 10;
+	this.size = new Vector(10, 10);
 	this.d = new Vector(0, 0);
 }
