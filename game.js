@@ -17,7 +17,7 @@ function Player(p, n, sid)
 	this.pos = p;
 	this.name = n;
 	this.simpleid = sid;
-	this.radius = 10;
+	this.size = new Vector(10, 10);
 }
 
 function indexOf(simpleid) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
@@ -40,59 +40,22 @@ window.addEventListener("keyup", function (args)
 {
     keys[args.keyCode] = false;
 }, false);
-function drawWall(current){
-	
-	context.fillStyle = "green";
-	context.beginPath();
-	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.iner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.iner);
-	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/100) {
-		context.lineTo(current.pos.x+Math.cos(i)*current.radius.iner,current.pos.y+Math.sin(i)*current.radius.iner);
-	}
-	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/100) {
-		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
-	}
-	context.closePath();
-	context.fill();
-	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
-						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
-									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
-	context.closePath();
-	context.fill();
-	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
-						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
-									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
-	context.closePath();
-	context.fill();
-	
-}
-	
+
 function draw() // moje bi edinstvenoto koeto pravi game.js
 {	
 	context.clearRect(0,0,canvas.width,canvas.height);
 
 	if(myself != undefined)
 	{
-		for ( var i = 0 ; i < players.length ; i ++ )
+		for (var i =0 ;i < players.length ; i++)
 		{
 			context.fillStyle = "red";
 			if (players[i].simpleid == myself.simpleid)
 				context.fillStyle = "blue";
-			context.beginPath();
-			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, 0 , Math.PI*2);
-			context.closePath();
-			context.fill();
+			context.fillRect(players[i].pos.x, players[i].pos.y, 10, 10);
 		}
 	}
-	
-	i = undefined;
-	//drawWall(testWall);
-	for (var i = 0 ; i < walls.length ; i ++)
-	{
-		drawWall(walls[i]);
-	}
-	
+
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
