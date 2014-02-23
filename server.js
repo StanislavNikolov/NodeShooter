@@ -21,14 +21,10 @@ var users = []; // masiv s SOCKET-ite
 var nextIndex = 0; // s tova se zadava simpleid-to
 var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
 var walls = [];// masiv s stenite
-function generateTerrain()
-{
-	walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
-}
-generateTerrain();// slagat se stenite
 
+walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
 
-//ima golqma razlika m/u user i player
+//walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
 function socketGet(socket, item)
 {
@@ -100,10 +96,9 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 					socket.emit("initNewUser", pts );
 				}
 			}
+
 			for (var i = 0 ; i < walls.length ; i ++)
-			{
-				socket.emit("setWall",walls[i]);
-			}
+				socket.emit("initNewWall", walls[i]);
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
 			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
@@ -137,50 +132,50 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	});
 });
 
+function inWall(p)
+{
+	for (var j = 0 ; j < walls.length ; j ++)
+	{
+		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.iner)
+		{
+			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
+			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
+				return true;
+			else 
+			{	
+				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
+				var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
+				
+				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
+				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
+			
+				if (col1 || col2)
+					return true;
+			}
+		}
+	}
+}
+
 function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
 		if(players[i].d.x > 0.1 || players[i].d.x < -0.1 || players[i].d.y > 0.1 || players[i].d.y < -0.1)
-		{
+		{	
+			if(inWall(players[i]) != undefined)
+			{
+				players[i].d.x = -players[i].d.x;
+				players[i].d.y = -players[i].d.y;
+			}
+			else
+			{
+				players[i].d.x *= 0.97; players[i].d.y *= 0.97;
+			}
+
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
-
-			players[i].d.x *= 0.97; players[i].d.y *= 0.97;
-			
-			for (var j = 0 ; j < walls.length ; j ++)
-			{
-				if (distanceBetween(walls[j].pos,players[i].pos)<players[i].radius+walls[j].radius.outer && distanceBetween(walls[j].pos,players[i].pos)+players[i].radius>walls[j].radius.iner)
-				{
-					var angle = Math.acos((walls[j].pos.x-players[i].pos.x)/distanceBetween(walls[j].pos,players[i].pos))+(players[i].pos.y<walls[j].pos.y)*Math.PI;
-					if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-					{
-						players[i].pos.x = 10;
-					}
-					else 
-					{
-					//walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner))
-					//walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)
-						
-						var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
-							walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
-						var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
-						walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
-						//console.log ("center:", center1.x, center1.y, "player:", players[i].pos.x, players[i].pos.y);
-						
-						var col1 = distanceBetween(players[i].pos,center1)<players[i].radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
-						var col2 = distanceBetween(players[i].pos,center2)<players[i].radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
-					
-						if (col1 || col2)
-						{
-							players[i].d.x = -players[i].d.x;
-							players[i].d.y = -players[i].d.y;
-						}
-					}
-				}
-			}
-			
-			
 			
 			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
 		}
