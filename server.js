@@ -84,7 +84,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			addUser(socket, data.name); sid = socketGet(socket, "simpleid");
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
 			
-			cp = players[indexOf(sid)]; // walls[j]Player - tozi ot socketa
+			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
 			sendToAll("initNewUser", cp);
 
 			//prashtam lognalite se na noviq, no ne se samoprashtam
@@ -108,17 +108,24 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	socket.on("move", function (data)
 	{
 		if(data.direction == "up")
+		{
 			cp.d.y -= 0.2;
+		}
 
 		if(data.direction == "down")
+		{
 			cp.d.y += 0.2;
-
+		}
 		if(data.direction == "left")
+		{
 			cp.d.x -= 0.2;
-		
+			cp.rotation -= 0.2;
+		}
 		if(data.direction == "right")
+		{
 			cp.d.x += 0.2;
-		
+			cp.rotation += 0.2;
+		}
 	});
 
 	socket.on("disconnect", function (data)
@@ -178,7 +185,7 @@ function movePlayers()
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
 			
-			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
+			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos, rotation: players[i].rotation});
 		}
 	}
 }
@@ -220,5 +227,6 @@ function Player(p, n, sid)
 	this.name = n;
 	this.simpleid = sid;
 	this.radius = 10;
+	this.rotation = 0;
 	this.d = new Vector(0, 0);
 }

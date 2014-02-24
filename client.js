@@ -13,7 +13,9 @@ console.log("Login info sent.");
 socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti i poluchi odobrenie, da go obnovq v masiva-si
 {
 	console.log("Received newUserLocation event!");
-	players[indexOf(data.simpleid)].pos = data.pos;
+	var index = indexOf(data.simpleid);
+	players[index].pos = data.pos;
+	players[index].rotation = data.rotation; 
 });
 
 socket.on("initNewUser", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq

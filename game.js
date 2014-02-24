@@ -80,9 +80,11 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 			if (players[i].simpleid == myself.simpleid)
 				context.fillStyle = "blue";
 			context.beginPath();
-			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, 0 , Math.PI*2);
+			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, players[i].rotation, Math.PI*2 + players[i].rotation);
+			console.log ("Rotation:",players[i].rotation);
+			context.lineTo(players[i].pos.x, players[i].pos.y);
 			context.closePath();
-			context.fill();
+			context.stroke();
 		}
 	}
 	
