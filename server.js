@@ -109,21 +109,23 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	{
 		if(data.direction == "up")
 		{
-			cp.d.y -= 0.2;
+			cp.d.x += Math.cos(cp.rotation)/5;
+			cp.d.y += Math.sin(cp.rotation)/5;
+			
 		}
 
 		if(data.direction == "down")
 		{
-			cp.d.y += 0.2;
+		//	cp.d.y += 0.2;
 		}
 		if(data.direction == "left")
 		{
-			cp.d.x -= 0.2;
+			//cp.d.x -= 0.2;
 			cp.rotation -= 0.2;
 		}
 		if(data.direction == "right")
 		{
-			cp.d.x += 0.2;
+			//cp.d.x += 0.2;
 			cp.rotation += 0.2;
 		}
 	});
