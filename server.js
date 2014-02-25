@@ -150,7 +150,7 @@ function inWall(p)
 		{
 			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
 			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-				return {index: j};
+				return {index: j, partCollided: {pos: walls[j].pos, raduis: walls[j].radius.outer}};
 			else 
 			{	
 				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
@@ -161,8 +161,10 @@ function inWall(p)
 				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
 				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
 			
-				if (col1 || col2)
-					return {index: j};
+				if (col1)
+					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2}};
+				if (col2)
+					return {index: j, partCollided:{pos: center2, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2}};
 			}
 		}
 	}
@@ -175,8 +177,37 @@ function movePlayers()
 	{
 		if(players[i].speed > 0.1 || players[i].speed < -0.1)
 		{	
-			if(inWall(players[i]).index != -1)
-				players[i].speed = -players[i].speed;
+		
+			
+			if(inWall(players[i]).index != -1){
+				//tuka she ima nqkvi magii
+				
+				var index = inWall(players[i]).index, objectCollided = inWall(players[i]).partCollided;
+				var vx=players[i].d.x,vy=players[i].d.y,tpx=(objectCollided.pos.x-players[i].pos.x),tpy=(objectCollided.pos.y-players[i].pos.y),p,increasement=0;
+				
+				while(tpx*tpx+tpy*tpy<=(objectCollided.radius+players[i].radius)*(objectCollided.radius+players[i].radius))
+				{
+					players[i].pos.x-=0.1*vx;
+					players[i].pos.y-=0.1*vy;
+					tpx+=0.1*vx;
+					tpy+=0.1*vy;
+				}
+					
+					
+				p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
+				players[i].d.x=(vx-p*tpx);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
+				players[i].d.y=(vy-p*tpy);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
+				players[i].speed *= 0.5;
+				if (players[i].d.y<0)
+				{
+					increasement = Math.PI;
+				}
+				
+				players[i].rotation = Math.acos(players[i].d.x/(distanceBetween(players[i].pos, players[i].d)))+increasement;
+				
+				console.log("p:",p,"dX:",players[i].d.x,"dY:",players[i].d.y,"rotation:",players[i].rotation);
+				
+			}
 			else
 				players[i].speed *= 0.97;
 
@@ -186,7 +217,7 @@ function movePlayers()
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
 			
-			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
+			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos, rotation: players[i].rotation});
 		}
 	}
 }
@@ -210,11 +241,17 @@ function moveBullets()
 				collision = true;
 			}
 		}
+		
+		sendToAll("newBulletLocation", {simpleid: bullets[i].simpleid, rotation: bullets[i].rotation, pos: bullets[i].pos});
 
 		if(bullets[i].radius <= 0.1 || collision)
 		{
 			bullets.splice(i, 1);
 			i --;
+		}else {
+			if (inWall(bullets[i]).index!=-1){
+				bullets[i].rotation+=Math.PI;	
+			}
 		}
 	}
 }

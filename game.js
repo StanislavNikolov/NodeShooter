@@ -151,5 +151,5 @@ function updateBullets()
 	}
 }
 
-setInterval(updateBullets, 20);
+//setInterval(updateBullets, 20);
 setInterval(draw, 20);

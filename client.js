@@ -12,7 +12,6 @@ console.log("Login info sent.");
 
 socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti i poluchi odobrenie, da go obnovq v masiva-si
 {
-	console.log("Received newUserLocation event!");
 	var index = indexOf(data.simpleid);
 	if(data.pos != undefined)
 		players[index].pos = data.pos;
@@ -20,6 +19,16 @@ socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti 
 		players[index].rotation = data.rotation; 
 	if(data.radius != undefined)
 		players[index].radius = data.radius; 
+});
+socket.on("newBulletLocation", function (data)
+{
+	var index = indexOf(data.simpleid,"bullet");
+	if(data.pos != undefined)
+		bullets[index].pos = data.pos;
+	if(data.rotation != undefined)
+		bullets[index].rotation = data.rotation; 
+	if(data.radius != undefined)
+		bullets[index].radius = data.radius; 
 });
 
 socket.on("initNewUser", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq
