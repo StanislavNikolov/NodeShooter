@@ -2,6 +2,7 @@ var app = require('express')()
   , server = require('http').createServer(app)
   , io = require('socket.io').listen(server);
 
+io.set('log level', 1);
 server.listen(8080); // setvam si port-a
 
 app.get('/', function (req, res)
@@ -21,6 +22,7 @@ var users = []; // masiv s SOCKET-ite
 var nextIndex = 0; // s tova se zadava simpleid-to
 var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
 var walls = [];// masiv s stenite
+var bullets = [];
 
 walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
 
@@ -108,28 +110,25 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	socket.on("move", function (data)
 	{
 		if(data.direction == "up")
-		{
-			cp.d.x += Math.cos(cp.rotation)/5;
-			cp.d.y += Math.sin(cp.rotation)/5;
-			
-		}
-
+			cp.speed += 0.3;
 		if(data.direction == "down")
-		{
-			cp.d.x -= Math.cos(cp.rotation)/15;
-			cp.d.y -= Math.sin(cp.rotation)/15;
-		//	cp.d.y += 0.2;
-		}
+			cp.speed -= 0.15;
 		if(data.direction == "left")
 		{
-			//cp.d.x -= 0.2;
 			cp.rotation -= 0.2;
+			sendToAll("newUserLocation", {simpleid: cp.simpleid, rotation: cp.rotation});
 		}
 		if(data.direction == "right")
 		{
-			//cp.d.x += 0.2;
 			cp.rotation += 0.2;
+			sendToAll("newUserLocation", {simpleid: cp.simpleid, rotation: cp.rotation});
 		}
+	});
+
+	socket.on("shoot", function (data)
+	{
+		bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 1));
+		sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
 	});
 
 	socket.on("disconnect", function (data)
@@ -174,27 +173,55 @@ function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
-		if(players[i].d.x > 0.1 || players[i].d.x < -0.1 || players[i].d.y > 0.1 || players[i].d.y < -0.1)
+		if(players[i].speed > 0.1 || players[i].speed < -0.1)
 		{	
 			if(inWall(players[i]).index != -1)
-			{
-				players[i].d.x = -players[i].d.x;
-				players[i].d.y = -players[i].d.y;
-			}
+				players[i].speed = -players[i].speed;
 			else
-			{
-				players[i].d.x *= 0.97; players[i].d.y *= 0.97;
-			}
+				players[i].speed *= 0.97;
+
+			players[i].d.x = Math.cos(players[i].rotation) * players[i].speed;
+			players[i].d.y = Math.sin(players[i].rotation) * players[i].speed;
 
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
 			
-			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos, rotation: players[i].rotation});
+			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos});
 		}
 	}
 }
 
+function moveBullets()
+{
+	for(var i = 0;i < bullets.length;i ++)
+	{
+		var collision = false;
+		bullets[i].radius -= 0.004;
+		bullets[i].pos.x += Math.cos(bullets[i].rotation) * 6;
+		bullets[i].pos.y += Math.sin(bullets[i].rotation) * 6;
+
+		for(var j = 0;j < players.length;j ++)
+		{
+			if(players[j].simpleid != bullets[i].shooter && distanceBetween(bullets[i].pos, players[j].pos) < bullets[i].radius + players[j].radius)
+			{
+
+				players[j].radius -= 0.2;
+				sendToAll("newUserLocation", {simpleid: players[j].simpleid, radius: players[j].radius});
+				collision = true;
+			}
+		}
+
+		if(bullets[i].radius <= 0.1 || collision)
+		{
+			bullets.splice(i, 1);
+			i --;
+		}
+	}
+}
+
+
 setInterval(movePlayers, 20);
+setInterval(moveBullets, 20);
 
 function distanceBetween(one, two)
 {
@@ -203,11 +230,22 @@ function distanceBetween(one, two)
     return Math.sqrt((alpha*alpha)+(beta*beta));
 }
 
-function indexOf(simpleid) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
+function indexOf(simpleid, t) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
 {
-	for(var i = 0;i < players.length;i ++)
+	var array;
+	if(t == undefined || t == "player")
+		array = players;
+	else
 	{
-		if(players[i].simpleid == simpleid)
+		if(t == "wall")
+			array = walls;
+		else
+			array = bullets;
+	}
+
+	for(var i = 0;i < array.length;i ++)
+	{
+		if(array[i].simpleid == simpleid)
 			return i;
 	}
 }
@@ -232,5 +270,16 @@ function Player(p, n, sid)
 	this.simpleid = sid;
 	this.radius = 10;
 	this.rotation = 0;
+	this.speed = 0;
 	this.d = new Vector(0, 0);
+}
+
+function Bullet(x, y, r, shr, damage)
+{
+	this.pos = new Vector(x, y);
+	this.rotation = r;
+	this.radius = 2;
+	this.simpleid = ++ nextIndex;
+	this.shooter = shr;
+	this.damage = damage;
 }

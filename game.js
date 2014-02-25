@@ -5,6 +5,17 @@ var walls = []; // pazq si vsichki steni
 var players = []; // ppazq si vsichki player-i
 var keys = []; // koi buton e natisnat
 var myself; //ukazatel (referenciq) kum elementa ot players, koito predstavlqvam
+var bullets = [];
+
+var maxShootPeriod = 20, currentShootPeriod = 0;
+
+function Bullet(x, y, r, s)
+{
+	this.pos = new Vector(x, y);
+	this.rotation = r;
+	this.radius = 2;
+	this.simpleid = s;
+}
 
 function Vector(x, y)
 {
@@ -18,13 +29,25 @@ function Player(p, n, sid)
 	this.name = n;
 	this.simpleid = sid;
 	this.radius = 10;
+	this.rotation = 0;
 }
 
-function indexOf(simpleid) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
+function indexOf(simpleid, t) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
 {
-	for(var i = 0;i < players.length;i ++)
+	var array;
+	if(t == undefined || t == "player")
+		array = players;
+	else
 	{
-		if(players[i].simpleid == simpleid)
+		if(t == "wall")
+			array = walls;
+		else
+			array = bullets;
+	}
+	
+	for(var i = 0;i < array.length;i ++)
+	{
+		if(array[i].simpleid == simpleid)
 			return i;
 	}
 }
@@ -40,7 +63,8 @@ window.addEventListener("keyup", function (args)
 {
     keys[args.keyCode] = false;
 }, false);
-function drawWall(current){
+function drawWall(current)
+{
 	
 	context.fillStyle = "green";
 	context.beginPath();
@@ -65,12 +89,22 @@ function drawWall(current){
 									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
-	
 }
 	
-function draw() // moje bi edinstvenoto koeto pravi game.js
+function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 {	
 	context.clearRect(0,0,canvas.width,canvas.height);
+
+	for(var i = 0;i < bullets.length;i ++)
+	{
+
+		context.beginPath();
+
+		context.arc(bullets[i].pos.x, bullets[i].pos.y, bullets[i].radius, 0, Math.PI * 2);
+		context.fill();
+
+		context.closePath();
+	}
 
 	if(myself != undefined)
 	{
@@ -79,17 +113,19 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 			context.fillStyle = "red";
 			if (players[i].simpleid == myself.simpleid)
 				context.fillStyle = "blue";
+
 			context.beginPath();
-			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, players[i].rotation, Math.PI*2 + players[i].rotation);
-			console.log ("Rotation:",players[i].rotation);
+
+			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
 			context.lineTo(players[i].pos.x, players[i].pos.y);
-			context.closePath();
 			context.stroke();
+
+			context.closePath();
 		}
 	}
 	
 	i = undefined;
-	//drawWall(testWall);
+
 	for (var i = 0 ; i < walls.length ; i ++)
 	{
 		drawWall(walls[i]);
@@ -98,4 +134,22 @@ function draw() // moje bi edinstvenoto koeto pravi game.js
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
-setInterval(draw, 50);
+function updateBullets()
+{
+	for(var i = 0;i < bullets.length;i ++)
+	{
+		bullets[i].radius -= 0.004;
+		bullets[i].pos.x += Math.cos(bullets[i].rotation) * 6;
+		bullets[i].pos.y += Math.sin(bullets[i].rotation) * 6;
+
+
+		if(bullets[i].radius <= 0.1)
+		{
+			bullets.splice(i, 2);
+			i --;
+		}
+	}
+}
+
+setInterval(updateBullets, 20);
+setInterval(draw, 20);
