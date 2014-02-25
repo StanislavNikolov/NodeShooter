@@ -116,6 +116,8 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 		if(data.direction == "down")
 		{
+			cp.d.x -= Math.cos(cp.rotation)/15;
+			cp.d.y -= Math.sin(cp.rotation)/15;
 		//	cp.d.y += 0.2;
 		}
 		if(data.direction == "left")
