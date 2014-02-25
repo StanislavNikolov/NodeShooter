@@ -14,8 +14,12 @@ socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti 
 {
 	console.log("Received newUserLocation event!");
 	var index = indexOf(data.simpleid);
-	players[index].pos = data.pos;
-	players[index].rotation = data.rotation; 
+	if(data.pos != undefined)
+		players[index].pos = data.pos;
+	if(data.rotation != undefined)
+		players[index].rotation = data.rotation; 
+	if(data.radius != undefined)
+		players[index].radius = data.radius; 
 });
 
 socket.on("initNewUser", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq
@@ -31,6 +35,12 @@ socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maha
 {
 	console.log("Received removeUser event!");
 	players.splice( indexOf(data.simpleid), 1 );
+});
+socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
+{
+	var index = indexOf(data.psimpleid);
+	bullets.push(new Bullet(  players[index].pos.x, 
+		players[index].pos.y, players[index].rotation, data.bsimpleid  ));
 });
 
 socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite me vijdat
@@ -51,6 +61,15 @@ function sendMoveRequest()
 		socket.emit("move", {direction: "right"});
 }
 
-setInterval(sendMoveRequest, 50);
+function sendShootRequest()
+{
+	currentShootPeriod --;
+	if(keys[32] && currentShootPeriod <= 0)
+	{
+		socket.emit("shoot", {});
+		currentShootPeriod=maxShootPeriod;
+	}
+}
 
-//git push origin devViktor
+setInterval(sendMoveRequest, 50);
+setInterval(sendShootRequest, 20);
