@@ -150,7 +150,7 @@ function inWall(p)
 		{
 			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
 			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-				return {index: j, partCollided: {pos: walls[j].pos, raduis: walls[j].radius.outer}};
+				return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer}};
 			else 
 			{	
 				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
@@ -184,8 +184,12 @@ function movePlayers()
 				
 				var index = inWall(players[i]).index, objectCollided = inWall(players[i]).partCollided;
 				var vx=players[i].d.x,vy=players[i].d.y,tpx=(objectCollided.pos.x-players[i].pos.x),tpy=(objectCollided.pos.y-players[i].pos.y),p,increasement=0;
-				
-				while(tpx*tpx+tpy*tpy<=(objectCollided.radius+players[i].radius)*(objectCollided.radius+players[i].radius))
+				var bx = objectCollided.pos.x,by = objectCollided.pos.y, r1 = players[i].radius, r2 = objectCollided.radius, px = players[i].pos.x , py = players[i].pos.y	
+				var a = vx*vx+vy*vy , b = 2*bx*vx + 2*by*vy - 2*px*vx - 2*py*vy , c = (r1+r2)*(r1+r2)-bx*bx-by*by+2*bx*px+2*by*py-py*py-px*px; 
+				p = (-b+Math.sqrt(b*b-4*a*c))/2*a;
+				//players[i].pos.x -= vx*p;
+				//players[i].pos.y -= vy*p;
+				while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
 				{
 					players[i].pos.x-=0.1*vx;
 					players[i].pos.y-=0.1*vy;
@@ -198,12 +202,13 @@ function movePlayers()
 				players[i].d.x=(vx-p*tpx);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
 				players[i].d.y=(vy-p*tpy);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
 				players[i].speed *= 0.5;
+					
 				if (players[i].d.y<0)
 				{
 					increasement = Math.PI;
 				}
 				
-				players[i].rotation = Math.acos(players[i].d.x/(distanceBetween(players[i].pos, players[i].d)))+increasement;
+				players[i].rotation = Math.acos(players[i].d.x/(distanceBetween({x:0,y:0}, players[i].d)))+increasement;
 				
 				console.log("p:",p,"dX:",players[i].d.x,"dY:",players[i].d.y,"rotation:",players[i].rotation);
 				
