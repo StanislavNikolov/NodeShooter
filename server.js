@@ -24,7 +24,8 @@ var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera
 var walls = [];// masiv s stenite
 var bullets = [];
 
-walls.push(new Wall(400,400,30,50,Math.PI,Math.PI*2));
+walls.push(new Wall(400,400,30,50,0,Math.PI));
+walls.push(new Wall(400,300,280,300,0,Math.PI*2));
 
 //walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
@@ -47,7 +48,7 @@ function addUser(socket, name)
 	socketSet(socket, "simpleid", sid); //vajno e socketa da znae za koi player otgovarq
 	socketSet(socket, "logged", true);
 
-	players.push( new Player( new Vector(10, 10), name, sid ) );
+	players.push( new Player( new Vector(300, 300), name, sid ) );
 	users.push(socket);
 }
 
@@ -150,7 +151,14 @@ function inWall(p)
 		{
 			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
 			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
-				return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer}};
+			{
+				console.log ("distance:",distanceBetween(walls[j].pos,p.pos),walls[j].radius.iner );
+				if (distanceBetween(walls[j].pos,p.pos)<walls[j].radius.iner)
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 1}};
+				else 
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.iner, inIner: 0}};
+				
+			}
 			else 
 			{	
 				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
@@ -162,9 +170,9 @@ function inWall(p)
 				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
 			
 				if (col1)
-					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2}};
+					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2, inIner: 0}};
 				if (col2)
-					return {index: j, partCollided:{pos: center2, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2}};
+					return {index: j, partCollided:{pos: center2, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2, inIner: 0}};
 			}
 		}
 	}
@@ -189,14 +197,30 @@ function movePlayers()
 				p = (-b+Math.sqrt(b*b-4*a*c))/2*a;
 				//players[i].pos.x -= vx*p;
 				//players[i].pos.y -= vy*p;
-				while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
+				console.log ("inIner:",objectCollided);
+				if (!objectCollided.inIner)
 				{
-					players[i].pos.x-=0.1*vx;
-					players[i].pos.y-=0.1*vy;
-					tpx+=0.1*vx;
-					tpy+=0.1*vy;
+					console.log ("outer");
+					while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
+					{
+						players[i].pos.x-=0.1*vx;
+						players[i].pos.y-=0.1*vy;
+						tpx+=0.1*vx;
+						tpy+=0.1*vy;
+					}
 				}
+				else
+				{	
+					console.log ("iner");
 					
+					while(tpx*tpx+tpy*tpy>=(r1+r2)*(r1+r2))
+					{
+						players[i].pos.x-=0.1*vx;
+						players[i].pos.y-=0.1*vy;
+						tpx+=0.1*vx;
+						tpy+=0.1*vy;
+					}
+				}
 					
 				p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
 				players[i].d.x=(vx-p*tpx);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
