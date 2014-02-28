@@ -154,9 +154,9 @@ function inWall(p)
 			{
 				console.log ("distance:",distanceBetween(walls[j].pos,p.pos),walls[j].radius.iner );
 				if (distanceBetween(walls[j].pos,p.pos)<walls[j].radius.iner)
-					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 1}};
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.iner, inIner: 1}};
 				else 
-					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.iner, inIner: 0}};
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 0}};
 				
 			}
 			else 
@@ -192,34 +192,35 @@ function movePlayers()
 				
 				var index = inWall(players[i]).index, objectCollided = inWall(players[i]).partCollided;
 				var vx=players[i].d.x,vy=players[i].d.y,tpx=(objectCollided.pos.x-players[i].pos.x),tpy=(objectCollided.pos.y-players[i].pos.y),p,increasement=0;
-				var bx = objectCollided.pos.x,by = objectCollided.pos.y, r1 = players[i].radius, r2 = objectCollided.radius, px = players[i].pos.x , py = players[i].pos.y	
-				var a = vx*vx+vy*vy , b = 2*bx*vx + 2*by*vy - 2*px*vx - 2*py*vy , c = (r1+r2)*(r1+r2)-bx*bx-by*by+2*bx*px+2*by*py-py*py-px*px; 
-				p = (-b+Math.sqrt(b*b-4*a*c))/2*a;
-				//players[i].pos.x -= vx*p;
-				//players[i].pos.y -= vy*p;
-				console.log ("inIner:",objectCollided);
+				var bx = objectCollided.pos.x,by = objectCollided.pos.y, r1 = players[i].radius, r2 = objectCollided.radius, px = players[i].pos.x , py = players[i].pos.y;
 				if (!objectCollided.inIner)
 				{
 					console.log ("outer");
-					while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
+					players[i].pos.x = bx + (px-bx)*(r1+r2)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
+					players[i].pos.y = by + (py-by)*(r1+r2)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
+				
+					/*while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
 					{
 						players[i].pos.x-=0.1*vx;
 						players[i].pos.y-=0.1*vy;
 						tpx+=0.1*vx;
 						tpy+=0.1*vy;
-					}
+					}*/
 				}
 				else
 				{	
 					console.log ("iner");
+				
+					players[i].pos.x = bx + (px-bx)*(r2-r1)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
+					players[i].pos.y = by + (py-by)*(r2-r1)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
 					
-					while(tpx*tpx+tpy*tpy>=(r1+r2)*(r1+r2))
+					/*while(tpx*tpx+tpy*tpy>=(r1+r2)*(r1+r2))
 					{
 						players[i].pos.x-=0.1*vx;
 						players[i].pos.y-=0.1*vy;
 						tpx+=0.1*vx;
 						tpy+=0.1*vy;
-					}
+					}*/
 				}
 					
 				p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
