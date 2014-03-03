@@ -125,7 +125,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			if(data.direction == "up")
 				cp.speed += 0.3;
 			if(data.direction == "down")
-				cp.speed -= 0.15;
+				cp.speed *= 0.8;
 			if(data.direction == "left")
 			{
 				cp.rotation -= 0.2;
