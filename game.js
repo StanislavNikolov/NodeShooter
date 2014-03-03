@@ -110,11 +110,13 @@ function drawWall(current, offset)
 
 function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
 {
+	var def = context.fillStyle;
 	context.globalAlpha = 0.7; context.fillStyle = "red";
 	var hpBarSize = (p.hp / p.maxhp) * ms;
 	context.fillRect(sx, sy, hpBarSize, w);
 	context.strokeRect(sx, sy, ms, w);
 	context.globalAlpha = 1;
+	context.fillStyle = def;
 }
 	
 function draw() // moje bi edno ot malkoto neshta koito pravi game.js
@@ -138,20 +140,25 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 		for ( var i = 0 ; i < players.length ; i ++ )
 		{
-			context.strokeStyle = "red";
+			context.strokeStyle = "red"; context.fillStyle = "red";
 			if (players[i].simpleid == myself.simpleid)
+			{
+				context.fillStyle = "blue";
 				context.strokeStyle = "blue";
+			}
 			else
-				drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius, 3);
+				drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
 
 			var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
-			context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/4, players[i].pos.y - offset.y - players[i].radius);
+			context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
 
 			context.beginPath();
 
 			context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
 			context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
-			context.stroke();
+
+			context.globalAlpha = 0.1; context.fill();
+			context.globalAlpha = 1; context.stroke();
 
 			context.closePath();
 		}
