@@ -10,7 +10,7 @@ console.log("Sending login info...");
 socket.emit("login", {name: loginName });
 console.log("Login info sent.");
 
-socket.on("newUserLocation", function (data) // kogato nqkoi iska da se premesti i poluchi odobrenie, da go obnovq v masiva-si
+socket.on("updateUserInformation", function (data) // servera kazva za promqna na nqkoi user
 {
 	var index = indexOf(data.simpleid);
 	if(data.pos != undefined)
@@ -22,7 +22,7 @@ socket.on("newUserLocation", function (data) // kogato nqkoi iska da se premesti
 	if(data.hp != undefined)
 		players[index].hp = data.hp; 
 });
-socket.on("newBulletLocation", function (data)
+socket.on("updateBulletInformation", function (data)
 {
 	var index = indexOf(data.simpleid,"bullet");
 	if(data.pos != undefined)
@@ -46,6 +46,10 @@ socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maha
 {
 	console.log("Received removeUser event!");
 	players.splice( indexOf(data.simpleid), 1 );
+});
+socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
+{
+	bullets.splice( indexOf(data.simpleid, "bullet"), 1 );
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
