@@ -107,6 +107,8 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 			for (var i = 0 ; i < walls.length ; i ++)
 				socket.emit("initNewWall", walls[i]);
+			for (var i = 0 ; i < bullets.length ; i ++)
+				socket.emit("initNewBullet", {simpleid: bullets[i].simpleid, pos: bullets[i].pos, rotation: bullets[i].rotation});
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
 			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
@@ -115,19 +117,22 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	socket.on("move", function (data)
 	{
-		if(data.direction == "up")
-			cp.speed += 0.3;
-		if(data.direction == "down")
-			cp.speed -= 0.15;
-		if(data.direction == "left")
+		if(!cp.dead)
 		{
-			cp.rotation -= 0.2;
-			sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
-		}
-		if(data.direction == "right")
-		{
-			cp.rotation += 0.2;
-			sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
+			if(data.direction == "up")
+				cp.speed += 0.3;
+			if(data.direction == "down")
+				cp.speed -= 0.15;
+			if(data.direction == "left")
+			{
+				cp.rotation -= 0.2;
+				sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
+			}
+			if(data.direction == "right")
+			{
+				cp.rotation += 0.2;
+				sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
+			}
 		}
 	});
 
@@ -135,7 +140,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	{
 		if(!cp.dead)
 		{
-			bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 1));
+			bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 20));
 			sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
 		}
 	});
@@ -267,12 +272,12 @@ function moveBullets()
 
 		for(var j = 0;j < players.length;j ++)
 		{
-			if(players[j].simpleid != bullets[i].shooter && distanceBetween(bullets[i].pos, players[j].pos) < bullets[i].radius + players[j].radius)
+			if(players[j].simpleid != bullets[i].shooter && !players[j].dead && distanceBetween(bullets[i].pos, players[j].pos) < bullets[i].radius + players[j].radius)
 			{
 				if((new Date()).getTime() - players[j].speTime > 5000)
 				{
 					players[j].radius -= 0.2;
-					players[j].hp -= (Math.random() * 5) + 3;//mejdu 3 i 8
+					players[j].hp -= bullets[i].damage;
 				}
 
 				if(players[j].hp > 0)
@@ -324,6 +329,7 @@ function respawnPlayers()
 			players[i].radius = 10;
 			players[i].speed = 0;
 			players[i].dead = false;
+			players[i].speTime = (new Date()).getTime();
 		}
 	}
 }
