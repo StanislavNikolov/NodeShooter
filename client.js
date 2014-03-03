@@ -1,5 +1,5 @@
 var loginName = ""; 
-while(loginName == "")
+while(loginName == "" || loginName.length > 8)
 {
 	loginName = prompt("Enter you username");
 }
