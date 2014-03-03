@@ -107,10 +107,20 @@ function drawWall(current, offset)
 		current.pos.y += offset.y;
 	}
 }
+
+function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
+{
+	context.globalAlpha = 0.7; context.fillStyle = "red";
+	var hpBarSize = (p.hp / p.maxhp) * ms;
+	context.fillRect(sx, sy, hpBarSize, w);
+	context.strokeRect(sx, sy, ms, w);
+	context.globalAlpha = 1;
+}
 	
 function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 {	
 	context.clearRect(0,0,canvas.width,canvas.height);
+	context.font = "10px Arial";
 
 	if(myself != undefined)
 	{
@@ -128,9 +138,14 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 		for ( var i = 0 ; i < players.length ; i ++ )
 		{
-			context.fillStyle = "red";
+			context.strokeStyle = "red";
 			if (players[i].simpleid == myself.simpleid)
-				context.fillStyle = "blue";
+				context.strokeStyle = "blue";
+			else
+				drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius, 3);
+
+			var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
+			context.fillText(players[i].name, players[i].pos.x - offset.x - players[i].radius - (textSize / 4), players[i].pos.y - offset.y - players[i].radius);
 
 			context.beginPath();
 
@@ -146,11 +161,7 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 		for (var i = 0 ; i < walls.length ; i ++)
 			drawWall(walls[i], offset);
 
-		context.globalAlpha = 0.7; var maxHpBarSize = 70; context.fillStyle = "red";
-		var hpBarSize = (myself.hp / myself.maxhp) * maxHpBarSize;
-		context.fillRect(5, 5, hpBarSize, 7);
-		context.strokeRect(5, 5, maxHpBarSize, 7);
-		context.globalAlpha = 1;
+		drawHpBar(myself, 100, 5, 5, 7);
 	}
 	
 	context.strokeRect(0, 0, canvas.width, canvas.height);
