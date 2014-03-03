@@ -5,6 +5,7 @@ while(loginName == "" || loginName.length > 8)
 }
 
 var socket = io.connect('http://safe-wildwood-8882.herokuapp.com/');//pravq socket za vruzka s server-a
+//var socket = io.connect('http://localhost');//pravq socket za vruzka s server-a
 
 console.log("Sending login info...");
 socket.emit("login", {name: loginName });

@@ -4,7 +4,6 @@ var app = require('express')()
 
 io.set('log level', 1);
 var port = Number(process.env.PORT || 5000);
-console.log(port);
 server.listen(port);
 
 app.get('/', function (req, res)
@@ -143,10 +142,11 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	socket.on("shoot", function (data)
 	{
-		if(!cp.dead)
+		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)
 		{
 			bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 20));
 			sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
+			cp.lastShootTime = (new Date()).getTime();
 		}
 	});
 
@@ -404,6 +404,7 @@ function Player(p, n, sid)
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
 	this.speTime = (new Date().getTime()); //special event time (kill time, respawn time, etc)
+	this.lastShootTime = 0;
 }
 
 function Bullet(x, y, r, shr, damage)
