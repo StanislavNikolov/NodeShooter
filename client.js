@@ -10,7 +10,7 @@ console.log("Sending login info...");
 socket.emit("login", {name: loginName });
 console.log("Login info sent.");
 
-socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti i poluchi odobrenie, da go obnovq v masiva-si
+socket.on("newUserLocation", function (data) // kogato nqkoi iska da se premesti i poluchi odobrenie, da go obnovq v masiva-si
 {
 	var index = indexOf(data.simpleid);
 	if(data.pos != undefined)
@@ -19,6 +19,8 @@ socket.on("newUserLocation", function (data) // kogato nqkoi iska da sepremesti 
 		players[index].rotation = data.rotation; 
 	if(data.radius != undefined)
 		players[index].radius = data.radius; 
+	if(data.hp != undefined)
+		players[index].hp = data.hp; 
 });
 socket.on("newBulletLocation", function (data)
 {

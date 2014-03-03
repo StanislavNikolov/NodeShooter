@@ -253,7 +253,8 @@ function moveBullets()
 			{
 
 				players[j].radius -= 0.2;
-				sendToAll("newUserLocation", {simpleid: players[j].simpleid, radius: players[j].radius});
+				players[j].hp -= (Math.random() * 5) + 3;//mejdu 3 i 8
+				sendToAll("newUserLocation", {simpleid: players[j].simpleid, radius: players[j].radius, hp: players[j].hp});
 				collision = true;
 			}
 		}
