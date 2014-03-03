@@ -117,12 +117,12 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 		if(data.direction == "left")
 		{
 			cp.rotation -= 0.2;
-			sendToAll("newUserLocation", {simpleid: cp.simpleid, rotation: cp.rotation});
+			sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
 		}
 		if(data.direction == "right")
 		{
 			cp.rotation += 0.2;
-			sendToAll("newUserLocation", {simpleid: cp.simpleid, rotation: cp.rotation});
+			sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
 		}
 	});
 
@@ -229,7 +229,7 @@ function movePlayers()
 			players[i].pos.x += players[i].d.x;
 			players[i].pos.y += players[i].d.y;
 			
-			sendToAll("newUserLocation", {simpleid: players[i].simpleid, pos: players[i].pos, rotation: players[i].rotation});
+			sendToAll("updateUserInformation", {simpleid: players[i].simpleid, pos: players[i].pos, rotation: players[i].rotation});
 		}
 	}
 }
@@ -252,15 +252,16 @@ function moveBullets()
 
 				players[j].radius -= 0.2;
 				players[j].hp -= (Math.random() * 5) + 3;//mejdu 3 i 8
-				sendToAll("newUserLocation", {simpleid: players[j].simpleid, radius: players[j].radius, hp: players[j].hp});
+				sendToAll("updateUserInformation", {simpleid: players[j].simpleid, radius: players[j].radius, hp: players[j].hp});
 				collision = true;
 			}
 		}
 		
-		sendToAll("newBulletLocation", {simpleid: bullets[i].simpleid, rotation: bullets[i].rotation, pos: bullets[i].pos});
+		sendToAll("updateBulletInformation", {simpleid: bullets[i].simpleid, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
 
-		if(bullets[i].radius <= 0.1 || collision)
+		if(bullets[i].radius <= 0.5 || collision)
 		{
+			sendToAll("removeBullet", {simpleid: bullets[i].simpleid});
 			bullets.splice(i, 1);
 			i --;
 		}else {
@@ -279,7 +280,6 @@ function moveBullets()
 		}
 	}
 }
-
 
 setInterval(movePlayers, 20);
 setInterval(moveBullets, 20);
