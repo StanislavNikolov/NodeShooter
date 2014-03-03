@@ -178,12 +178,15 @@ function inWall(p)
 	}
 	return {index: -1};
 }
-
+function putOutOf(o1,o2,distance){
+	o1.pos.x = o2.pos.x + (o1.pos.x-o2.pos.x)*distance/(distanceBetween(o1.pos,o2.pos));
+	o1.pos.y = o2.pos.y + (o1.pos.y-o2.pos.y)*distance/(distanceBetween(o1.pos,o2.pos));
+}
 function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
-		if(players[i].speed > 0.1 || players[i].speed < -0.1)
+		if(players[i].speed > 0.01 || players[i].speed < -0.01)
 		{	
 		
 			
@@ -192,48 +195,31 @@ function movePlayers()
 				
 				var index = inWall(players[i]).index, objectCollided = inWall(players[i]).partCollided;
 				var vx=players[i].d.x,vy=players[i].d.y,tpx=(objectCollided.pos.x-players[i].pos.x),tpy=(objectCollided.pos.y-players[i].pos.y),p,increasement=0;
-				var bx = objectCollided.pos.x,by = objectCollided.pos.y, r1 = players[i].radius, r2 = objectCollided.radius, px = players[i].pos.x , py = players[i].pos.y;
+				var bx = objectCollided.pos.x,by = objectCollided.pos.y, r1 = players[i].radius + 1, r2 = objectCollided.radius, px = players[i].pos.x , py = players[i].pos.y;
 				if (!objectCollided.inIner)
 				{
-					console.log ("outer");
-					players[i].pos.x = bx + (px-bx)*(r1+r2)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
-					players[i].pos.y = by + (py-by)*(r1+r2)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
-				
-					/*while(tpx*tpx+tpy*tpy<=(r1+r2)*(r1+r2))
-					{
-						players[i].pos.x-=0.1*vx;
-						players[i].pos.y-=0.1*vy;
-						tpx+=0.1*vx;
-						tpy+=0.1*vy;
-					}*/
+					putOutOf(players[i],objectCollided,r1+r2);
 				}
 				else
 				{	
-					console.log ("iner");
-				
-					players[i].pos.x = bx + (px-bx)*(r2-r1)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
-					players[i].pos.y = by + (py-by)*(r2-r1)/(distanceBetween({x: px , y:py},{x:bx , y:by}));
-					
-					/*while(tpx*tpx+tpy*tpy>=(r1+r2)*(r1+r2))
-					{
-						players[i].pos.x-=0.1*vx;
-						players[i].pos.y-=0.1*vy;
-						tpx+=0.1*vx;
-						tpy+=0.1*vy;
-					}*/
+					putOutOf(players[i],objectCollided,r2-r1);
 				}
 					
 				p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
-				players[i].d.x=(vx-p*tpx);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
+				players[i].d.x=(vx-p*tpx);//
 				players[i].d.y=(vy-p*tpy);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
 				players[i].speed *= 0.8;
 					
-				if (players[i].d.y<0)
+				if (players[i].d.y>0)
 				{
-					increasement = Math.PI;
+					players[i].rotation = Math.acos(players[i].d.x/(Math.sqrt(players[i].d.x*players[i].d.x+players[i].d.y*players[i].d.y)));
+				}
+				else 
+				{
+					players[i].rotation = Math.PI*2-Math.acos(players[i].d.x/(Math.sqrt(players[i].d.x*players[i].d.x+players[i].d.y*players[i].d.y)));
+				
 				}
 				
-				players[i].rotation = Math.acos(players[i].d.x/(distanceBetween({x:0,y:0}, players[i].d)))+increasement;
 				
 				console.log("p:",p,"dX:",players[i].d.x,"dY:",players[i].d.y,"rotation:",players[i].rotation);
 				
@@ -321,6 +307,17 @@ function Vector(x, y)
 {
 	this.x = x;
 	this.y = y;
+	this.multiply = function VectorMultiply (num) {
+		this.x *= num;
+		this.y *= num;
+	}
+	this.add = function VectorAdd (b) {
+		this.x += b.x;
+		this.y += b.y;
+	}
+	this.len = function VectorLength() {
+		return Math.sqrt(this.x*this.x+this.y*this.y);
+	}
 }
 
 function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
@@ -338,6 +335,8 @@ function Player(p, n, sid)
 	this.radius = 10;
 	this.rotation = 0;
 	this.speed = 0;
+	this.hp = 100;
+	this.maxhp = 100;
 	this.d = new Vector(0, 0);
 }
 
