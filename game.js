@@ -145,7 +145,7 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 				drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius, 3);
 
 			var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
-			context.fillText(players[i].name, players[i].pos.x - offset.x - players[i].radius - (textSize / 4), players[i].pos.y - offset.y - players[i].radius);
+			context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/4, players[i].pos.y - offset.y - players[i].radius);
 
 			context.beginPath();
 
