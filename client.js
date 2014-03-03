@@ -73,13 +73,13 @@ socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite m
 
 function sendMoveRequest()
 {
-	if(keys[87])
+	if(keys[87] || keys[38])
 		socket.emit("move", {direction: "up"});
-	if(keys[83])
+	if(keys[83] || keys[40])
 		socket.emit("move", {direction: "down"});
-	if(keys[65])
+	if(keys[65] || keys[37])
 		socket.emit("move", {direction: "left"});
-	if(keys[68])
+	if(keys[68] || keys[39])
 		socket.emit("move", {direction: "right"});
 }
 
