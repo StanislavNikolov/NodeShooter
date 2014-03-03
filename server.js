@@ -25,7 +25,7 @@ var walls = [];// masiv s stenite
 var bullets = [];
 
 walls.push(new Wall(400,400,30,50,0,Math.PI));
-walls.push(new Wall(400,300,280,300,0,Math.PI));
+walls.push(new Wall(400,300,280,300,0,Math.PI*2));
 
 //walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
