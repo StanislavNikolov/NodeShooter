@@ -1,7 +1,7 @@
 var loginName = ""; 
 while(loginName == "" || loginName.length > 8)
 {
-	loginName = prompt("Enter you username");
+	loginName = prompt("Enter you username", "The maximal size is 8 characters!");
 }
 
 var socket = io.connect('http://localhost');//pravq socket za vruzka s server-a
