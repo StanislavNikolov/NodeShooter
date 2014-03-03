@@ -4,6 +4,7 @@ var app = require('express')()
 
 io.set('log level', 1);
 var port = Number(process.env.PORT || 5000);
+console.log(port);
 server.listen(port);
 
 app.get('/', function (req, res)
