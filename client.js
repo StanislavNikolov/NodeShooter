@@ -60,6 +60,11 @@ socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go m
 		players[index].pos.y, players[index].rotation, data.bsimpleid  ));
 });
 
+socket.on("initNewBulllet", function (data) // kogato nqkoi se disconnectne, go maham
+{
+	bullets.push(new Bullet( data.pos.x, data.pos.y, data.rotation, data.simpleid ));
+});
+
 socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite me vijdat
 {
 	console.log("Received joinGame event!");
