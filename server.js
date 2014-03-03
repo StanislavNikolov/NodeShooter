@@ -3,7 +3,8 @@ var app = require('express')()
   , io = require('socket.io').listen(server);
 
 io.set('log level', 1);
-server.listen(8080); // setvam si port-a
+var port = Number(process.env.PORT || 5000);
+server.listen(port);
 
 app.get('/', function (req, res)
 {
@@ -180,7 +181,6 @@ function inWall(p)
 			if ((angle>walls[j].angle.start && angle<walls[j].angle.finish) || 
 							(walls[j].angle.finish>2*Math.PI && angle+2*Math.PI>walls[j].angle.start && angle+2*Math.PI<walls[j].angle.finish)  )
 			{
-				console.log ("distance:",distanceBetween(walls[j].pos,p.pos),walls[j].radius.iner );
 				if (distanceBetween(walls[j].pos,p.pos)<(walls[j].radius.iner+walls[j].radius.outer)/2)
 					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.iner, inIner: 1}};
 				else 
