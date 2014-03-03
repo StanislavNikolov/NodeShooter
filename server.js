@@ -152,10 +152,12 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	socket.on("disconnect", function (data)
 	{
-		console.log("Disconnecting user: " + cp.name + " with sid: " + cp.simpleid);
- 
-		for(var i = 0;i < users.length;i ++)
-			users[i].emit("removeUser", {simpleid: cp.simpleid });
+		if(socketGet(socket, "logged"))
+		{
+			console.log("Disconnecting user: " + cp.name + " with sid: " + cp.simpleid);
+			for(var i = 0;i < users.length;i ++)
+				users[i].emit("removeUser", {simpleid: cp.simpleid });
+		}
 
 		removeUser(socket);
 	});
