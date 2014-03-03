@@ -21,6 +21,8 @@ socket.on("updateUserInformation", function (data) // servera kazva za promqna n
 		players[index].radius = data.radius; 
 	if(data.hp != undefined)
 		players[index].hp = data.hp; 
+	if(data.dead != undefined)
+		players[index].dead = data.dead; 
 });
 socket.on("updateBulletInformation", function (data)
 {

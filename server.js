@@ -133,8 +133,11 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	socket.on("shoot", function (data)
 	{
-		bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 1));
-		sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
+		if(!cp.dead)
+		{
+			bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 1));
+			sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
+		}
 	});
 
 	socket.on("disconnect", function (data)
@@ -220,7 +223,7 @@ function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
 	{
-		if(players[i].speed > 0.01 || players[i].speed < -0.01)
+		if( (players[i].speed > 0.01 || players[i].speed < -0.01) && !players[i].dead)
 		{	
 		
 			if(inWall(players[i]).index != -1){
@@ -266,10 +269,21 @@ function moveBullets()
 		{
 			if(players[j].simpleid != bullets[i].shooter && distanceBetween(bullets[i].pos, players[j].pos) < bullets[i].radius + players[j].radius)
 			{
+				if((new Date()).getTime() - players[j].speTime > 5000)
+				{
+					players[j].radius -= 0.2;
+					players[j].hp -= (Math.random() * 5) + 3;//mejdu 3 i 8
+				}
 
-				players[j].radius -= 0.2;
-				players[j].hp -= (Math.random() * 5) + 3;//mejdu 3 i 8
-				sendToAll("updateUserInformation", {simpleid: players[j].simpleid, radius: players[j].radius, hp: players[j].hp});
+				if(players[j].hp > 0)
+					sendToAll("updateUserInformation", {simpleid: players[j].simpleid, radius: players[j].radius, hp: players[j].hp});
+				if(players[j].hp <= 0)
+				{
+					sendToAll("updateUserInformation", {simpleid: players[j].simpleid, dead: true});
+					players[j].dead = true;
+					players[j].speTime = (new Date()).getTime();
+				}
+
 				collision = true;
 			}
 		}
@@ -298,8 +312,25 @@ function moveBullets()
 	}
 }
 
+function respawnPlayers()
+{
+	for(var i = 0;i < players.length; i ++)
+	{
+		if(players[i].dead && (new Date).getTime() - players[i].speTime > 5000)
+		{
+			sendToAll("updateUserInformation", {simpleid: players[i].simpleid, dead: false, pos: new Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			players[i].pos = new Vector(400, 300);
+			players[i].hp = 100;
+			players[i].radius = 10;
+			players[i].speed = 0;
+			players[i].dead = false;
+		}
+	}
+}
+
 setInterval(movePlayers, 20);
 setInterval(moveBullets, 20);
+setInterval(respawnPlayers, 1000);
 
 function distanceBetween(one, two)
 {
@@ -363,6 +394,7 @@ function Player(p, n, sid)
 	this.hp = 100;
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
+	this.speTime = (new Date().getTime()); //special event time (kill time, respawn time, etc)
 }
 
 function Bullet(x, y, r, shr, damage)

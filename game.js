@@ -120,12 +120,10 @@ function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
 }
 	
 function draw() // moje bi edno ot malkoto neshta koito pravi game.js
-{	
-	context.clearRect(0,0,canvas.width,canvas.height);
-	context.font = "10px Arial";
-
-	if(myself != undefined)
+{
+	if(myself != undefined && !myself.dead)
 	{
+		context.clearRect(0,0,canvas.width,canvas.height); context.font = "10px Arial";
 		var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
 		
 		for(var i = 0;i < bullets.length;i ++)
@@ -140,28 +138,31 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 		for ( var i = 0 ; i < players.length ; i ++ )
 		{
-			context.fillStyle = "red";
-			if (players[i].simpleid == myself.simpleid)
+			if(!players[i].dead)
 			{
-				context.fillStyle = "blue";
+				context.fillStyle = "red";
+				if (players[i].simpleid == myself.simpleid)
+				{
+					context.fillStyle = "blue";
+				}
+				else
+					drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
+
+				context.strokeStyle = context.fillStyle;
+				var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
+				context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
+
+				//tuk zapochva de se risuva player-a
+				context.beginPath();
+
+				context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
+				context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
+
+				context.globalAlpha = 0.1; context.fill();
+				context.globalAlpha = 1; context.stroke();
+
+				context.closePath();
 			}
-			else
-				drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
-
-			context.strokeStyle = context.fillStyle;
-			var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
-			context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
-
-			//tuk zapochva de se risuva player-a
-			context.beginPath();
-
-			context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
-			context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
-
-			context.globalAlpha = 0.1; context.fill();
-			context.globalAlpha = 1; context.stroke();
-
-			context.closePath();
 		}
 		
 		i = undefined;
@@ -170,6 +171,14 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 			drawWall(walls[i], offset);
 
 		drawHpBar(myself, 100, 5, 5, 7);
+	}
+
+	if(myself != undefined && myself.dead)
+	{
+		context.globalAlpha = 0.1; context.fillStyle = "white";
+		context.fillRect(0, 0, canvas.width, canvas.height); context.fillStyle = "red";
+		context.font = "30px Arial";
+		context.fillText("You were killed!", 50, 50);
 	}
 	
 	context.strokeStyle = "black";
