@@ -107,8 +107,11 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 			for (var i = 0 ; i < walls.length ; i ++)
 				socket.emit("initNewWall", walls[i]);
+
 			for (var i = 0 ; i < bullets.length ; i ++)
+			{
 				socket.emit("initNewBullet", {simpleid: bullets[i].simpleid, pos: bullets[i].pos, rotation: bullets[i].rotation});
+			}
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
 			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
