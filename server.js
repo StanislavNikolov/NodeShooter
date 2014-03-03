@@ -24,10 +24,11 @@ var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera
 var walls = [];// masiv s stenite
 var bullets = [];
 
-//walls.push(new Wall(150,300,150,180,Math.PI*0.5,Math.PI*1.5));
+walls.push(new Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
+walls.push(new Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
 
-walls.push(new Wall(400,50,200,230,Math.PI,Math.PI*2));
-walls.push(new Wall(400,550,200,230,0,Math.PI));
+walls.push(new Wall(400,50,130,160,Math.PI,Math.PI*2));
+walls.push(new Wall(400,550,130,160,0,Math.PI));
 
 walls.push(new Wall(400,300,570,600,0,Math.PI*2));
 
@@ -52,7 +53,7 @@ function addUser(socket, name)
 	socketSet(socket, "simpleid", sid); //vajno e socketa da znae za koi player otgovarq
 	socketSet(socket, "logged", true);
 
-	players.push( new Player( new Vector(300, 300), name, sid ) );
+	players.push( new Player( new Vector(400, 300), name, sid ) );
 	users.push(socket);
 }
 
@@ -153,8 +154,20 @@ function inWall(p)
 	{
 		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.iner)
 		{
-			var angle = Math.acos((walls[j].pos.x-p.pos.x)/distanceBetween(walls[j].pos,p.pos))+(p.pos.y<walls[j].pos.y)*Math.PI;
-			if (angle>walls[j].angle.start && angle<walls[j].angle.finish)
+			
+			var angle;
+			
+			if (p.pos.y-walls[j].pos.y>0)
+			{
+				angle = Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
+			}
+			else 
+			{
+				angle = 2*Math.PI - Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
+			}
+			
+			if ((angle>walls[j].angle.start && angle<walls[j].angle.finish) || 
+							(walls[j].angle.finish>2*Math.PI && angle+2*Math.PI>walls[j].angle.start && angle+2*Math.PI<walls[j].angle.finish)  )
 			{
 				console.log ("distance:",distanceBetween(walls[j].pos,p.pos),walls[j].radius.iner );
 				if (distanceBetween(walls[j].pos,p.pos)<(walls[j].radius.iner+walls[j].radius.outer)/2)
