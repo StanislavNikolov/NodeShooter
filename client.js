@@ -60,7 +60,7 @@ socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go m
 		players[index].pos.y, players[index].rotation, data.bsimpleid  ));
 });
 
-socket.on("initNewBulllet", function (data) // kogato nqkoi se disconnectne, go maham
+socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	bullets.push(new Bullet( data.pos.x, data.pos.y, data.rotation, data.simpleid ));
 });
