@@ -224,8 +224,7 @@ function findNewAngle (p,w){
 	else 
 	{
 		return Math.PI*2-Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
-	}
-				
+	}		
 }
 function movePlayers()
 {

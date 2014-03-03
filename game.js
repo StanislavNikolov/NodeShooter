@@ -140,28 +140,28 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 		{
 			if(!players[i].dead)
 			{
-				context.fillStyle = "red";
-				if (players[i].simpleid == myself.simpleid)
-				{
-					context.fillStyle = "blue";
-				}
-				else
-					drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
+					context.fillStyle = "red";
+					if (players[i].simpleid == myself.simpleid)
+					{
+						context.fillStyle = "blue";
+					}
+					else
+						drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
 
-				context.strokeStyle = context.fillStyle;
-				var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
-				context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
+					context.strokeStyle = context.fillStyle;
+					var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
+					context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
 
-				//tuk zapochva de se risuva player-a
-				context.beginPath();
+					//tuk zapochva de se risuva player-a
+					context.beginPath();
 
-				context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
-				context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
+					context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
+					context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
 
-				context.globalAlpha = 0.1; context.fill();
-				context.globalAlpha = 1; context.stroke();
+					context.globalAlpha = 0.1; context.fill();
+					context.globalAlpha = 1; context.stroke();
 
-				context.closePath();
+					context.closePath();
 			}
 		}
 		
