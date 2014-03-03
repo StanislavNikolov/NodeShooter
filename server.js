@@ -25,7 +25,7 @@ var walls = [];// masiv s stenite
 var bullets = [];
 
 walls.push(new Wall(400,400,30,50,0,Math.PI));
-walls.push(new Wall(400,300,280,300,0,Math.PI*2));
+walls.push(new Wall(400,300,280,300,0,Math.PI));
 
 //walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
@@ -226,7 +226,7 @@ function movePlayers()
 				p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
 				players[i].d.x=(vx-p*tpx);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
 				players[i].d.y=(vy-p*tpy);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
-				players[i].speed *= 0.5;
+				players[i].speed *= 0.8;
 					
 				if (players[i].d.y<0)
 				{

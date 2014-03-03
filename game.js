@@ -63,11 +63,18 @@ window.addEventListener("keyup", function (args)
 {
     keys[args.keyCode] = false;
 }, false);
-function drawWall(current)
-{
-	
+function drawWall(current, offset)
+{	
+	console.log(current.pos, offset);
+	if(offset != undefined)
+	{
+		current.pos.x -= offset.x;
+		current.pos.y -= offset.y;
+	}
+
 	context.fillStyle = "green";
 	context.beginPath();
+
 	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.iner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.iner);
 	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/100) {
 		context.lineTo(current.pos.x+Math.cos(i)*current.radius.iner,current.pos.y+Math.sin(i)*current.radius.iner);
@@ -75,8 +82,10 @@ function drawWall(current)
 	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/100) {
 		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
 	}
+	
 	context.closePath();
 	context.fill();
+
 	context.beginPath();
 	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
 						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
@@ -89,25 +98,32 @@ function drawWall(current)
 									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
+
+	if(offset != undefined)
+	{
+		current.pos.x += offset.x;
+		current.pos.y += offset.y;
+	}
 }
 	
 function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 {	
 	context.clearRect(0,0,canvas.width,canvas.height);
 
-	for(var i = 0;i < bullets.length;i ++)
-	{
-
-		context.beginPath();
-
-		context.arc(bullets[i].pos.x, bullets[i].pos.y, bullets[i].radius, 0, Math.PI * 2);
-		context.fill();
-
-		context.closePath();
-	}
-
 	if(myself != undefined)
 	{
+		var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
+		
+		for(var i = 0;i < bullets.length;i ++)
+		{
+			context.beginPath();
+
+			context.arc(bullets[i].pos.x - offset.x, bullets[i].pos.y - offset.y, bullets[i].radius, 0, Math.PI * 2);
+			context.fill();
+
+			context.closePath();
+		}
+
 		for ( var i = 0 ; i < players.length ; i ++ )
 		{
 			context.fillStyle = "red";
@@ -116,40 +132,20 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 			context.beginPath();
 
-			context.arc(players[i].pos.x, players[i].pos.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
-			context.lineTo(players[i].pos.x, players[i].pos.y);
+			context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
+			context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
 			context.stroke();
 
 			context.closePath();
 		}
-	}
-	
-	i = undefined;
+		
+		i = undefined;
 
-	for (var i = 0 ; i < walls.length ; i ++)
-	{
-		drawWall(walls[i]);
+		for (var i = 0 ; i < walls.length ; i ++)
+			drawWall(walls[i], offset);
 	}
 	
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
-function updateBullets()
-{
-	for(var i = 0;i < bullets.length;i ++)
-	{
-		bullets[i].radius -= 0.004;
-		bullets[i].pos.x += Math.cos(bullets[i].rotation) * 6;
-		bullets[i].pos.y += Math.sin(bullets[i].rotation) * 6;
-
-
-		if(bullets[i].radius <= 0.1)
-		{
-			bullets.splice(i, 2);
-			i --;
-		}
-	}
-}
-
-//setInterval(updateBullets, 20);
-setInterval(draw, 20);
+setInterval(draw, 50);
