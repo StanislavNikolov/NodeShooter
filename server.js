@@ -24,8 +24,12 @@ var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera
 var walls = [];// masiv s stenite
 var bullets = [];
 
-walls.push(new Wall(400,400,30,50,0,Math.PI));
-walls.push(new Wall(400,300,280,300,0,Math.PI*2));
+//walls.push(new Wall(150,300,150,180,Math.PI*0.5,Math.PI*1.5));
+
+walls.push(new Wall(400,50,200,230,Math.PI,Math.PI*2));
+walls.push(new Wall(400,550,200,230,0,Math.PI));
+
+walls.push(new Wall(400,300,570,600,0,Math.PI*2));
 
 //walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
