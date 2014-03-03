@@ -30,6 +30,8 @@ function Player(p, n, sid)
 	this.simpleid = sid;
 	this.radius = 10;
 	this.rotation = 0;
+	this.hp = 100;
+	this.maxhp = 100;
 }
 
 function indexOf(simpleid, t) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
@@ -143,6 +145,12 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 		for (var i = 0 ; i < walls.length ; i ++)
 			drawWall(walls[i], offset);
+
+		context.globalAlpha = 0.7; var maxHpBarSize = 70; context.fillStyle = "red";
+		var hpBarSize = (myself.hp / myself.maxhp) * maxHpBarSize;
+		context.fillRect(5, 5, hpBarSize, 7);
+		context.strokeRect(5, 5, maxHpBarSize, 7);
+		context.globalAlpha = 1;
 	}
 	
 	context.strokeRect(0, 0, canvas.width, canvas.height);
