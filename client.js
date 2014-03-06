@@ -1,12 +1,12 @@
 var loginName = ""; 
-while(loginName == "" || loginName.length > 8)
+while(loginName == "" || loginName.length > 12)
 {
-	loginName = prompt("Enter you username", "The maximal size is 8 characters!");
+	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
 }
 
-var socket = io.connect('http://mpshooter.herokuapp.com/');//pravq socket za vruzka s server-a
-//var socket = io.connect('http://localhost');//pravq socket za vruzka s server-a
+var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
 
+var socket = io.connect(serverIP);//pravq socket za vruzka s server-a
 console.log("Sending login info...");
 socket.emit("login", {name: loginName });
 console.log("Login info sent.");
@@ -56,6 +56,7 @@ socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go ma
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
+	console.log(frame - data.frame);
 	var index = indexOf(data.psimpleid);
 	bullets.push(new Bullet(  players[index].pos.x, 
 		players[index].pos.y, players[index].rotation, data.bsimpleid  ));
@@ -70,6 +71,7 @@ socket.on("joinGame", function (data) // ako sum poluchil tova, znachi drugite m
 {
 	console.log("Received joinGame event!");
 	myself = players[indexOf(data.simpleid)]; // za da imam referenciq kum sebesi
+	frame = data.frame;
 });
 
 function sendMoveRequest()
@@ -96,3 +98,4 @@ function sendShootRequest()
 
 setInterval(sendMoveRequest, 50);
 setInterval(sendShootRequest, 20);
+setInterval(function nextFrame() {frame ++;}, 20);
