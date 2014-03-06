@@ -187,4 +187,4 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 }
 
 setInterval(draw, 30); // risuva
-setInterval(function nextFrame() {frame ++; console.log(frame);}, 20);
+setInterval(function nextFrame() {frame ++;}, 20);
