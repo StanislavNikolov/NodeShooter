@@ -425,4 +425,4 @@ function Bullet(x, y, r, shr, damage)
 	this.damage = damage;
 }
 
-setInterval(function nextFrame() {frame ++; console.log(frame);}, 20);
+setInterval(function nextFrame() {frame ++;}, 20);
