@@ -24,16 +24,13 @@ var nextIndex = 0; // s tova se zadava simpleid-to
 var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
 var walls = [];// masiv s stenite
 var bullets = [];
+var frame = 0;
 
 walls.push(new Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
 walls.push(new Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
-
 walls.push(new Wall(400,50,130,160,Math.PI,Math.PI*2));
 walls.push(new Wall(400,550,130,160,0,Math.PI));
-
 walls.push(new Wall(400,300,570,600,0,Math.PI*2));
-
-//walls.push(new Wall(0,0,200,220,Math.PI,Math.PI*2));
 
 function socketGet(socket, item)
 {
@@ -72,8 +69,10 @@ function removeUser(socket)
 	}
 }
 
-function sendToAll(type, data)
+function sendToAll(type, data, sendFrame)
 {
+	if(sendFrame == undefined || sendFrame == true)
+		data.frame = frame;
 	for(var i = 0;i < users.length;i ++)
 		users[i].emit(type, data);
 }
@@ -94,7 +93,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			console.log("User logged! Name: " + data.name + " with sid: " + sid);
 			
 			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
-			sendToAll("initNewUser", cp);
+			sendToAll("initNewUser", cp, false);
 
 			//prashtam lognalite se na noviq, no ne se samoprashtam
 			for(var i = 0;i < users.length;i ++)
@@ -102,7 +101,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 				if(socketGet(users[i], "simpleid") != socketGet(socket, "simpleid"))
 				{
 					var pts = players[ indexOf( socketGet(users[i], "simpleid") ) ]; //player to send, tozi do koito shte prashtam
-					socket.emit("initNewUser", pts );
+					socket.emit("initNewUser", pts, false);
 				}
 			}
 
@@ -115,7 +114,7 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			}
 
 			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
-			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid") });
+			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid"), frame: frame });
 		}
 	});
 
@@ -152,11 +151,12 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 
 	socket.on("disconnect", function (data)
 	{
+		console.log("Received disconnect event!");
+
 		if(socketGet(socket, "logged"))
 		{
 			console.log("Disconnecting user: " + cp.name + " with sid: " + cp.simpleid);
-			for(var i = 0;i < users.length;i ++)
-				users[i].emit("removeUser", {simpleid: cp.simpleid });
+			sendToAll("removeUser", {simpleid: cp.simpleid }, false);
 		}
 
 		removeUser(socket);
@@ -209,11 +209,15 @@ function inWall(p)
 	}
 	return {index: -1};
 }
-function putOutOf(o1,o2,distance){
+
+function putOutOf(o1,o2,distance)
+{
 	o1.pos.x = o2.pos.x + (o1.pos.x-o2.pos.x)*distance/(distanceBetween(o1.pos,o2.pos));
 	o1.pos.y = o2.pos.y + (o1.pos.y-o2.pos.y)*distance/(distanceBetween(o1.pos,o2.pos));
 }
-function findNewAngle (p,w){
+
+function findNewAngle (p,w)
+{
 	var vx=p.d.x,vy=p.d.y,tpx=(w.pos.x-p.pos.x),tpy=(w.pos.y-p.pos.y),p;
 	var bx = w.pos.x,by = w.pos.y, px = p.pos.x , py = p.pos.y;
 
@@ -229,6 +233,7 @@ function findNewAngle (p,w){
 		return Math.PI*2-Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
 	}		
 }
+
 function movePlayers()
 {
 	for(var i = 0;i < players.length;i ++)
@@ -419,3 +424,5 @@ function Bullet(x, y, r, shr, damage)
 	this.d = new Vector(Math.cos(r),Math.sin(r));
 	this.damage = damage;
 }
+
+setInterval(function nextFrame() {frame ++; console.log(frame);}, 20);

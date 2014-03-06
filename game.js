@@ -6,6 +6,7 @@ var players = []; // ppazq si vsichki player-i
 var keys = []; // koi buton e natisnat
 var myself; //ukazatel (referenciq) kum elementa ot players, koito predstavlqvam
 var bullets = [];
+var frame = 0;//izpolzva se za frame skipping-a
 
 var maxShootPeriod = 20, currentShootPeriod = 0;
 
@@ -185,4 +186,5 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
-setInterval(draw, 30);
+setInterval(draw, 30); // risuva
+setInterval(function nextFrame() {frame ++; console.log(frame);}, 20);
