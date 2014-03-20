@@ -1,6 +1,7 @@
 var app = require('express')()
   , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server);
+  , io = require('socket.io').listen(server)
+  , fs = require('fs');//File System
 
 io.set('log level', 1);
 var port = Number(process.env.PORT || 5000);
@@ -19,11 +20,14 @@ app.get('/game.js', function (req, res)
 	res.sendfile(__dirname + '/game.js');
 });
 
-var users = []; // masiv s SOCKET-ite
-var nextIndex = 0; // s tova se zadava simpleid-to
-var players = []; // vsichki player-i, vsecki socket znae simpleid-to na playera koito predstavlqva
+function writeFile(filename, data)
+{
+
+}
+
+var players = {}; //map s vsichki player-i
 var walls = [];// masiv s stenite
-var bullets = [];
+var bullets = []; // masiv s kurshumite
 var frame = 0;
 
 walls.push(new Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
@@ -31,6 +35,11 @@ walls.push(new Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
 walls.push(new Wall(400,50,130,160,Math.PI,Math.PI*2));
 walls.push(new Wall(400,550,130,160,0,Math.PI));
 walls.push(new Wall(400,300,570,600,0,Math.PI*2));
+
+function generateSid()
+{
+	return Math.random().toString(36).substring(7);
+}
 
 function socketGet(socket, item)
 {
@@ -46,81 +55,78 @@ function socketSet(socket, item, data)
 
 function addUser(socket, name)
 {
-	var sid = ++nextIndex;
+	var sid = generateSid();
+	socket.vars.logged = true;
+	socket.vars.sid = sid;
 
-	socketSet(socket, "simpleid", sid); //vajno e socketa da znae za koi player otgovarq
-	socketSet(socket, "logged", true);
+	players[sid] = {};
+	players[sid].socket = socket;
+	players[sid].player = new Player( new Vector(400, 300), name );
 
-	players.push( new Player( new Vector(400, 300), name, sid ) );
-	users.push(socket);
+	return sid;
 }
 
 function removeUser(socket)
 {
-	var simpleid = socketGet(socket, "simpleid");
-	players.splice(indexOf(simpleid), 1);
-	for(var i = 0;i < users.length;i ++)
-	{
-		if(socketGet(users[i], "simpleid") == simpleid)
-		{
-			users.splice(i, 1);
-			return;
-		}
-	}
+	delete players[socket.vars.sid];
 }
 
 function sendToAll(type, data, sendFrame)
 {
 	if(sendFrame == undefined || sendFrame == true)
 		data.frame = frame;
-	for(var i = 0;i < users.length;i ++)
-		users[i].emit(type, data);
+	for(var i in players)
+		players[i].socket.emit(type, data);
 }
 
 io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 {
-	console.log("Connection from unknown user.");
-	socketSet(socket, "logged", false);
+	/*
 
-	var sid; //simple id-to na player-a i socketa
-	var cp; //copy na player-a s tozi socket
+	players = {}
+		* .player = new Player()
+		* .socket = socket ------------^ Референция към този сокет
+
+	*/
+
+	socket.vars = {};
+	socket.vars.logged = false;
+	var cp, mysid;
 	
-	socket.on("login", function (data) 
+	socket.on("login", function (data)
 	{
-		if(socketGet(socket, "logged") == false) // ako reshi da me spami s "login"-i da ne dobavqm user-i kat poburkan
+		if(!socket.vars.logged) // Ако изпрати няколко логин-а, го слагам само първия път
 		{
-			addUser(socket, data.name); sid = socketGet(socket, "simpleid");
-			console.log("User logged! Name: " + data.name + " with sid: " + sid);
-			
-			cp = players[indexOf(sid)]; // currentPlayer - tozi ot socketa
-			sendToAll("initNewUser", cp, false);
+			mysid = addUser(socket, data.name);
+			cp = players[ mysid ].player; // currentPlayer - референция към players[mysid].player
 
-			//prashtam lognalite se na noviq, no ne se samoprashtam
-			for(var i = 0;i < users.length;i ++)
+			console.log("User logged! Name: " + data.name + " with sid: " + mysid);
+			
+			sendToAll("initNewPlayer", {sid: mysid, player: cp}, false); // пращам на всички информацията за играча, без .socket
+
+			//пращам на новия всички останали, но без него самия защото той вече се има
+			for(var i in players)
 			{
-				if(socketGet(users[i], "simpleid") != socketGet(socket, "simpleid"))
+				if(i != mysid)
 				{
-					var pts = players[ indexOf( socketGet(users[i], "simpleid") ) ]; //player to send, tozi do koito shte prashtam
-					socket.emit("initNewUser", pts, false);
+					socket.emit("initNewPlayer", {sid: i, player: players[i].player}, false);
 				}
 			}
 
 			for (var i = 0 ; i < walls.length ; i ++)
-				socket.emit("initNewWall", walls[i]);
+				socket.emit("initNewWall", walls[i]); // може да се замести с players[mysid].socket.emit("init..., но няма смисъл
 
 			for (var i = 0 ; i < bullets.length ; i ++)
-			{
-				socket.emit("initNewBullet", {simpleid: bullets[i].simpleid, pos: bullets[i].pos, rotation: bullets[i].rotation});
-			}
+				socket.emit("initNewBullet", {sid: bullets[i].simpleid, pos: bullets[i].pos, rotation: bullets[i].rotation});
 
-			//prashtam mu negovoto id, za da znae koi ot po-gore poluchenite e toi samiq
-			socket.emit("joinGame", {simpleid: socketGet(socket, "simpleid"), frame: frame });
+			//казвам му кой по-точно е той съмия
+			socket.emit("joinGame", {sid: mysid });
 		}
 	});
 
 	socket.on("move", function (data)
 	{
-		if(!cp.dead)
+		if(players[mysid].socket.vars.logged)
 		{
 			if(data.direction == "up")
 				cp.speed += 0.3;
@@ -129,12 +135,12 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 			if(data.direction == "left")
 			{
 				cp.rotation -= 0.2;
-				sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
+				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
 			}
 			if(data.direction == "right")
 			{
 				cp.rotation += 0.2;
-				sendToAll("updateUserInformation", {simpleid: cp.simpleid, rotation: cp.rotation});
+				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
 			}
 		}
 	});
@@ -143,9 +149,9 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	{
 		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)
 		{
-			bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 20));
-			sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
-			cp.lastShootTime = (new Date()).getTime();
+			//bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 20));
+			//sendToAll("playerShooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
+			//cp.lastShootTime = (new Date()).getTime();
 		}
 	});
 
@@ -153,10 +159,10 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	{
 		console.log("Received disconnect event!");
 
-		if(socketGet(socket, "logged"))
+		if(socket.vars.logged)
 		{
-			console.log("Disconnecting user: " + cp.name + " with sid: " + cp.simpleid);
-			sendToAll("removeUser", {simpleid: cp.simpleid }, false);
+			console.log("Disconnecting user with sid: " + socket.vars.sid);
+			sendToAll("removeUser", {simpleid: socket.vars.sid }, false);
 		}
 
 		removeUser(socket);
@@ -399,11 +405,10 @@ function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
-function Player(p, n, sid)
+function Player(p, n)
 {
-	this.pos = p;
+	this.pos = p; // трябва да е Vector
 	this.name = n;
-	this.simpleid = sid;
 	this.radius = 10;
 	this.rotation = 0;
 	this.speed = 0;

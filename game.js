@@ -1,14 +1,13 @@
 var canvas = document.getElementById("main");
 var context = canvas.getContext("2d");
 
-var walls = []; // pazq si vsichki steni
-var players = []; // ppazq si vsichki player-i
-var keys = []; // koi buton e natisnat
-var myself; //ukazatel (referenciq) kum elementa ot players, koito predstavlqvam
-var bullets = [];
-var frame = 0;//izpolzva se za frame skipping-a
+var walls = []; // масив с всички стени
+var players = {}; // мап с всички играчи
+var keys = []; // бутоните от клавиатурата които са натиснати
+var myself; // референция към себе си
+var bullets = []; // масив с всички куршуми
 
-var maxShootPeriod = 20, currentShootPeriod = 0;
+var maxShootPeriod = 20, currentShootPeriod = 0; // неща с тъпи имена
 
 function Bullet(x, y, r, s)
 {
@@ -33,26 +32,6 @@ function Player(p, n, sid)
 	this.rotation = 0;
 	this.hp = 100;
 	this.maxhp = 100;
-}
-
-function indexOf(simpleid, t) // pprosto e - kazvam i simpleid, a tq(funkciqta) na koi index ot masiva players otgovarq
-{
-	var array;
-	if(t == undefined || t == "player")
-		array = players;
-	else
-	{
-		if(t == "wall")
-			array = walls;
-		else
-			array = bullets;
-	}
-	
-	for(var i = 0;i < array.length;i ++)
-	{
-		if(array[i].simpleid == simpleid)
-			return i;
-	}
 }
 
 for(var i = 0;i < 200;i ++){keys[i] = false;}
@@ -137,27 +116,27 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 			context.closePath();
 		}
 
-		for ( var i = 0 ; i < players.length ; i ++ )
+		for ( var i in players )
 		{
-			if(!players[i].dead)
+			if(!players[i].player.dead)
 			{
 					context.fillStyle = "red";
-					if (players[i].simpleid == myself.simpleid)
+					if (myself == players[i].player)
 					{
 						context.fillStyle = "blue";
 					}
 					else
-						drawHpBar(players[i], 20, players[i].pos.x - offset.x - players[i].radius, players[i].pos.y - offset.y + players[i].radius + 2, 3);
+						drawHpBar(players[i].player, 20, players[i].player.pos.x - offset.x - players[i].player.radius, players[i].player.pos.y - offset.y + players[i].player.radius + 2, 3);
 
 					context.strokeStyle = context.fillStyle;
-					var textSize = 10 * players[i].name.length; //10(font size) * po vseki simvol
-					context.fillText(players[i].name, players[i].pos.x - offset.x - textSize/3, players[i].pos.y - offset.y - players[i].radius - 2);
+					var textSize = 10 * players[i].player.name.length; //10(font size) * po vseki simvol
+					context.fillText(players[i].player.name, players[i].player.pos.x - offset.x - textSize/3, players[i].player.pos.y - offset.y - players[i].player.radius - 2);
 
 					//tuk zapochva de se risuva player-a
 					context.beginPath();
 
-					context.arc(players[i].pos.x - offset.x, players[i].pos.y - offset.y, players[i].radius, players[i].rotation, Math.PI * 2 + players[i].rotation);
-					context.lineTo(players[i].pos.x - offset.x, players[i].pos.y - offset.y);
+					context.arc(players[i].player.pos.x - offset.x, players[i].player.pos.y - offset.y, players[i].player.radius, players[i].player.rotation, Math.PI * 2 + players[i].player.rotation);
+					context.lineTo(players[i].player.pos.x - offset.x, players[i].player.pos.y - offset.y);
 
 					context.globalAlpha = 0.1; context.fill();
 					context.globalAlpha = 1; context.stroke();
@@ -187,4 +166,3 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 }
 
 setInterval(draw, 30); // risuva
-setInterval(function nextFrame() {frame ++;}, 20);
