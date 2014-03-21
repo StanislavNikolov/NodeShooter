@@ -26,18 +26,16 @@ function writeFile(filename, data)
 
 }
 
-// основни променливи. НЕ ПОЛЗВАИ!!! използваи g.users, g.walls...
-var users = {}; //мап с всички плеъри и сокети
-var walls = [];// масив с стените
-var bullets = []; // мъсив с куршумите
-var frame = 0;
+//Записвам го така за да може да се достигат тези променливи от други файлове
+global.users = {};// мап с всички плеъри и сокети
+global.walls = [];// масив с стените
+global.bullets = [];// мъсив с куршумите
+global.frame = 0;
 
-// с тези няколко реда позволявам на всички други скриптове да пипат тези променливи
-var g = global; // За да е по-кратко
-g.users = users;
-g.walls = walls;
-g.bullets = bullets;
-g.frame = frame;
+var users = global.users;
+var walls = global.walls;
+var bullets = global.bullets; 
+var frame = global.frame;
 
 function generateSid(prefix)//За юзър той е _, а за куршуми - *
 {

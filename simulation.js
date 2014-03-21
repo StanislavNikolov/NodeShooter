@@ -1,58 +1,62 @@
 /*
-Коментирал съм редовете които викат moveg.users, moveg.bullets, respawng.users.
+Коментирал съм редовете които викат moveusers, movebullets, respawnusers.
 Може да ги откоментираш като щеш.
 */
 
-var g = global;
+var users = global.users;
+var walls = global.walls;
+var bullets = global.bullets; 
+var frame = global.frame;
+
 var classes = require('./classes.js');
 
-g.walls.push(new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
-g.walls.push(new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
-g.walls.push(new classes.Wall(400,50,130,160,Math.PI,Math.PI*2));
-g.walls.push(new classes.Wall(400,550,130,160,0,Math.PI));
-g.walls.push(new classes.Wall(400,300,570,600,0,Math.PI*2));
+walls.push(new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
+walls.push(new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
+walls.push(new classes.Wall(400,50,130,160,Math.PI,Math.PI*2));
+walls.push(new classes.Wall(400,550,130,160,0,Math.PI));
+walls.push(new classes.Wall(400,300,570,600,0,Math.PI*2));
 
 function inWall(p)
 {
-	for (var j = 0 ; j < g.walls.length ; j ++)
+	for (var j = 0 ; j < walls.length ; j ++)
 	{
-		if (distanceBetween(g.walls[j].pos,p.pos)<p.radius+g.walls[j].radius.outer && distanceBetween(g.walls[j].pos,p.pos)+p.radius>g.walls[j].radius.iner)
+		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.iner)
 		{
 			
 			var angle;
 			
-			if (p.pos.y-g.walls[j].pos.y>0)
+			if (p.pos.y-walls[j].pos.y>0)
 			{
-				angle = Math.acos((p.pos.x-g.walls[j].pos.x)/distanceBetween(g.walls[j].pos,p.pos));
+				angle = Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
 			}
 			else 
 			{
-				angle = 2*Math.PI - Math.acos((p.pos.x-g.walls[j].pos.x)/distanceBetween(g.walls[j].pos,p.pos));
+				angle = 2*Math.PI - Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
 			}
 			
-			if ((angle>g.walls[j].angle.start && angle<g.walls[j].angle.finish) || 
-							(g.walls[j].angle.finish>2*Math.PI && angle+2*Math.PI>g.walls[j].angle.start && angle+2*Math.PI<g.walls[j].angle.finish)  )
+			if ((angle>walls[j].angle.start && angle<walls[j].angle.finish) || 
+							(walls[j].angle.finish>2*Math.PI && angle+2*Math.PI>walls[j].angle.start && angle+2*Math.PI<walls[j].angle.finish)  )
 			{
-				if (distanceBetween(g.walls[j].pos,p.pos)<(g.walls[j].radius.iner+g.walls[j].radius.outer)/2)
-					return {index: j, partCollided: {pos: g.walls[j].pos, radius: g.walls[j].radius.iner, inIner: 1}};
+				if (distanceBetween(walls[j].pos,p.pos)<(walls[j].radius.iner+walls[j].radius.outer)/2)
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.iner, inIner: 1}};
 				else 
-					return {index: j, partCollided: {pos: g.walls[j].pos, radius: g.walls[j].radius.outer, inIner: 0}};
+					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 0}};
 				
 			}
 			else 
 			{	
-				var center1 = new Vector(g.walls[j].pos.x+(Math.cos(g.walls[j].angle.finish)*(Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2+g.walls[j].radius.iner)),
-					g.walls[j].pos.y+Math.sin(g.walls[j].angle.finish)*(Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2+g.walls[j].radius.iner));
-				var center2 = new Vector(g.walls[j].pos.x+(Math.cos(g.walls[j].angle.start)*(Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2+g.walls[j].radiuwwws.iner)),
-				g.walls[j].pos.y+Math.sin(g.walls[j].angle.start)*(Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2+g.walls[j].radius.iner));
+				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
+				var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radiuwwws.iner)),
+				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
 				
-				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2;
-				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2;
+				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
+				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
 			
 				if (col1)
-					return {index: j, partCollided:{pos: center1, radius: Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2, inIner: 0}};
+					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2, inIner: 0}};
 				if (col2)
-					return {index: j, partCollided:{pos: center2, radius: Math.abs(g.walls[j].radius.outer-g.walls[j].radius.iner)/2, inIner: 0}};
+					return {index: j, partCollided:{pos: center2, radius: Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2, inIner: 0}};
 			}
 		}
 	}
@@ -85,91 +89,91 @@ function findNewAngle (p,w)
 
 function moveusers()
 {
-	for(var i = 0;i < g.users.length;i ++)
+	for(var i = 0;i < users.length;i ++)
 	{
-		if( (g.users[i].speed > 0.01 || g.users[i].speed < -0.01) && !g.users[i].dead)
+		if( (users[i].speed > 0.01 || users[i].speed < -0.01) && !users[i].dead)
 		{	
 		
-			if(inWall(g.users[i]).index != -1){
+			if(inWall(users[i]).index != -1){
 				//tuka she ima nqkvi magii
 				
-				var index = inWall(g.users[i]).index, objectCollided = inWall(g.users[i]).partCollided,r1 = g.users[i].radius + 1, r2 = objectCollided.radius;
+				var index = inWall(users[i]).index, objectCollided = inWall(users[i]).partCollided,r1 = users[i].radius + 1, r2 = objectCollided.radius;
 				
 				if (!objectCollided.inIner)
-					putOutOf(g.users[i],objectCollided,r1+r2);
+					putOutOf(users[i],objectCollided,r1+r2);
 				else
-					putOutOf(g.users[i],objectCollided,r2-r1);
+					putOutOf(users[i],objectCollided,r2-r1);
 					
-				g.users[i].speed *= 0.8;
-				g.users[i].rotation = findNewAngle(g.users[i],objectCollided);
+				users[i].speed *= 0.8;
+				users[i].rotation = findNewAngle(users[i],objectCollided);
 				
 			}
 			else
-				g.users[i].speed *= 0.97;
+				users[i].speed *= 0.97;
 
-			g.users[i].d.x = Math.cos(g.users[i].rotation) * g.users[i].speed;
-			g.users[i].d.y = Math.sin(g.users[i].rotation) * g.users[i].speed;
+			users[i].d.x = Math.cos(users[i].rotation) * users[i].speed;
+			users[i].d.y = Math.sin(users[i].rotation) * users[i].speed;
 
-			g.users[i].pos.x += g.users[i].d.x;
-			g.users[i].pos.y += g.users[i].d.y;
+			users[i].pos.x += users[i].d.x;
+			users[i].pos.y += users[i].d.y;
 			
-			sendToAll("updateUserInformation", {simpleid: g.users[i].simpleid, pos: g.users[i].pos, rotation: g.users[i].rotation});
+			sendToAll("updateUserInformation", {simpleid: users[i].simpleid, pos: users[i].pos, rotation: users[i].rotation});
 		}
 	}
 }
 
 function movebullets()
 {
-	for(var i = 0;i < g.bullets.length;i ++)
+	for(var i = 0;i < bullets.length;i ++)
 	{
 		var collision = false;
-		g.bullets[i].radius -= 0.004;
-		g.bullets[i].d.x = Math.cos(g.bullets[i].rotation) * 6;
-		g.bullets[i].d.y = Math.sin(g.bullets[i].rotation) * 6;
-		g.bullets[i].pos.x += g.bullets[i].d.x;
-		g.bullets[i].pos.y += g.bullets[i].d.y;
+		bullets[i].radius -= 0.004;
+		bullets[i].d.x = Math.cos(bullets[i].rotation) * 6;
+		bullets[i].d.y = Math.sin(bullets[i].rotation) * 6;
+		bullets[i].pos.x += bullets[i].d.x;
+		bullets[i].pos.y += bullets[i].d.y;
 
-		for(var j = 0;j < g.users.length;j ++)
+		for(var j = 0;j < users.length;j ++)
 		{
-			if(g.users[j].simpleid != g.bullets[i].shooter && !g.users[j].dead && distanceBetween(g.bullets[i].pos, g.users[j].pos) < g.bullets[i].radius + g.users[j].radius)
+			if(users[j].simpleid != bullets[i].shooter && !users[j].dead && distanceBetween(bullets[i].pos, users[j].pos) < bullets[i].radius + users[j].radius)
 			{
-				if((new Date()).getTime() - g.users[j].speTime > 5000)
+				if((new Date()).getTime() - users[j].speTime > 5000)
 				{
-					g.users[j].radius -= 0.2;
-					g.users[j].hp -= g.bullets[i].damage;
+					users[j].radius -= 0.2;
+					users[j].hp -= bullets[i].damage;
 				}
 
-				if(g.users[j].hp > 0)
-					sendToAll("updateUserInformation", {simpleid: g.users[j].simpleid, radius: g.users[j].radius, hp: g.users[j].hp});
-				if(g.users[j].hp <= 0)
+				if(users[j].hp > 0)
+					sendToAll("updateUserInformation", {simpleid: users[j].simpleid, radius: users[j].radius, hp: users[j].hp});
+				if(users[j].hp <= 0)
 				{
-					sendToAll("updateUserInformation", {simpleid: g.users[j].simpleid, dead: true});
-					g.users[j].dead = true;
-					g.users[j].speTime = (new Date()).getTime();
+					sendToAll("updateUserInformation", {simpleid: users[j].simpleid, dead: true});
+					users[j].dead = true;
+					users[j].speTime = (new Date()).getTime();
 				}
 
 				collision = true;
 			}
 		}
 		
-		sendToAll("updateBulletInformation", {simpleid: g.bullets[i].simpleid, rotation: g.bullets[i].rotation, pos: g.bullets[i].pos, radius: g.bullets[i].radius});
+		sendToAll("updateBulletInformation", {simpleid: bullets[i].simpleid, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
 
-		if(g.bullets[i].radius <= 0.5 || collision)
+		if(bullets[i].radius <= 0.5 || collision)
 		{
-			sendToAll("removeBullet", {simpleid: g.bullets[i].simpleid});
-			g.bullets.splice(i, 1);
+			sendToAll("removeBullet", {simpleid: bullets[i].simpleid});
+			bullets.splice(i, 1);
 			i --;
 		}else {
-			if (inWall(g.bullets[i]).index!=-1){
+			if (inWall(bullets[i]).index!=-1){
 				
-				var index = inWall(g.bullets[i]).index, objectCollided = inWall(g.bullets[i]).partCollided,r1 = g.bullets[i].radius + 1, r2 = objectCollided.radius;
+				var index = inWall(bullets[i]).index, objectCollided = inWall(bullets[i]).partCollided,r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
 				
 				if (!objectCollided.inIner)
-					putOutOf(g.bullets[i],objectCollided,r1+r2);
+					putOutOf(bullets[i],objectCollided,r1+r2);
 				else
-					putOutOf(g.bullets[i],objectCollided,r2-r1);
+					putOutOf(bullets[i],objectCollided,r2-r1);
 					
-				g.bullets[i].rotation = findNewAngle(g.bullets[i],objectCollided);
+				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
 			
 			}
 		}
@@ -178,24 +182,24 @@ function movebullets()
 
 function respawnusers()
 {
-	for(var i = 0;i < g.users.length; i ++)
+	for(var i = 0;i < users.length; i ++)
 	{
-		if(g.users[i].dead && (new Date).getTime() - g.users[i].speTime > 5000)
+		if(users[i].dead && (new Date).getTime() - users[i].speTime > 5000)
 		{
-			sendToAll("updateUserInformation", {simpleid: g.users[i].simpleid, dead: false, pos: new Vector(400, 300), radius: 10, speed: 0, hp: 100});
-			g.users[i].pos = new Vector(400, 300);
-			g.users[i].hp = 100;
-			g.users[i].radius = 10;
-			g.users[i].speed = 0;
-			g.users[i].dead = false;
-			g.users[i].speTime = (new Date()).getTime();
+			sendToAll("updateUserInformation", {simpleid: users[i].simpleid, dead: false, pos: new Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			users[i].pos = new Vector(400, 300);
+			users[i].hp = 100;
+			users[i].radius = 10;
+			users[i].speed = 0;
+			users[i].dead = false;
+			users[i].speTime = (new Date()).getTime();
 		}
 	}
 }
 
-//setInterval(moveg.users, 20);
-//setInterval(moveg.bullets, 20);
-//setInterval(respawng.users, 1000);
+//setInterval(moveusers, 20);
+//setInterval(movebullets, 20);
+//setInterval(respawnusers, 1000);
 
 function distanceBetween(one, two)
 {
