@@ -14,15 +14,15 @@ console.log("Login info sent.");
 socket.on("updatePlayerInformation", function (data)
 {
 	if(data.pos != undefined)
-		players[data.sid].player.pos = data.pos;
+		users[data.sid].player.pos = data.pos;
 	if(data.rotation != undefined)
-		players[data.sid].player.rotation = data.rotation; 
+		users[data.sid].player.rotation = data.rotation; 
 	if(data.radius != undefined)
-		players[data.sid].player.radius = data.radius; 
+		users[data.sid].player.radius = data.radius; 
 	if(data.hp != undefined)
-		players[data.sid].player.hp = data.hp; 
+		users[data.sid].player.hp = data.hp; 
 	if(data.dead != undefined)
-		players[data.sid].player.dead = data.dead; 
+		users[data.sid].player.dead = data.dead; 
 });
 socket.on("updateBulletInformation", function (data)
 {
@@ -37,9 +37,9 @@ socket.on("updateBulletInformation", function (data)
 socket.on("initNewPlayer", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq
 {
 	console.log(data);
-	players[data.sid] = {}; 
-	players[data.sid].player = data.player;
-	players[data.sid].socket = {};
+	users[data.sid] = {}; 
+	users[data.sid].player = data.player;
+	users[data.sid].socket = {};
 });
 socket.on("initNewWall", function (data)
 {
@@ -48,16 +48,16 @@ socket.on("initNewWall", function (data)
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	console.log("Received removeUser event!");
-	delete players[data.sid];
+	delete users[data.sid];
 });
 socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	bullets.splice( data.sidOf(data.simpleid, "bullet"), 1 );
+	//bullets.splice( data.sidOf(data.simpleid, "bullet"), 1 );
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	//bullets.push(new Bullet(  players[data.sid].pos.x, 
-	//	players[data.sid].pos.y, players[data.sid].rotation, data.bsimpleid  ));
+	//bullets.push(new Bullet(  users[data.sid].pos.x, 
+	//	users[data.sid].pos.y, users[data.sid].rotation, data.bsimpleid  ));
 });
 
 socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham
@@ -68,7 +68,7 @@ socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go m
 socket.on("joinGame", function (data) // значи: "Ок, всички вече те знаят, влизай и ти"
 {
 	console.log("Received joinGame event!");
-	myself = players[data.sid].player; // за да знам точно кой съм аз0
+	myself = users[data.sid].player; // за да знам точно кой съм аз0
 });
 
 function sendMoveRequest()

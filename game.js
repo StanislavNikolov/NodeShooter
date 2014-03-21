@@ -2,7 +2,7 @@ var canvas = document.getElementById("main");
 var context = canvas.getContext("2d");
 
 var walls = []; // масив с всички стени
-var players = {}; // мап с всички играчи
+var users = {}; // мап с всички играчи
 var keys = []; // бутоните от клавиатурата които са натиснати
 var myself; // референция към себе си
 var bullets = []; // масив с всички куршуми
@@ -116,27 +116,27 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 			context.closePath();
 		}
 
-		for ( var i in players )
+		for ( var i in users )
 		{
-			if(!players[i].player.dead)
+			if(!users[i].player.dead)
 			{
 					context.fillStyle = "red";
-					if (myself == players[i].player)
+					if (myself == users[i].player)
 					{
 						context.fillStyle = "blue";
 					}
 					else
-						drawHpBar(players[i].player, 20, players[i].player.pos.x - offset.x - players[i].player.radius, players[i].player.pos.y - offset.y + players[i].player.radius + 2, 3);
+						drawHpBar(users[i].player, 20, users[i].player.pos.x - offset.x - users[i].player.radius, users[i].player.pos.y - offset.y + users[i].player.radius + 2, 3);
 
 					context.strokeStyle = context.fillStyle;
-					var textSize = 10 * players[i].player.name.length; //10(font size) * po vseki simvol
-					context.fillText(players[i].player.name, players[i].player.pos.x - offset.x - textSize/3, players[i].player.pos.y - offset.y - players[i].player.radius - 2);
+					var textSize = 10 * users[i].player.name.length; //10(font size) * po vseki simvol
+					context.fillText(users[i].player.name, users[i].player.pos.x - offset.x - textSize/3, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
 
 					//tuk zapochva de se risuva player-a
 					context.beginPath();
 
-					context.arc(players[i].player.pos.x - offset.x, players[i].player.pos.y - offset.y, players[i].player.radius, players[i].player.rotation, Math.PI * 2 + players[i].player.rotation);
-					context.lineTo(players[i].player.pos.x - offset.x, players[i].player.pos.y - offset.y);
+					context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y, users[i].player.radius, users[i].player.rotation, Math.PI * 2 + users[i].player.rotation);
+					context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
 
 					context.globalAlpha = 0.1; context.fill();
 					context.globalAlpha = 1; context.stroke();
