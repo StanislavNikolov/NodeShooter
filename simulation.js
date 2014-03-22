@@ -117,7 +117,7 @@ function movePlayers()
 			users[i].player.pos.y += users[i].player.d.y;
 			
 			console.log("asd");
-			sendToAll("updatePlayerInformation", {sid: users[i].socket.vars.sid, pos: users[i].player.pos, rotation: users[i].player.rotation});
+			sendToAll("updatePlayerInformation", {sid: i, pos: users[i].player.pos, rotation: users[i].player.rotation});
 		}
 	}
 }
@@ -133,23 +133,24 @@ function movebullets()
 		bullets[i].pos.x += bullets[i].d.x;
 		bullets[i].pos.y += bullets[i].d.y;
 
-		for(var j = 0;j < users.length;j ++)
+		for(var j in users)
 		{
-			if(users[j].simpleid != bullets[i].shooter && !users[j].dead && distanceBetween(bullets[i].pos, users[j].pos) < bullets[i].radius + users[j].radius)
+			var cp = users[j].player;
+			if(j != bullets[i].shooter && !cp.dead && distanceBetween(bullets[i].pos, cp.pos) < bullets[i].radius + cp.radius)
 			{
-				if((new Date()).getTime() - users[j].speTime > 5000)
+				if((new Date()).getTime() - cp.speTime > 5000)
 				{
-					users[j].radius -= 0.2;
-					users[j].hp -= bullets[i].damage;
+					cp.radius -= 0.2;
+					cp.hp -= bullets[i].damage;
 				}
 
-				if(users[j].hp > 0)
-					sendToAll("updatePlayerInformtion", {simpleid: users[j].simpleid, radius: users[j].radius, hp: users[j].hp});
-				if(users[j].hp <= 0)
+				if(cp.hp > 0)
+					sendToAll("updatePlayerInformtion", {simpleid: j, radius: cp.radius, hp: cp.hp});
+				if(cp.hp <= 0)
 				{
-					sendToAll("updatePlayerInformtion", {simpleid: users[j].simpleid, dead: true});
-					users[j].dead = true;
-					users[j].speTime = (new Date()).getTime();
+					sendToAll("updatePlayerInformtion", {simpleid: j, dead: true});
+					cp.dead = true;
+					cp.speTime = (new Date()).getTime();
 				}
 
 				collision = true;
@@ -182,24 +183,24 @@ function movebullets()
 
 function respawnusers()
 {
-	for(var i = 0;i < users.length; i ++)
+	for(var i in users)
 	{
-		if(users[i].dead && (new Date).getTime() - users[i].speTime > 5000)
+		if(users[i].player.dead && (new Date).getTime() - users[i].player.speTime > 5000)
 		{
-			sendToAll("updatePlayerInformtion", {simpleid: users[i].simpleid, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
-			users[i].pos = new classes.Vector(400, 300);
-			users[i].hp = 100;
-			users[i].radius = 10;
-			users[i].speed = 0;
-			users[i].dead = false;
-			users[i].speTime = (new Date()).getTime();
+			sendToAll("updatePlayerInformtion", {simpleid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			users[i].player.pos = new classes.Vector(400, 300);
+			users[i].player.hp = 100;
+			users[i].player.radius = 10;
+			users[i].player.speed = 0;
+			users[i].player.dead = false;
+			users[i].player.speTime = (new Date()).getTime();
 		}
 	}
 }
 
 setInterval(movePlayers, 20);
-//setInterval(movebullets, 20);
-//setInterval(respawnusers, 1000);
+setInterval(movebullets, 20);
+setInterval(respawnusers, 1000);
 
 function distanceBetween(one, two)
 {
