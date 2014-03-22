@@ -4,7 +4,7 @@ while(loginName == "" || loginName.length > 12)
 	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
 }
 
-var serverIP = "192.168.1.117"; // Тук се настроива ип-то на сървъра
+var serverIP = "http://localhost"; // Тук се настроива ип-то на сървъра
 
 var socket = io.connect(serverIP);// сокет за връзка със сървъра
 console.log("Sending login info...");
@@ -19,8 +19,10 @@ socket.on("updatePlayerInformation", function (data)
 		users[data.sid].player.rotation = data.rotation; 
 	if(data.radius != undefined)
 		users[data.sid].player.radius = data.radius; 
-	if(data.hp != undefined)
+	if(data.hp != undefined){
+		console.log (data);
 		users[data.sid].player.hp = data.hp; 
+	}
 	if(data.dead != undefined)
 		users[data.sid].player.dead = data.dead; 
 });

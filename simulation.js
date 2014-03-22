@@ -145,10 +145,10 @@ function movebullets()
 				}
 
 				if(cp.hp > 0)
-					sendToAll("updatePlayerInformtion", {simpleid: j, radius: cp.radius, hp: cp.hp});
+					sendToAll("updatePlayerInformation", {sid: j, radius: cp.radius, hp: cp.hp});
 				if(cp.hp <= 0)
 				{
-					sendToAll("updatePlayerInformtion", {simpleid: j, dead: true});
+					sendToAll("updatePlayerInformation", {sid: j, dead: true});
 					cp.dead = true;
 					cp.speTime = (new Date()).getTime();
 				}
