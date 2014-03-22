@@ -4,7 +4,7 @@ while(loginName == "" || loginName.length > 12)
 	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
 }
 
-var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
+var serverIP = "192.168.1.117"; // Тук се настроива ип-то на сървъра
 
 var socket = io.connect(serverIP);// сокет за връзка със сървъра
 console.log("Sending login info...");
@@ -26,10 +26,8 @@ socket.on("updatePlayerInformation", function (data)
 });
 socket.on("updateBulletInformation", function (data)
 {
-	if(data.pos != undefined){
-		console.log (data);
+	if(data.pos != undefined)
 		bullets[data.sid].pos = data.pos;
-	}
 	if(data.rotation != undefined)
 		bullets[data.sid].rotation = data.rotation; 
 	if(data.radius != undefined)
@@ -54,7 +52,7 @@ socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maha
 });
 socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	//bullets.splice( data.sidOf(data.simpleid, "bullet"), 1 );
+	delete bullets[data.sid];
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {

@@ -161,7 +161,7 @@ function movebullets()
 
 		if(bullets[i].radius <= 0.5 || collision)
 		{
-			sendToAll("removeBullet", {simpleid: bullets[i].simpleid});
+			sendToAll("removeBullet", {sid: i});
 			delete bullets[i];
 		}else {
 			if (inWall(bullets[i]).index!=-1){
