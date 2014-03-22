@@ -177,7 +177,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 		{
 			var bsid = generateSid("*"); 
 			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
-			sendToAll("playerShooted", {psid: cp.sid, bsid: bsid});
+			sendToAll("playerShooted", {psid: mysid, bsid: bsid});
 			cp.lastShootTime = (new Date()).getTime();
 		}
 	});
@@ -189,7 +189,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 		if(socket.vars.logged)
 		{
 			console.log("Disconnecting user with sid: " + socket.vars.sid);
-			sendToAll("removeUser", {simpleid: socket.vars.sid }, false);
+			sendToAll("removeUser", {sid: socket.vars.sid }, false);
 		}
 
 		removeUser(socket);

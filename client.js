@@ -13,7 +13,6 @@ console.log("Login info sent.");
 
 socket.on("updatePlayerInformation", function (data)
 {
-	console.log(data);
 	if(data.pos != undefined)
 		users[data.sid].player.pos = data.pos;
 	if(data.rotation != undefined)
@@ -57,7 +56,8 @@ socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go ma
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	bullets[data.bsid] = new Bullet( players[psid].pos.x, player[psid].pos.y, player[psid].rotation, data.psid );
+	console.log(data);
+	bullets[data.bsid] = new Bullet( users[data.psid].player.pos.x, users[data.psid].player.pos.y, users[data.psid].player.rotation, data.psid );
 });
 
 socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham
