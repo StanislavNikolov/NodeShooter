@@ -116,7 +116,7 @@ function movePlayers()
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
 			
-			console.log("asd");
+			//console.log("asd");
 			sendToAll("updatePlayerInformation", {sid: i, pos: users[i].player.pos, rotation: users[i].player.rotation});
 		}
 	}
@@ -124,7 +124,7 @@ function movePlayers()
 
 function movebullets()
 {
-	for(var i = 0;i < bullets.length;i ++)
+	for(var i in bullets)
 	{
 		var collision = false;
 		bullets[i].radius -= 0.004;
@@ -155,15 +155,14 @@ function movebullets()
 
 				collision = true;
 			}
-		}
+		}	
 		
-		sendToAll("updateBulletInformation", {simpleid: bullets[i].simpleid, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
+		sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
 
 		if(bullets[i].radius <= 0.5 || collision)
 		{
 			sendToAll("removeBullet", {simpleid: bullets[i].simpleid});
-			bullets.splice(i, 1);
-			i --;
+			delete bullets[i];
 		}else {
 			if (inWall(bullets[i]).index!=-1){
 				

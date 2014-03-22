@@ -26,12 +26,14 @@ socket.on("updatePlayerInformation", function (data)
 });
 socket.on("updateBulletInformation", function (data)
 {
-	if(data.pos != undefined)
-		bullets[data.sid].player.pos = data.pos;
+	if(data.pos != undefined){
+		console.log (data);
+		bullets[data.sid].pos = data.pos;
+	}
 	if(data.rotation != undefined)
-		bullets[data.sid].player.rotation = data.rotation; 
+		bullets[data.sid].rotation = data.rotation; 
 	if(data.radius != undefined)
-		bullets[data.sid].player.radius = data.radius; 
+		bullets[data.sid].radius = data.radius; 
 });
 
 socket.on("initNewPlayer", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq
@@ -62,7 +64,7 @@ socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go m
 
 socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	//bullets.push(new Bullet( data.pos.x, data.pos.y, data.rotation, data.simpleid ));
+	bullets[data.bsid] = new Bullet( data.pos.x, data.pos.y, data.rotation, data.psid );
 });
 
 socket.on("joinGame", function (data) // значи: "Ок, всички вече те знаят, влизай и ти"
