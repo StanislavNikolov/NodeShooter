@@ -5,7 +5,7 @@ var walls = []; // масив с всички стени
 var users = {}; // мап с всички играчи
 var keys = []; // бутоните от клавиатурата които са натиснати
 var myself; // референция към себе си
-var bullets = []; // масив с всички куршуми
+var bullets = {}; // масив с всички куршуми
 
 var maxShootPeriod = 20, currentShootPeriod = 0; // неща с тъпи имена
 
