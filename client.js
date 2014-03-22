@@ -57,8 +57,7 @@ socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go ma
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	//bullets.push(new Bullet(  users[data.sid].pos.x, 
-	//	users[data.sid].pos.y, users[data.sid].rotation, data.bsimpleid  ));
+	bullets[data.bsid] = new Bullet( players[psid].pos.x, player[psid].pos.y, player[psid].rotation, data.psid );
 });
 
 socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham

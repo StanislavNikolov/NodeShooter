@@ -51,7 +51,7 @@ console.log( readFile("./accounts/test") );
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
 global.walls = [];// масив с стените
-global.bullets = [];// мъсив с куршумите
+global.bullets = {};// масив с куршумите
 global.frame = 0;
 
 var users = global.users;
@@ -59,7 +59,7 @@ var walls = global.walls;
 var bullets = global.bullets; 
 var frame = global.frame;
 
-function generateSid(prefix)//За юзър той е _, а за куршуми - *
+function generateSid(prefix)//За юзър той е _, а за куршуми e *
 {
 	return prefix + Math.random().toString(36).substring(2, 8);
 }
@@ -104,13 +104,14 @@ function sendToAll(type, data, sendFrame)
 
 global.sendToAll = sendToAll;
 
-io.sockets.on("connection", function (socket) //CQLATA komunikaciq
+io.sockets.on("connection", function (socket) //Почти цялата документация с клиентите
 {
 	/*
 
 	users = {}
 		* .player = new Player()
 		* .socket = socket ------------^ Референция към този сокет
+		* .account = 
 
 	*/
 
@@ -174,9 +175,10 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	{
 		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)
 		{
-			//bullets.push(new Bullet(cp.pos.x, cp.pos.y, cp.rotation, cp.simpleid, 20));
-			//sendToAll("usershooted", {psimpleid: cp.simpleid, bsimpleid: nextIndex});
-			//cp.lastShootTime = (new Date()).getTime();
+			var bsid = generateSid("*"); 
+			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
+			sendToAll("playerShooted", {psid: cp.sid, bsid: bsid});
+			cp.lastShootTime = (new Date()).getTime();
 		}
 	});
 
@@ -194,4 +196,4 @@ io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 	});
 });
 
-var simulation = require("./simulation.js"); // последен файл, защото вика вункции написани в този
+var simulation = require("./simulation.js"); // последен файл, защото вика функции написани в този
