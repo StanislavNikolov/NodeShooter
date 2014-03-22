@@ -106,7 +106,7 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 		context.clearRect(0,0,canvas.width,canvas.height); context.font = "10px Arial";
 		var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
 		
-		for(var i = 0;i < bullets.length;i ++)
+		for(var i in bullets)
 		{
 			context.beginPath();
 

@@ -51,7 +51,7 @@ console.log( readFile("./accounts/test") );
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
 global.walls = [];// масив с стените
-global.bullets = {};// масив с куршумите
+global.bullets = {};// мап с куршумите
 global.frame = 0;
 
 var users = global.users;
@@ -142,8 +142,8 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 			for (var i = 0 ; i < walls.length ; i ++)
 				socket.emit("initNewWall", walls[i]); // може да се замести с users[mysid].socket.emit("init..., но няма смисъл
 
-			for (var i = 0 ; i < bullets.length ; i ++)
-				socket.emit("initNewBullet", {sid: bullets[i].simpleid, pos: bullets[i].pos, rotation: bullets[i].rotation});
+			for (var i in bullets)
+				socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].owner });
 
 			//казвам му кой по-точно е той съмия
 			socket.emit("joinGame", {sid: mysid });
