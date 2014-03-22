@@ -143,7 +143,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 				socket.emit("initNewWall", walls[i]); // може да се замести с users[mysid].socket.emit("init..., но няма смисъл
 
 			for (var i in bullets)
-				socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].owner });
+				socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].shooter });
 
 			//казвам му кой по-точно е той съмия
 			socket.emit("joinGame", {sid: mysid });
