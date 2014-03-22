@@ -7,6 +7,7 @@ var users = global.users;
 var walls = global.walls;
 var bullets = global.bullets; 
 var frame = global.frame;
+var sendToAll = global.sendToAll;
 
 var classes = require('./classes.js');
 
@@ -45,9 +46,9 @@ function inWall(p)
 			}
 			else 
 			{	
-				var center1 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
+				var center1 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
 					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
-				var center2 = new Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radiuwwws.iner)),
+				var center2 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner)),
 				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2+walls[j].radius.iner));
 				
 				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.iner)/2;
@@ -87,37 +88,36 @@ function findNewAngle (p,w)
 	}		
 }
 
-function moveusers()
+function movePlayers()
 {
-	for(var i = 0;i < users.length;i ++)
+	for(var i in users)
 	{
-		if( (users[i].speed > 0.01 || users[i].speed < -0.01) && !users[i].dead)
+		if( (users[i].player.speed > 0.01 || users[i].player.speed < -0.01) && !users[i].player.dead)
 		{	
-		
-			if(inWall(users[i]).index != -1){
-				//tuka she ima nqkvi magii
-				
-				var index = inWall(users[i]).index, objectCollided = inWall(users[i]).partCollided,r1 = users[i].radius + 1, r2 = objectCollided.radius;
-				
+			var iw = inWall(users[i].player);// За да не се смята отново и отново
+			if(iw.index != -1){
+				var index = iw.index, objectCollided = iw.partCollided,r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
+
 				if (!objectCollided.inIner)
-					putOutOf(users[i],objectCollided,r1+r2);
+					putOutOf(users[i].player,objectCollided,r1+r2);
 				else
-					putOutOf(users[i],objectCollided,r2-r1);
+					putOutOf(users[i].player,objectCollided,r2-r1);
 					
-				users[i].speed *= 0.8;
-				users[i].rotation = findNewAngle(users[i],objectCollided);
+				users[i].player.speed *= 0.8;
+				users[i].player.rotation = findNewAngle(users[i].player,objectCollided);
 				
 			}
 			else
-				users[i].speed *= 0.97;
+				users[i].player.speed *= 0.97;
 
-			users[i].d.x = Math.cos(users[i].rotation) * users[i].speed;
-			users[i].d.y = Math.sin(users[i].rotation) * users[i].speed;
+			users[i].player.d.x = Math.cos(users[i].player.rotation) * users[i].player.speed;
+			users[i].player.d.y = Math.sin(users[i].player.rotation) * users[i].player.speed;
 
-			users[i].pos.x += users[i].d.x;
-			users[i].pos.y += users[i].d.y;
+			users[i].player.pos.x += users[i].player.d.x;
+			users[i].player.pos.y += users[i].player.d.y;
 			
-			sendToAll("updateUserInformation", {simpleid: users[i].simpleid, pos: users[i].pos, rotation: users[i].rotation});
+			console.log("asd");
+			sendToAll("updatePlayerInformation", {sid: users[i].socket.vars.sid, pos: users[i].player.pos, rotation: users[i].player.rotation});
 		}
 	}
 }
@@ -144,10 +144,10 @@ function movebullets()
 				}
 
 				if(users[j].hp > 0)
-					sendToAll("updateUserInformation", {simpleid: users[j].simpleid, radius: users[j].radius, hp: users[j].hp});
+					sendToAll("updatePlayerInformtion", {simpleid: users[j].simpleid, radius: users[j].radius, hp: users[j].hp});
 				if(users[j].hp <= 0)
 				{
-					sendToAll("updateUserInformation", {simpleid: users[j].simpleid, dead: true});
+					sendToAll("updatePlayerInformtion", {simpleid: users[j].simpleid, dead: true});
 					users[j].dead = true;
 					users[j].speTime = (new Date()).getTime();
 				}
@@ -186,8 +186,8 @@ function respawnusers()
 	{
 		if(users[i].dead && (new Date).getTime() - users[i].speTime > 5000)
 		{
-			sendToAll("updateUserInformation", {simpleid: users[i].simpleid, dead: false, pos: new Vector(400, 300), radius: 10, speed: 0, hp: 100});
-			users[i].pos = new Vector(400, 300);
+			sendToAll("updatePlayerInformtion", {simpleid: users[i].simpleid, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			users[i].pos = new classes.Vector(400, 300);
 			users[i].hp = 100;
 			users[i].radius = 10;
 			users[i].speed = 0;
@@ -197,7 +197,7 @@ function respawnusers()
 	}
 }
 
-//setInterval(moveusers, 20);
+setInterval(movePlayers, 20);
 //setInterval(movebullets, 20);
 //setInterval(respawnusers, 1000);
 

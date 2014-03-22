@@ -23,8 +23,30 @@ app.get('/game.js', function (req, res)
 
 function writeFile(filename, data)
 {
-
+	fs.writeFile(filename, data, function(err)
+	{
+	    if(err) 
+	    {
+	        console.log(err);
+	        return false;
+	    }
+	    return true;
+	}); 
 }
+
+function readFile(filename)
+{
+	var self = this;
+	self.output = 0;
+
+	fs.readFile(filename, 'utf8', function (err, data) { self.output = data; } );
+
+	return self.output;
+} 
+
+writeFile("./accounts/test", "asdasd");
+console.log( readFile("./accounts/test") );
+//readFile("./accounts/test")
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
@@ -79,6 +101,8 @@ function sendToAll(type, data, sendFrame)
 	for(var i in users)
 		users[i].socket.emit(type, data);
 }
+
+global.sendToAll = sendToAll;
 
 io.sockets.on("connection", function (socket) //CQLATA komunikaciq
 {

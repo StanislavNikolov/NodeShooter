@@ -13,6 +13,7 @@ console.log("Login info sent.");
 
 socket.on("updatePlayerInformation", function (data)
 {
+	console.log(data);
 	if(data.pos != undefined)
 		users[data.sid].player.pos = data.pos;
 	if(data.rotation != undefined)
