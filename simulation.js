@@ -9,17 +9,23 @@ var bullets = global.bullets;
 var frame = global.frame;
 var sendToAll = global.sendToAll;
 
+
+function generateSid(prefix)//За юзър той е _, а за куршуми e *, за стена е +
+{
+	return prefix + Math.random().toString(36).substring(2, 8);
+}
+
 var classes = require('./classes.js');
 
-walls.push(new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5));
-walls.push(new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5));
-walls.push(new classes.Wall(400,50,130,160,Math.PI,Math.PI*2));
-walls.push(new classes.Wall(400,550,130,160,0,Math.PI));
-walls.push(new classes.Wall(400,300,570,600,0,Math.PI*2));
+walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
+walls[generateSid("+")] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
+walls[generateSid("+")] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
+walls[generateSid("+")] = new classes.Wall(400,550,130,160,0,Math.PI);
+walls[generateSid("+")] = new classes.Wall(400,300,570,600,0,Math.PI*2);
 
 function inWall(p)
 {
-	for (var j = 0 ; j < walls.length ; j ++)
+	for (var j in walls)
 	{
 		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.iner)
 		{
@@ -186,7 +192,7 @@ function respawnusers()
 	{
 		if(users[i].player.dead && (new Date).getTime() - users[i].player.speTime > 5000)
 		{
-			sendToAll("updatePlayerInformtion", {simpleid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			sendToAll("updatePlayerInformation", {sid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
 			users[i].player.pos = new classes.Vector(400, 300);
 			users[i].player.hp = 100;
 			users[i].player.radius = 10;

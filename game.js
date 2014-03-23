@@ -147,7 +147,7 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 		
 		i = undefined;
 
-		for (var i = 0 ; i < walls.length ; i ++)
+		for (var i in walls)
 			drawWall(walls[i], offset);
 
 		drawHpBar(myself, 100, 5, 5, 7);
