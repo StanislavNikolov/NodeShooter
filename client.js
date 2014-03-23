@@ -4,7 +4,7 @@ while(loginName == "" || loginName.length > 12)
 	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
 }
 
-var serverIP = "http://safe-wildwood-8882.herokuapp.com/"; // Тук се настроива ип-то на сървъра
+var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
 
 var socket = io.connect(serverIP);// сокет за връзка със сървъра
 console.log("Sending login info...");
@@ -36,7 +36,7 @@ socket.on("updateBulletInformation", function (data)
 		bullets[data.sid].radius = data.radius; 
 });
 
-socket.on("initNewPlayer", function (data) // kogato nqkoi se logne, survara mi go prashta za da go dobavq
+socket.on("initNewPlayer", function (data)
 {
 	console.log(data);
 	users[data.sid] = {}; 

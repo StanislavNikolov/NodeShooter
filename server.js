@@ -21,33 +21,6 @@ app.get('/game.js', function (req, res)
 	res.sendfile(__dirname + '/game.js');
 });
 
-function writeFile(filename, data)
-{
-	fs.writeFile(filename, data, function(err)
-	{
-	    if(err) 
-	    {
-	        console.log(err);
-	        return false;
-	    }
-	    return true;
-	}); 
-}
-
-function readFile(filename)
-{
-	var self = this;
-	self.output = 0;
-
-	fs.readFile(filename, 'utf8', function (err, data) { self.output = data; } );
-
-	return self.output;
-} 
-
-writeFile("./accounts/test", "asdasd");
-console.log( readFile("./accounts/test") );
-//readFile("./accounts/test")
-
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
 global.walls = {};// масив с стените
@@ -62,18 +35,6 @@ var frame = global.frame;
 function generateSid(prefix)//За юзър той е _, а за куршуми e *
 {
 	return prefix + Math.random().toString(36).substring(2, 8);
-}
-
-function socketGet(socket, item)
-{
-	var output;
-	socket.get(item, function (err, o) {output = o;});
-	return output;
-}
-
-function socketSet(socket, item, data)
-{
-	socket.set(item, data, function () {} );
 }
 
 function addUser(socket, name)
@@ -134,9 +95,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 			for(var i in users)
 			{
 				if(i != mysid)
-				{
 					socket.emit("initNewPlayer", {sid: i, player: users[i].player}, false);
-				}
 			}
 
 			for (var i in walls)
