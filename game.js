@@ -14,7 +14,7 @@ function Bullet(x, y, r, s)
 	this.pos = new Vector(x, y);
 	this.rotation = r;
 	this.radius = 2;
-	this.simpleid = s;
+	this.sid = s;
 }
 
 function Vector(x, y)
@@ -27,7 +27,6 @@ function Player(p, n, sid)
 {
 	this.pos = p;
 	this.name = n;
-	this.simpleid = sid;
 	this.radius = 10;
 	this.rotation = 0;
 	this.hp = 100;
