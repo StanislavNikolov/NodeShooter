@@ -45,7 +45,7 @@ socket.on("initNewPlayer", function (data) // kogato nqkoi se logne, survara mi 
 });
 socket.on("initNewWall", function (data)
 {
-	walls.push(data);
+	walls[data.sid] = data.wall;
 });
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
