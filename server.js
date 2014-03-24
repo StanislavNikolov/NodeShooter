@@ -20,6 +20,10 @@ app.get('/game.js', function (req, res)
 {
 	res.sendfile(__dirname + '/game.js');
 });
+app.get('/styles.css', function (req, res)
+{
+	res.sendfile(__dirname + '/styles.css');
+});
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
