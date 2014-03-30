@@ -8,12 +8,9 @@ var walls = global.walls;
 var bullets = global.bullets; 
 var frame = global.frame;
 var sendToAll = global.sendToAll;
+var generateSid = global.generateSid;
 
-
-function generateSid(prefix)//За юзър той е _, а за куршуми e *, за стена е +
-{
-	return prefix + Math.random().toString(36).substring(2, 8);
-}
+console.log (generateSid);
 
 var classes = require('./classes.js');
 

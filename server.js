@@ -59,10 +59,11 @@ var walls = global.walls;
 var bullets = global.bullets; 
 var frame = global.frame;
 
-function generateSid(prefix)//За юзър той е _, а за куршуми e *
+function generateSid(prefix)//За юзър той е _, а за куршуми e *, за стена е +
 {
 	return prefix + Math.random().toString(36).substring(2, 8);
 }
+global.generateSid = generateSid;
 
 function socketGet(socket, item)
 {
