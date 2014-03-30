@@ -90,11 +90,13 @@ function drawWall(current, offset)
 
 function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
 {
-	var def = context.fillStyle;
+	var def = context.fillStyle, sDef = context.strokeStyle;
 	context.globalAlpha = 0.7; context.fillStyle = "red";
 	var hpBarSize = (p.hp / p.maxhp) * ms;
 	context.fillRect(sx, sy, hpBarSize, w);
+	context.strokeStyle = "black";
 	context.strokeRect(sx, sy, ms, w);
+	context.strokeStyle = sDef;
 	context.globalAlpha = 1;
 	context.fillStyle = def;
 }
