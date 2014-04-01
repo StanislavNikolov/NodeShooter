@@ -4,8 +4,8 @@ var app = require('express')()
   , fs = require('fs')//File System
   , classes = require('./classes.js');
 
-io.set('log level', 1);
-var port = Number(process.env.PORT || 5000);
+io.set('log level', 1);// За да няма постоянни debug съобщения
+var port = Number(process.env.PORT || 5000);//  Определя порта, защото за heroku примерно той може да не е 5000
 server.listen(port);
 
 app.get('/', function (req, res)
@@ -20,33 +20,10 @@ app.get('/game.js', function (req, res)
 {
 	res.sendfile(__dirname + '/game.js');
 });
-
-function writeFile(filename, data)
+app.get('/styles.css', function (req, res)
 {
-	fs.writeFile(filename, data, function(err)
-	{
-	    if(err) 
-	    {
-	        console.log(err);
-	        return false;
-	    }
-	    return true;
-	}); 
-}
-
-function readFile(filename)
-{
-	var self = this;
-	self.output = 0;
-
-	fs.readFile(filename, 'utf8', function (err, data) { self.output = data; } );
-
-	return self.output;
-} 
-
-writeFile("./accounts/test", "asdasd");
-console.log( readFile("./accounts/test") );
-//readFile("./accounts/test")
+	res.sendfile(__dirname + '/styles.css');
+});
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
@@ -65,19 +42,7 @@ function generateSid(prefix)//За юзър той е _, а за куршуми 
 }
 global.generateSid = generateSid;
 
-function socketGet(socket, item)
-{
-	var output;
-	socket.get(item, function (err, o) {output = o;});
-	return output;
-}
-
-function socketSet(socket, item, data)
-{
-	socket.set(item, data, function () {} );
-}
-
-function addUser(socket, name)
+function addUser(socket, name)// Записва човека в масива с потребители
 {
 	var sid = generateSid("_");
 	socket.vars.logged = true;
@@ -95,7 +60,7 @@ function removeUser(socket)
 	delete users[socket.vars.sid];
 }
 
-function sendToAll(type, data, sendFrame)
+function sendToAll(type, data, sendFrame)// функция която изпраща информация на всички вече логналите се
 {
 	if(sendFrame == undefined || sendFrame == true)
 		data.frame = frame;
@@ -129,15 +94,13 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 			console.log("User logged! Name: " + data.name + " with sid: " + mysid);
 			
-			sendToAll("initNewPlayer", {sid: mysid, player: cp}, false); // пращам на всички информацията за играча, без .socket
+			sendToAll("initNewPlayer", {sid: mysid, player: cp}, false); // пращам на всички (и на мен) информацията за играча, без .socket
 
 			//пращам на новия всички останали, но без него самия защото той вече се има
 			for(var i in users)
 			{
 				if(i != mysid)
-				{
 					socket.emit("initNewPlayer", {sid: i, player: users[i].player}, false);
-				}
 			}
 
 			for (var i in walls)
@@ -153,7 +116,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 	socket.on("move", function (data)
 	{
-		if(users[mysid].socket.vars.logged)
+		if(users[mysid].socket.vars.logged) // Нужно е за да съм сигурен, че cp и mysid съществуват 
 		{
 			if(data.direction == "up")
 				cp.speed += 0.3;
@@ -174,7 +137,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 	socket.on("shoot", function (data)
 	{
-		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)
+		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)//С това подсигурявам, че няма да спамя с булети
 		{
 			var bsid = generateSid("*"); 
 			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
@@ -185,13 +148,8 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 	socket.on("disconnect", function (data)
 	{
-		console.log("Received disconnect event!");
-
-		if(socket.vars.logged)
-		{
-			console.log("Disconnecting user with sid: " + socket.vars.sid);
+		if(socket.vars.logged) // Няма смисъл да казвам на всички, че някой е влязъл, ако не се е логнал
 			sendToAll("removeUser", {sid: socket.vars.sid }, false);
-		}
 
 		removeUser(socket);
 	});
