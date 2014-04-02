@@ -151,9 +151,9 @@ function movebullets()
 	for(var i in bullets)
 	{
 		var collision = false;
-		bullets[i].radius -= 0.004;
-		bullets[i].d.x = Math.cos(bullets[i].rotation) * 6;
-		bullets[i].d.y = Math.sin(bullets[i].rotation) * 6;
+		bullets[i].radius -= 0.01;
+		bullets[i].d.x = Math.cos(bullets[i].rotation) * 10;
+		bullets[i].d.y = Math.sin(bullets[i].rotation) * 10;
 		bullets[i].pos.x += bullets[i].d.x;
 		bullets[i].pos.y += bullets[i].d.y;
 
@@ -162,19 +162,27 @@ function movebullets()
 			var cp = users[j].player;
 			if(j != bullets[i].shooter && !cp.dead && distanceBetween(bullets[i].pos, cp.pos) < bullets[i].radius + cp.radius)
 			{
-				if((new Date()).getTime() - cp.speTime > 5000)
+				if((new Date()).getTime() - cp.lastEvent.respawn > 5000)
 				{
-					cp.radius -= 0.2;
 					cp.hp -= bullets[i].damage;
 				}
 
 				if(cp.hp > 0)
-					sendToAll("updatePlayerInformation", {sid: j, radius: cp.radius, hp: cp.hp});
+				{
+					sendToAll("updatePlayerInformation", {sid: j, hp: cp.hp});
+				}
+
 				if(cp.hp <= 0)
 				{
 					sendToAll("updatePlayerInformation", {sid: j, dead: true});
 					cp.dead = true;
-					cp.speTime = (new Date()).getTime();
+					cp.lastEvent.killed = (new Date()).getTime();
+
+					cp.deads ++;
+					sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
+
+					var scndp = users[bullets[i].shooter].player; scndp.kills ++;
+					sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
 				}
 
 				collision = true;
@@ -208,7 +216,7 @@ function respawnusers()
 {
 	for(var i in users)
 	{
-		if(users[i].player.dead && (new Date).getTime() - users[i].player.speTime > 5000)
+		if(users[i].player.dead && (new Date).getTime() - users[i].player.lastEvent.killed > 5000)
 		{
 			sendToAll("updatePlayerInformation", {sid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
 			users[i].player.pos = new classes.Vector(400, 300);
@@ -216,7 +224,7 @@ function respawnusers()
 			users[i].player.radius = 10;
 			users[i].player.speed = 0;
 			users[i].player.dead = false;
-			users[i].player.speTime = (new Date()).getTime();
+			users[i].player.lastEvent.respawn = (new Date()).getTime();
 		}
 	}
 }

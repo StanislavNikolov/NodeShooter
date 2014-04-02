@@ -32,8 +32,9 @@ function Player(p, n)
 	this.hp = 100;
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
-	this.speTime = (new Date().getTime()); //special event time (kill time, respawn time, etc)
-	this.lastShootTime = 0;
+	this.lastEvent = {move: 0, shoot: 0, respawn: 0, killed: 0};
+	this.kills = 0;
+	this.deads = 0;
 }
 
 function Bullet(x, y, r, shr, damage)

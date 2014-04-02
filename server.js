@@ -84,9 +84,26 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 	socket.vars = {};
 	socket.vars.logged = false;
 	var cp, mysid;
+
+	socket.emit("enterUsername", {});
 	
 	socket.on("login", function (data)
 	{
+		if(data.name == undefined || data.name.length > 12 || data.name == "")
+		{
+			socket.emit("enterUsername", {});
+			return;
+		}
+
+		for(var i in users)
+		{
+			if(users[i].player.name == data.name)
+			{
+				socket.emit("enterUsername", {});
+				return;
+			}
+		}
+
 		if(!socket.vars.logged) // Ако изпрати няколко логин-а, го слагам само първия път
 		{
 			mysid = addUser(socket, data.name);
@@ -116,12 +133,19 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 	socket.on("move", function (data)
 	{
-		if(users[mysid].socket.vars.logged) // Нужно е за да съм сигурен, че cp и mysid съществуват 
+		if(mysid != undefined) // Нужно е за да съм сигурен, че cp и mysid съществуват 
 		{
-			if(data.direction == "up")
-				cp.speed += 0.3;
+			if(data.direction == "up" && (new Date()).getTime() - cp.lastEvent.move > 50)
+			{
+				cp.lastEvent.move = (new Date()).getTime();
+				cp.speed += 0.6;
+			}
+
 			if(data.direction == "down")
+			{
 				cp.speed *= 0.8;
+			}
+
 			if(data.direction == "left")
 			{
 				cp.rotation -= 0.2;
@@ -137,12 +161,12 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 	socket.on("shoot", function (data)
 	{
-		if(!cp.dead && (new Date()).getTime() - cp.lastShootTime > 400)//С това подсигурявам, че няма да спамя с булети
+		if(!cp.dead && (new Date()).getTime() - cp.lastEvent.shoot > 120)//С това подсигурявам, че няма да спамя с булети
 		{
 			var bsid = generateSid("*"); 
 			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
 			sendToAll("playerShooted", {psid: mysid, bsid: bsid});
-			cp.lastShootTime = (new Date()).getTime();
+			cp.lastEvent.shoot = (new Date()).getTime();
 		}
 	});
 
