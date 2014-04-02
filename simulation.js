@@ -13,12 +13,30 @@ var generateSid = global.generateSid;
 console.log (generateSid);
 
 var classes = require('./classes.js');
-
+/*
 walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
 walls[generateSid("+")] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
 walls[generateSid("+")] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
 walls[generateSid("+")] = new classes.Wall(400,550,130,160,0,Math.PI);
 walls[generateSid("+")] = new classes.Wall(400,300,570,600,0,Math.PI*2);
+*/
+
+for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
+
+	walls[generateSid("+")] = new classes.Wall(400,300,570,600,i,0.6+i);
+	
+}
+
+for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
+
+	var angle = i - Math.PI/10 - 0.01;
+	
+	walls[generateSid("+")] = new classes.Wall( 400 + Math.cos( angle )*(570/2 + 300), 300 + Math.sin( angle )*(570/2 + 300), 170,190,0,2*Math.PI);
+	
+}
+
+walls[generateSid("+")] = new classes.Wall( 400, 300 , 170,290,0,Math.PI);
+
 
 function inWall(p)
 {
@@ -113,8 +131,11 @@ function movePlayers()
 			else
 				users[i].player.speed *= 0.97;
 
-			users[i].player.d.x = Math.cos(users[i].player.rotation) * users[i].player.speed;
-			users[i].player.d.y = Math.sin(users[i].player.rotation) * users[i].player.speed;
+			users[i].player.d.x *= 0.2;
+			users[i].player.d.y *= 0.2;
+
+			users[i].player.d.x += Math.cos(users[i].player.rotation) * users[i].player.speed;
+			users[i].player.d.y += Math.sin(users[i].player.rotation) * users[i].player.speed;
 
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
