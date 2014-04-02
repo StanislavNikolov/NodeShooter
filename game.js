@@ -9,7 +9,9 @@ var keys = []; // бутоните от клавиатурата които са
 var myself; // референция към себе си
 var bullets = {}; // масив с всички куршуми
 
-var maxShootPeriod = 20, currentShootPeriod = 0; // неща с тъпи имена
+var maxShootPeriod = 6, currentShootPeriod = 0; // неща с тъпи имена
+var scoreBoard = [];
+scoreBoard[0] = ["Name:", "Kills:", "Deaths:"];
 
 function Bullet(x, y, r, s)
 {
@@ -109,6 +111,7 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 		context.clearRect(0,0,canvas.width,canvas.height); context.font = "10px Arial";
 		var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
 		
+		context.fillStyle = "black";
 		for(var i in bullets)
 		{
 			context.beginPath();
@@ -118,6 +121,9 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 
 			context.closePath();
 		}
+
+		for (var i in walls)
+			drawWall(walls[i], offset);
 
 		for ( var i in users )
 		{
@@ -147,13 +153,21 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 					context.closePath();
 			}
 		}
-		
-		i = undefined;
-
-		for (var i in walls)
-			drawWall(walls[i], offset);
 
 		drawHpBar(myself, 100, 5, 5, 7);
+
+		context.font = "13px Arial";
+		for(var i in scoreBoard)
+		{
+			for(var j in scoreBoard[i])
+			{
+				context.globalAlpha = 0.5; 
+				context.fillStyle = "black";
+				context.fillRect(canvas.width - (scoreBoard[i].length - j) * 102, i * 15 + 20, 100, 14);
+				context.globalAlpha = 1; context.fillStyle = "yellow";
+				context.fillText(scoreBoard[i][j], canvas.width - (scoreBoard[i].length - j) * 102, i * 15 + 32);
+			}
+		}
 	}
 
 	if(myself != undefined && myself.dead)

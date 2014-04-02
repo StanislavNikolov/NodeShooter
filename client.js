@@ -1,15 +1,14 @@
+var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
+//var serverIP = "192.168.43.163";
+var socket = io.connect(serverIP);// сокет за връзка със сървъра
+
 var loginName = ""; 
-while(loginName == "" || loginName.length > 12)
+
+socket.on("enterUsername", function (data)
 {
 	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
-}
-
-var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
-
-var socket = io.connect(serverIP);// сокет за връзка със сървъра
-console.log("Sending login info...");
-socket.emit("login", {name: loginName });
-console.log("Login info sent.");
+	socket.emit("login", {name: loginName});
+});
 
 socket.on("updatePlayerInformation", function (data)
 {
@@ -19,10 +18,8 @@ socket.on("updatePlayerInformation", function (data)
 		users[data.sid].player.rotation = data.rotation; 
 	if(data.radius != undefined)
 		users[data.sid].player.radius = data.radius; 
-	if(data.hp != undefined){
-		console.log (data);
-		users[data.sid].player.hp = data.hp; 
-	}
+	if(data.hp != undefined)
+		users[data.sid].player.hp = data.hp;
 	if(data.dead != undefined)
 		users[data.sid].player.dead = data.dead; 
 });
@@ -38,11 +35,27 @@ socket.on("updateBulletInformation", function (data)
 
 socket.on("initNewPlayer", function (data)
 {
-	console.log(data);
 	users[data.sid] = {}; 
 	users[data.sid].player = data.player;
 	users[data.sid].socket = {};
+	scoreBoard.push([users[data.sid].player.name, users[data.sid].player.kills, users[data.sid].player.deads]);
 });
+
+
+socket.on("updateScoreBoard", function (data)
+{
+	var x = 1;
+	for(var i in users)
+	{
+		if(i == data.sid)
+		{
+			scoreBoard[x][data.y] = data.value;
+			return;
+		}
+		x ++;
+	}
+});
+
 socket.on("initNewWall", function (data)
 {
 	walls[data.sid] = data.wall;
@@ -50,6 +63,16 @@ socket.on("initNewWall", function (data)
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	console.log("Received removeUser event!");
+	
+	for(var i in scoreBoard)
+	{
+		if(i != 0 && scoreBoard[i][0] == users[data.sid].player.name)
+		{
+			scoreBoard.splice(i, 1);
+			break;
+		}
+	}
+
 	delete users[data.sid];
 });
 socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
@@ -58,7 +81,6 @@ socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go ma
 });
 socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
 {
-	console.log(data);
 	bullets[data.bsid] = new Bullet( users[data.psid].player.pos.x, users[data.psid].player.pos.y, users[data.psid].player.rotation, data.psid );
 });
 
