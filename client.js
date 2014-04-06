@@ -1,5 +1,5 @@
-var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
-//var serverIP = "192.168.43.163";
+//var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
+var serverIP = "192.168.43.163";
 var socket = io.connect(serverIP);// сокет за връзка със сървъра
 
 var loginName = ""; 
@@ -93,6 +93,11 @@ socket.on("joinGame", function (data) // значи: "Ок, всички веч�
 {
 	console.log("Received joinGame event!");
 	myself = users[data.sid].player; // за да знам точно кой съм аз0
+});
+
+socket.on("addMessage", function (data)
+{
+	messageBoard.push(data.message);
 });
 
 function sendMoveRequest()

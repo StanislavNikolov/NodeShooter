@@ -24,6 +24,10 @@ app.get('/styles.css', function (req, res)
 {
 	res.sendfile(__dirname + '/styles.css');
 });
+app.get('/userSimulation.js', function (req, res)
+{
+	res.sendfile(__dirname + '/userSimulation.js');
+});
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
 global.users = {};// мап с всички плеъри и сокети
@@ -62,8 +66,6 @@ function removeUser(socket)
 
 function sendToAll(type, data, sendFrame)// функция която изпраща информация на всички вече логналите се
 {
-	if(sendFrame == undefined || sendFrame == true)
-		data.frame = frame;
 	for(var i in users)
 		users[i].socket.emit(type, data);
 }
@@ -73,12 +75,10 @@ global.sendToAll = sendToAll;
 io.sockets.on("connection", function (socket) //Почти цялата документация с клиентите
 {
 	/*
-
 	users = {}
 		* .player = new Player()
 		* .socket = socket ------------^ Референция към този сокет
 		* .account = 
-
 	*/
 
 	socket.vars = {};
@@ -89,7 +89,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 	
 	socket.on("login", function (data)
 	{
-		if(data.name == undefined || data.name.length > 12 || data.name == "")
+		if(data == undefined || data.name == undefined || data.name.length > 12 || data.name == "")
 		{
 			socket.emit("enterUsername", {});
 			return;
@@ -128,6 +128,7 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 
 			//казвам му кой по-точно е той съмия
 			socket.emit("joinGame", {sid: mysid });
+			sendToAll("addMessage", {message: ("Player " + data.name + " joined.") });
 		}
 	});
 
@@ -173,7 +174,10 @@ io.sockets.on("connection", function (socket) //Почти цялата доку
 	socket.on("disconnect", function (data)
 	{
 		if(socket.vars.logged) // Няма смисъл да казвам на всички, че някой е влязъл, ако не се е логнал
+		{
+			sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
 			sendToAll("removeUser", {sid: socket.vars.sid }, false);
+		}
 
 		removeUser(socket);
 	});

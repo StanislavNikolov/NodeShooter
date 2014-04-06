@@ -13,30 +13,56 @@ var generateSid = global.generateSid;
 console.log (generateSid);
 
 var classes = require('./classes.js');
-/*
-walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
+
+/*walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
 walls[generateSid("+")] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
 walls[generateSid("+")] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
 walls[generateSid("+")] = new classes.Wall(400,550,130,160,0,Math.PI);
 walls[generateSid("+")] = new classes.Wall(400,300,570,600,0,Math.PI*2);
 */
-
 for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
-
 	walls[generateSid("+")] = new classes.Wall(400,300,570,600,i,0.6+i);
-	
 }
-
 for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
-
 	var angle = i - Math.PI/10 - 0.01;
-	
 	walls[generateSid("+")] = new classes.Wall( 400 + Math.cos( angle )*(570/2 + 300), 300 + Math.sin( angle )*(570/2 + 300), 170,190,0,2*Math.PI);
-	
 }
-
 walls[generateSid("+")] = new classes.Wall( 400, 300 , 170,290,0,Math.PI);
 
+
+function isFree(x, y, r)
+{
+	for(var i in walls)
+	{
+		//console.log(distanceBetween({x: x, y}, walls[i].pos));
+		if(distanceBetween({x: x, y: y}, walls[i].pos) < walls[i].radius.outer + r)
+		{
+			return false;
+		}
+
+	}
+	return true;
+}
+
+function generateRandomMap(sp)
+{
+	var wallsCount = 0;
+	for(var i = 0;i < 100000 && wallsCount < sp;i ++)
+	{
+		var r1 = Math.random() * 200 + 40; var r2 = r1 + Math.random() * 10 + 20;
+		var a1 = Math.random() * Math.PI * 2; var a2 = a1 + Math.random() * Math.PI * 2;
+		var x = Math.random() * 1000 - 500; var y = Math.random() * 1000 - 500;
+
+		var ang = a2 - a1; 
+		if(ang < Math.PI / 180 * 90 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2)) {if(i < 29){i --;}continue;}
+		walls[generateSid("+")] = new classes.Wall(x, y, r1, r2, a1, a2);
+		wallsCount ++;
+	}
+
+	walls[generateSid("+")] = new classes.Wall(0, 0, 800, 840, 0, Math.PI * 2);
+}
+
+//generateRandomMap(6);
 
 function inWall(p)
 {
@@ -151,7 +177,7 @@ function movebullets()
 	for(var i in bullets)
 	{
 		var collision = false;
-		bullets[i].radius -= 0.01;
+		bullets[i].radius -= 0.02;
 		bullets[i].d.x = Math.cos(bullets[i].rotation) * 10;
 		bullets[i].d.y = Math.sin(bullets[i].rotation) * 10;
 		bullets[i].pos.x += bullets[i].d.x;
@@ -183,13 +209,14 @@ function movebullets()
 
 					var scndp = users[bullets[i].shooter].player; scndp.kills ++;
 					sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
+					sendToAll("addMessage", {message: (scndp.name + " killed " + cp.name) });
 				}
 
 				collision = true;
 			}
 		}	
 		
-		sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
+		//sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
 
 		if(bullets[i].radius <= 0.5 || collision)
 		{
@@ -240,3 +267,12 @@ function distanceBetween(one, two)
     return Math.sqrt((alpha*alpha)+(beta*beta));
 }
 
+function sync()
+{
+	for(var i in bullets)
+	{
+		sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
+	}
+}
+
+setInterval(sync, 10000);

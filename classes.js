@@ -43,7 +43,7 @@ function Bullet(x, y, r, shr, damage)
 	this.rotation = r;
 	this.radius = 2;
 	this.shooter = shr;
-	this.d = new Vector(Math.cos(r),Math.sin(r));
+	this.d = new Vector(Math.cos(r), Math.sin(r));
 	this.damage = damage;
 }
 
