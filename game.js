@@ -1,7 +1,16 @@
 var canvas = document.getElementById("mainCanvas");
 var context = canvas.getContext("2d");
-canvas.width = window.innerWidth - 0.02 * window.innerWidth;
-canvas.height = window.innerHeight - 0.02 * window.innerHeight;
+
+function resize()
+{
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	canvas.getContext("2d").fillText("Resizeing...", canvas.width / 2, canvas.height / 2);
+}
+
+resize();
+
+window.addEventListener("resize", resize, false);
 
 var walls = {}; // масив с всички стени
 var users = {}; // мап с всички играчи

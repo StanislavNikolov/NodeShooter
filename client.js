@@ -1,5 +1,4 @@
-//var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
-var serverIP = "192.168.43.163";
+var serverIP = "localhost"; // Тук се настроива ип-то на сървъра
 var socket = io.connect(serverIP);// сокет за връзка със сървъра
 
 var loginName = ""; 
