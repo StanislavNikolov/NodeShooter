@@ -124,7 +124,11 @@ function draw() // moje bi edno ot malkoto neshta koito pravi game.js
 	{
 		if(!myself.dead)
 		{
-			context.clearRect(0,0,canvas.width,canvas.height); context.font = "10px Arial";
+			context.globalAlpha = myself.hp / myself.maxhp; context.fillStyle = "white";
+			context.fillRect(0,0,canvas.width,canvas.height);
+
+			context.globalAlpha = 1; context.font = "10px Arial";
+
 			var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
 			
 			context.fillStyle = "black";
