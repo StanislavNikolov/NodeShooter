@@ -10,23 +10,23 @@ server.listen(port);
 
 app.get('/', function (req, res)
 {
-	res.sendfile(__dirname + '/index.html');
+	res.sendfile(__dirname + '/userFiles/index.html');
 });
-app.get('/client.js', function (req, res)
+app.get('/userFiles/client.js', function (req, res)
 {
-	res.sendfile(__dirname + '/client.js');
+	res.sendfile(__dirname + '/userFiles/client.js');
 });
-app.get('/game.js', function (req, res)
+app.get('/userFiles/game.js', function (req, res)
 {
-	res.sendfile(__dirname + '/game.js');
+	res.sendfile(__dirname + '/userFiles/game.js');
 });
-app.get('/styles.css', function (req, res)
+app.get('/userFiles/styles.css', function (req, res)
 {
-	res.sendfile(__dirname + '/styles.css');
+	res.sendfile(__dirname + '/userFiles/styles.css');
 });
-app.get('/userSimulation.js', function (req, res)
+app.get('/userFiles/simulation.js', function (req, res)
 {
-	res.sendfile(__dirname + '/userSimulation.js');
+	res.sendfile(__dirname + '/userFiles/simulation.js');
 });
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
