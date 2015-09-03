@@ -2,17 +2,20 @@ function Vector(x, y)
 {
 	this.x = x;
 	this.y = y;
-	this.multiply = function VectorMultiply (num) {
-		this.x *= num;
-		this.y *= num;
-	}
-	this.add = function VectorAdd (b) {
-		this.x += b.x;
-		this.y += b.y;
-	}
-	this.len = function VectorLength() {
-		return Math.sqrt(this.x*this.x+this.y*this.y);
-	}
+}
+
+Vector.prototype.multiply = function VectorMultiply (num) {
+	this.x *= num;
+	this.y *= num;
+}
+
+Vector.prototype.add = this.add = function VectorAdd (b) {
+	this.x += b.x;
+	this.y += b.y;
+}
+
+Vector.prototype.len = this.len = function VectorLength() {
+	return Math.sqrt(this.x*this.x+this.y*this.y);
 }
 
 function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
