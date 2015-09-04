@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/tany2001/NodeShooter"
+    "url": "https://github.com/StanislavNikolov/NodeShooter"
   },
   "keywords": [
     "node",
@@ -27,7 +27,7 @@
   ],
   "authors": "Viktor Terziev and Stanislav Nikolov",
   "bugs": {
-    "url": "https://github.com/tany2001/NodeShooter/issues"
+    "url": "https://github.com/StanislavNikolov/NodeShooter/issues"
   },
-  "homepage": "https://github.com/tany2001/NodeShooter"
+  "homepage": "https://github.com/StanislavNikolov/NodeShooter"
 }
