@@ -12,21 +12,14 @@ app.get('/', function (req, res)
 {
 	res.sendfile(__dirname + '/userFiles/index.html');
 });
-app.get('/userFiles/client.js', function (req, res)
+
+var userFiles = ['client.js', 'game.js', 'style.css', 'simulation.js'];
+userFiles.map(function(file)
 {
-	res.sendfile(__dirname + '/userFiles/client.js');
-});
-app.get('/userFiles/game.js', function (req, res)
-{
-	res.sendfile(__dirname + '/userFiles/game.js');
-});
-app.get('/userFiles/styles.css', function (req, res)
-{
-	res.sendfile(__dirname + '/userFiles/styles.css');
-});
-app.get('/userFiles/simulation.js', function (req, res)
-{
-	res.sendfile(__dirname + '/userFiles/simulation.js');
+	app.get('/userFiles/' + file, function (req, res)
+	{
+		res.sendFile(__dirname + '/userFiles/' + file);
+	});
 });
 
 //Записвам го така за да може да се достигат тези променливи от други файлове
