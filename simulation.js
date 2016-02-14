@@ -1,8 +1,4 @@
-/*
-Коментирал съм редовете които викат moveusers, movebullets, respawnusers.
-Може да ги откоментираш като щеш.
-*/
-
+// shortcuts
 var users = global.users;
 var walls = global.walls;
 var bullets = global.bullets; 
@@ -14,20 +10,32 @@ console.log (generateSid);
 
 var classes = require('./classes.js');
 
-/*walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
-walls[generateSid("+")] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
-walls[generateSid("+")] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
-walls[generateSid("+")] = new classes.Wall(400,550,130,160,0,Math.PI);
-walls[generateSid("+")] = new classes.Wall(400,300,570,600,0,Math.PI*2);
-*/
-for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
-	walls[generateSid("+")] = new classes.Wall(400,300,570,600,i,0.6+i);
+var type = 2;
+if(type == 0)
+{
+	walls[generateSid("+")] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
+	walls[generateSid("+")] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
+	walls[generateSid("+")] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
+	walls[generateSid("+")] = new classes.Wall(400,550,130,160,0,Math.PI);
+	walls[generateSid("+")] = new classes.Wall(400,300,570,600,0,Math.PI*2);
+
+} else if(type == 1)
+{
+	for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 )
+		walls[generateSid("+")] = new classes.Wall(400,300,570,600,i,0.6+i);
+	for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 )
+	{
+		var angle = i - Math.PI/10 - 0.01;
+		walls[generateSid("+")] = new classes.Wall(400 + Math.cos( angle )*(570/2 + 300),
+				300 + Math.sin( angle )*(570/2 + 300),
+				170, 190, 0, 2*Math.PI);
+	}
+	walls[generateSid("+")] = new classes.Wall( 400, 300 , 170,290,0,Math.PI);
+} else if(type == 2)
+{
+	generateRandomMap(25);
 }
-for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 ) {
-	var angle = i - Math.PI/10 - 0.01;
-	walls[generateSid("+")] = new classes.Wall( 400 + Math.cos( angle )*(570/2 + 300), 300 + Math.sin( angle )*(570/2 + 300), 170,190,0,2*Math.PI);
-}
-walls[generateSid("+")] = new classes.Wall( 400, 300 , 170,290,0,Math.PI);
+
 
 
 function isFree(x, y, r)
@@ -62,7 +70,6 @@ function generateRandomMap(sp)
 	walls[generateSid("+")] = new classes.Wall(0, 0, 800, 840, 0, Math.PI * 2);
 }
 
-//generateRandomMap(6);
 
 function inWall(p)
 {
@@ -216,8 +223,6 @@ function movebullets()
 			}
 		}	
 		
-		//sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
-
 		if(bullets[i].radius <= 0.5 || collision)
 		{
 			sendToAll("removeBullet", {sid: i});
@@ -271,7 +276,10 @@ function sync()
 {
 	for(var i in bullets)
 	{
-		sendToAll("updateBulletInformation", {sid: i, rotation: bullets[i].rotation, pos: bullets[i].pos, radius: bullets[i].radius});
+		sendToAll("updateBulletInformation", {sid: i,
+			rotation: bullets[i].rotation,
+			pos: bullets[i].pos,
+			radius: bullets[i].radius});
 	}
 }
 

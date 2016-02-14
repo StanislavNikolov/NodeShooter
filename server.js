@@ -1,11 +1,11 @@
 var app = require('express')()
   , server = require('http').createServer(app)
   , io = require('socket.io').listen(server)
-  , fs = require('fs')//File System
+  , fs = require('fs')
   , classes = require('./classes.js');
 
-io.set('log level', 1);// За да няма постоянни debug съобщения
-var port = Number(process.env.PORT || 5000);//  Определя порта, защото за heroku примерно той може да не е 5000
+io.set('log level', 1);// Remove unneeded debug messages
+var port = Number(process.env.PORT || 5000);
 server.listen(port);
 
 app.get('/', function (req, res)
