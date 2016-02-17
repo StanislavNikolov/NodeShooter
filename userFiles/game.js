@@ -39,16 +39,25 @@ function Vector(x, y)
 	this.y = y;
 }
 
-function Player(p, n, sid)
+function Player(p)
 {
-	this.pos = p;
-	this.name = n;
+	this.pos = p; // must be Vector
 	this.radius = 10;
 	this.rotation = 0;
+	this.speed = 0;
 	this.hp = 100;
 	this.maxhp = 100;
-	this.shooting = false;
-	this.lastEvent = {move: 0, shoot: 0, respawn: 0, killed: 0};
+	this.d = new Vector(0, 0);
+}
+
+function User(name, id, player)
+{
+	this.name = name;
+	this.id = id;
+	this.kills = 0;
+	this.deaths = 0;
+	this.lastEvent = {move: 0, shoot: 0, respawn: 0, getKilled: 0};
+	this.player = player;
 }
 
 for(var i = 0;i < 200;i ++){keys[i] = false;}

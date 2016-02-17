@@ -1,40 +1,109 @@
-var serverIP = "localhost";
-var socket = io.connect(serverIP);
+var serverIP = 'localhost:5000';
+var socket = new WebSocket('ws://' + serverIP);
+socket.binaryType = 'arraybuffer';
 
-var loginName = ""; 
-
-socket.on("enterUsername", function (data)
+socket.onopen = function(event)
 {
-	loginName = prompt("Enter you username", "The maximal size is 12 characters!");
-	socket.emit("login", {name: loginName});
-});
+	console.log('Connection succssesful');
+}
 
+// by "Joni", http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+function toUTF8Array(str) {
+    var utf8 = [];
+    for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6),
+                      0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12),
+                      0x80 | ((charcode>>6) & 0x3f),
+                      0x80 | (charcode & 0x3f));
+        }
+        // surrogate pair
+        else {
+            i++;
+            // UTF-16 encodes 0x10000-0x10FFFF by
+            // subtracting 0x10000 and splitting the
+            // 20 bits of 0x0-0xFFFFF into two halves
+            charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                      | (str.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >>18),
+                      0x80 | ((charcode>>12) & 0x3f),
+                      0x80 | ((charcode>>6) & 0x3f),
+                      0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+}
+
+socket.onmessage = function(event)
+{
+	var message = new DataView(event.data);
+	if(message.getUint8(0) == 0) // auth reqest
+	{
+		var loginName = "";
+		do
+		{
+			loginName = prompt("Enter you username", "The maximal size is 12 characters!");
+		} while(loginName.length > 12 || loginName == "");
+		// Javascript stores strings in UTF-16
+		// We convert it to UTF-8 and send it back to the server
+		// var utf8LoginName = toUTF8Array(loginName);
+
+		var response_b = new ArrayBuffer(1 + loginName.length);
+		var response = new DataView(response_b);
+
+		response.setUint8(0, 0); // pid
+		for(var i = 0;i < loginName.length;++ i)
+			response.setUint8(1+i, loginName.charCodeAt(i));
+
+		socket.send(response_b);
+	}
+	if(message.getUint8(0) == 1)
+	{
+		var name = "";
+		for(var i = 0;i < message.getUint8(1);++ i)
+			name += String.fromCharCode(message.getUint8(2+i));
+
+		var id = message.getInt32(2+name.length, false);
+		var x = message.getInt32(2+name.length+4 + 0,false);
+		var y = message.getInt32(2+name.length+4 + 4,false);
+
+		var user = new User(name, id, new Player(new Vector(x, y)));
+		users[user.id] = user;
+	}
+}
+
+/*
 socket.on("updatePlayerInformation", function (data)
 {
 	if(data.pos != undefined)
 		users[data.sid].player.pos = data.pos;
 	if(data.rotation != undefined)
-		users[data.sid].player.rotation = data.rotation; 
+		users[data.sid].player.rotation = data.rotation;
 	if(data.radius != undefined)
-		users[data.sid].player.radius = data.radius; 
+		users[data.sid].player.radius = data.radius;
 	if(data.hp != undefined)
 		users[data.sid].player.hp = data.hp;
 	if(data.dead != undefined)
-		users[data.sid].player.dead = data.dead; 
+		users[data.sid].player.dead = data.dead;
 });
 socket.on("updateBulletInformation", function (data)
 {
 	if(data.pos != undefined)
 		bullets[data.sid].pos = data.pos;
 	if(data.rotation != undefined)
-		bullets[data.sid].rotation = data.rotation; 
+		bullets[data.sid].rotation = data.rotation;
 	if(data.radius != undefined)
-		bullets[data.sid].radius = data.radius; 
+		bullets[data.sid].radius = data.radius;
 });
 
 socket.on("initNewPlayer", function (data)
 {
-	users[data.sid] = {}; 
+	users[data.sid] = {};
 	users[data.sid].player = data.player;
 	users[data.sid].socket = {};
 	scoreBoard.push([users[data.sid].player.name, users[data.sid].player.kills, users[data.sid].player.deads]);
@@ -123,3 +192,4 @@ function sendShootRequest()
 
 setInterval(sendMoveRequest, 50);
 setInterval(sendShootRequest, 20);
+*/

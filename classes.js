@@ -25,10 +25,9 @@ function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
-function Player(p, n)
+function Player(p)
 {
-	this.pos = p; // трябва да е Vector
-	this.name = n;
+	this.pos = p; // must be Vector
 	this.radius = 10;
 	this.rotation = 0;
 	this.speed = 0;
@@ -36,8 +35,18 @@ function Player(p, n)
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
 	this.lastEvent = {move: 0, shoot: 0, respawn: 0, killed: 0};
+}
+
+function User(socket, name, id)
+{
+	this.socket = socket;
+	this.name = name;
+	this.id = id;
 	this.kills = 0;
-	this.deads = 0;
+	this.deaths = 0;
+	this.lastEvent = {};
+
+	this.player = new Player(new Vector(400, 300));
 }
 
 function Bullet(x, y, r, shr, damage)
@@ -53,4 +62,5 @@ function Bullet(x, y, r, shr, damage)
 module.exports.Vector = Vector;
 module.exports.Wall = Wall;
 module.exports.Player = Player;
+module.exports.User = User;
 module.exports.Bullet = Bullet;
