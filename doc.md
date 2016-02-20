@@ -9,3 +9,4 @@ PID | Simple explanation
  * The next N bytes are the name. UTF-8 and shit **TODO**
  * ...
 2 ->	New wall
+5 -> 	Connection Complete

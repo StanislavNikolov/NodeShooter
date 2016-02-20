@@ -46,7 +46,25 @@ function sendMap(user)
 
 		user.socket.send(packet_b);
 	}
+
+	// TODO maybe we don't really need this
+	// for (var i in bullets)
+	// {
+	// 	socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].s// hooter });
+	// }
+}
+
+function initGame(user)
+{
+	// Initial connection complete
+	var packet_b = new ArrayBuffer(1 + 4);
+	var packet = new DataView(packet_b);
+
+	packet.setUint8(0, 5);
+	packet.setUint32(1, user.id);
+	user.socket.send(packet_b);
 }
 
 module.exports.broadcastNewUser = broadcastNewUser;
 module.exports.sendMap = sendMap;
+module.exports.initGame = initGame;

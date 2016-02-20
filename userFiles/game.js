@@ -148,7 +148,7 @@ function draw()
 		context.globalAlpha = 1;
 		context.font = "10px Arial";
 
-		var offset = new Vector(myself.pos.x - canvas.width / 2, myself.pos.y - canvas.height / 2);
+		var offset = new Vector(myself.player.pos.x - canvas.width / 2, myself.player.pos.y - canvas.height / 2);
 
 		context.fillStyle = "black";
 		for(var i in bullets)
@@ -172,15 +172,15 @@ function draw()
 			if(!users[i].player.dead)
 			{
 				context.fillStyle = "red";
-				if (myself == users[i].player)
+				if (myself.id == i)
 				{
 					context.fillStyle = "blue";
 				}
-				drawHpBar(users[i].player,
-						20,
-						users[i].player.pos.x - offset.x - users[i].player.radius,
-						users[i].player.pos.y - offset.y + users[i].player.radius + 2,
-						3);
+				drawHpBar(users[i].player
+						, 20
+						, users[i].player.pos.x - offset.x - users[i].player.radius
+						, users[i].player.pos.y - offset.y + users[i].player.radius + 2
+						, 3);
 
 				context.strokeStyle = context.fillStyle;
 				var textSize = 10 * users[i].player.name.length;
@@ -199,7 +199,7 @@ function draw()
 			}
 		}
 
-		drawHpBar(myself, 200, 5, 5, 15);
+		drawHpBar(myself.player, 200, 5, 5, 15);
 	}
 
 	if(myself.dead) // :(

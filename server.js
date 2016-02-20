@@ -97,6 +97,7 @@ wss.on('connection', function (socket)
 
 			cm.broadcastNewUser(cu);
 			cm.sendMap(cu);
+			cm.initGame(cu);
 		}
 	});
 	socket.on('close', function (rawData, flags)
@@ -104,15 +105,6 @@ wss.on('connection', function (socket)
 		if(typeof socket.ownerID !== "undefined")
 			delete users[socket.ownerID];
 	});
-// 
-// 		for (var i in walls)
-// 			socket.emit("initNewWall", { sid: i, wall: walls[i] }); // може да се замести с users[mysid].socket.emit("init..., но няма смисъл
-
-// 		for (var i in bullets)
-// 			socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].s// hooter });
-// 
-// 		//казвам му кой по-точно е той съмия
-// 		socket.emit("joinGame", {sid: mysid });
 // 		sendToAll("addMessage", {message: ("Player " + data.name + " joined.") });
 // 		}
 // 	});

@@ -90,6 +90,13 @@ socket.onmessage = function(event)
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
+	if(message.getUint8(0) == 5)
+	{
+		var id = message.getUint32(1, false);
+		myself = users[id]; // за да знам точно кой съм аз0
+		console.log("Received joinGame event!");
+	}
+
 }
 /*
 socket.on("updatePlayerInformation", function (data)
@@ -156,13 +163,6 @@ socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go m
 {
 	bullets[data.bsid] = new Bullet( data.pos.x, data.pos.y, data.rotation, data.psid );
 });
-
-socket.on("joinGame", function (data) // значи: "Ок, всички вече те знаят, влизай и ти"
-{
-	console.log("Received joinGame event!");
-	myself = users[data.sid].player; // за да знам точно кой съм аз0
-});
-
 socket.on("addMessage", function (data)
 {
 	messageBoard.push(data.message);
