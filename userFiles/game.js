@@ -83,9 +83,9 @@ function drawWall(current, offset)
 	context.fillStyle = "green";
 	context.beginPath();
 
-	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.iner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.iner);
+	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.inner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.inner);
 	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/100) {
-		context.lineTo(current.pos.x+Math.cos(i)*current.radius.iner,current.pos.y+Math.sin(i)*current.radius.iner);
+		context.lineTo(current.pos.x+Math.cos(i)*current.radius.inner,current.pos.y+Math.sin(i)*current.radius.inner);
 	}
 	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/100) {
 		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
@@ -95,15 +95,15 @@ function drawWall(current, offset)
 	context.fill();
 
 	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
-						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
-									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
+	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
+						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
+									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
 	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner)),
-						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.iner)/2+current.radius.iner),
-									Math.abs(current.radius.outer-current.radius.iner)/2,0,2*Math.PI);
+	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
+						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
+									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
 

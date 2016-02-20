@@ -18,10 +18,10 @@ Vector.prototype.len = this.len = function VectorLength() {
 	return Math.sqrt(this.x*this.x+this.y*this.y);
 }
 
-function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
+function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
 {
 	this.pos = new Vector(x, y);
-	this.radius = {iner:inerRadius, outer:outerRadius};
+	this.radius = {inner:innerRadius, outer:outerRadius};
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
