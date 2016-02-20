@@ -57,7 +57,12 @@ function generateRandomMap(sp)
 		var x = Math.floor(Math.random() * 1000 - 500);
 		var y = Math.floor(Math.random() * 1000 - 500);
 		var ang = a2 - a1; 
-		if(ang < Math.PI / 180 * 90 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2)) {if(i < 29){i --;}continue;}
+		if(ang < Math.PI / 180 * 90 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2))
+		{
+			if(i < 29)
+				i --;
+			continue;
+		}
 		walls[generateID()] = new classes.Wall(x, y, r1, r2, a1, a2);
 		wallsCount ++;
 	}

@@ -61,10 +61,16 @@ function initGame(user)
 	var packet = new DataView(packet_b);
 
 	packet.setUint8(0, 5);
-	packet.setUint32(1, user.id);
+	packet.setUint32(1, user.id, false);
 	user.socket.send(packet_b);
+}
+
+function broadcastMessage(msg) // TODO
+{
+
 }
 
 module.exports.broadcastNewUser = broadcastNewUser;
 module.exports.sendMap = sendMap;
 module.exports.initGame = initGame;
+module.exports.broadcastMessage = broadcastMessage;

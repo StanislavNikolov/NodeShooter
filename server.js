@@ -80,7 +80,7 @@ wss.on('connection', function (socket)
 			for(var i = 0;i < data.length-1;++ i)
 				name += String.fromCharCode(data[i+1]);
 
-			// Check if there's already a user with than name
+			// Check if there's already a user with that name
 			for(var i in global.users)
 			{
 				if(global.users[i].name == name)
@@ -98,6 +98,8 @@ wss.on('connection', function (socket)
 			cm.broadcastNewUser(cu);
 			cm.sendMap(cu);
 			cm.initGame(cu);
+
+			cm.broadcastMessage("Player %s joined.", cu.name);
 		}
 	});
 	socket.on('close', function (rawData, flags)
@@ -105,11 +107,6 @@ wss.on('connection', function (socket)
 		if(typeof socket.ownerID !== "undefined")
 			delete users[socket.ownerID];
 	});
-// 		sendToAll("addMessage", {message: ("Player " + data.name + " joined.") });
-// 		}
-// 	});
-//
-//
 // 	socket.on("move", function (data)
 // 	{
 // 		if(mysid != undefined) // Нужно е за да съм сигурен, че cp и mysid съществуват
@@ -162,4 +159,5 @@ wss.on('connection', function (socket)
 });
 
 
-var simulation = require("./simulation.js"); // последен файл, защото вика функции написани в този
+// Last file, because it calls functions written here
+var simulation = require("./simulation.js");
