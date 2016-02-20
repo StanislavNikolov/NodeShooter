@@ -91,12 +91,6 @@ socket.onmessage = function(event)
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
 }
-
-
-socket.on("initNewWall", function (data)
-{
-	walls[data.sid] = data.wall;
-});
 /*
 socket.on("updatePlayerInformation", function (data)
 {
@@ -120,15 +114,6 @@ socket.on("updateBulletInformation", function (data)
 	if(data.radius != undefined)
 		bullets[data.sid].radius = data.radius;
 });
-
-socket.on("initNewPlayer", function (data)
-{
-	users[data.sid] = {};
-	users[data.sid].player = data.player;
-	users[data.sid].socket = {};
-	scoreBoard.push([users[data.sid].player.name, users[data.sid].player.kills, users[data.sid].player.deads]);
-});
-
 
 socket.on("updateScoreBoard", function (data)
 {
