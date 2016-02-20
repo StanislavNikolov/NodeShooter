@@ -2,7 +2,6 @@ var app = require('express')()
   , server = require('http').createServer(app)
   , WebSocketServer = require('ws').Server
   , wss = new WebSocketServer({server: server})
-  //, wss = new WebSocketServer({port: 8080})
   , fs = require('fs')
   , classes = require('./classes.js')
   , cm = require('./connectionManager.js');
@@ -62,7 +61,7 @@ wss.on('connection', function (socket)
 	var authRequest = new Uint8Array(1);
 	socket.send(authRequest.buffer);
 
-	socket.on('message', function(rawData)
+	socket.on('message', function(rawData, flags)
 	{
 		var data = new Uint8Array(rawData);
 		if(data[0] == 0)
@@ -94,19 +93,17 @@ wss.on('connection', function (socket)
 
 			cu = new classes.User(socket, name, generateID());
 			users[cu.sid] = cu;
+			socket.ownerID = cu.id;
 
 			cm.broadcastNewUser(cu);
 			console.log("User logged! Name: " + cu.name);
 		}
 	});
-		//sendToAll("initNewPlayer", {sid: mysid, player: cp}, false); // пращам на всички (и на мен) информацията за играча, без .socket
-
-		//пращам на новия всички останали, но без него самия защото той вече се има
-// 		for(var i in users)
-// 		{
-// 			if(i != mysid)
-// 				socket.emit("initNewPlayer", {sid: i, player: users[i].player}, false);
-// 		}
+	socket.on('close', function (rawData, flags)
+	{
+		if(typeof socket.ownerID !== "undefined")
+			delete users[socket.ownerID];
+	});
 // 
 // 		for (var i in walls)
 // 			socket.emit("initNewWall", { sid: i, wall: walls[i] }); // може да се замести с users[mysid].socket.emit("init..., но няма смисъл
