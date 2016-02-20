@@ -96,7 +96,7 @@ wss.on('connection', function (socket)
 			socket.ownerID = cu.id;
 
 			cm.broadcastNewUser(cu);
-			console.log("User logged! Name: " + cu.name);
+			cm.sendMap(cu);
 		}
 	});
 	socket.on('close', function (rawData, flags)

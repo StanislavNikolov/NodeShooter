@@ -50,6 +50,13 @@ function Player(p)
 	this.d = new Vector(0, 0);
 }
 
+function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
+{
+	this.pos = new Vector(x, y);
+	this.radius = {inner:innerRadius, outer:outerRadius};
+	this.angle = {start:startAngle, finish:finishAngle};
+}
+
 function User(name, id, player)
 {
 	this.name = name;

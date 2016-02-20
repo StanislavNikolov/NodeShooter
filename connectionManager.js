@@ -12,7 +12,7 @@ function broadcastNewUser(user)
 		newUserPacket.setUint8(2+i, user.name.charCodeAt(i));
 
 	// id
-	newUserPacket.setUint32(1+1+user.name.length, user.id);
+	newUserPacket.setUint32(1+1+user.name.length, user.id, false);
 
 	// pos
 	var p1Offset = 1 + 1 + user.name.length + 4;
@@ -24,4 +24,29 @@ function broadcastNewUser(user)
 		global.users[n].socket.send(newUserPacket_b);
 }
 
+function sendMap(user)
+{
+	for(var i in global.walls)
+	{
+		// pid, id, pos, radius, angle
+		var packet_b = new ArrayBuffer(1 + 8 + 8 + 8 + 4)
+		var packet = new DataView(packet_b);
+		packet.setUint8(0, 2);
+
+		packet.setUint32(1, i); // id = wall id
+
+		packet.setInt32(2, global.walls[i].pos.x, false);
+		packet.setInt32(6, global.walls[i].pos.y, false);
+
+		packet.setFloat32(10, global.walls[i].radius.inner, false);
+		packet.setFloat32(14, global.walls[i].radius.outer, false);
+
+		packet.setFloat32(18, global.walls[i].angle.start, false);
+		packet.setFloat32(22, global.walls[i].angle.finish, false);
+
+		user.socket.send(packet_b);
+	}
+}
+
 module.exports.broadcastNewUser = broadcastNewUser;
+module.exports.sendMap = sendMap;

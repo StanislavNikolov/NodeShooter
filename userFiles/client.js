@@ -68,15 +68,35 @@ socket.onmessage = function(event)
 		for(var i = 0;i < message.getUint8(1);++ i)
 			name += String.fromCharCode(message.getUint8(2+i));
 
-		var id = message.getInt32(2+name.length, false);
+		var id = message.getUint32(2+name.length, false);
 		var x = message.getInt32(2+name.length+4 + 0,false);
 		var y = message.getInt32(2+name.length+4 + 4,false);
 
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
 	}
+	if(message.getUint8(0) == 2)
+	{
+		var id = message.getUint32(1, false);
+
+		var x = message.getInt32(2, false);
+		var y = message.getInt32(6, false);
+
+		var ir = message.getFloat32(10, false);
+		var or = message.getFloat32(14, false);
+
+		var sa = message.getFloat32(18, false);
+		var fa = message.getFloat32(22, false);
+
+		walls[id] = new Wall(x, y, ir, or, sa, fa);
+	}
 }
 
+
+socket.on("initNewWall", function (data)
+{
+	walls[data.sid] = data.wall;
+});
 /*
 socket.on("updatePlayerInformation", function (data)
 {
@@ -122,11 +142,6 @@ socket.on("updateScoreBoard", function (data)
 		}
 		x ++;
 	}
-});
-
-socket.on("initNewWall", function (data)
-{
-	walls[data.sid] = data.wall;
 });
 socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
 {
