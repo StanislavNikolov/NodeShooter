@@ -44,7 +44,7 @@ function User(socket, name, id)
 	this.id = id;
 	this.kills = 0;
 	this.deaths = 0;
-	this.lastEvent = {};
+	this.lastEvent = {shoot: 0, killed: 0, respawn: 0}; // TODO
 
 	this.player = new Player(new Vector(400, 300));
 }

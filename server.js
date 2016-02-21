@@ -56,7 +56,7 @@ global.sendToAll = sendToAll;
 
 wss.on('connection', function (socket)
 {
-	var cu = {}; // current user
+	var cu; // current user
 
 	var authRequest = new Uint8Array(1);
 	socket.send(authRequest.buffer);
@@ -66,7 +66,7 @@ wss.on('connection', function (socket)
 		var data = new Uint8Array(rawData);
 		if(data[0] == 0)
 		{
-			if(typeof cu.name === "string")
+			if(typeof(cu) != 'undefined' && typeof(cu.name) == 'string')
 				return; // This user already has a name
 
 			if(data.length > 12+1 || data.length <= 1) // Invalid name
@@ -99,12 +99,25 @@ wss.on('connection', function (socket)
 			cm.sendMap(cu);
 			cm.initGame(cu);
 
-			cm.broadcastMessage("Player %s joined.", cu.name);
+			cm.broadcastMessage('Player %s joined.', cu.name);
+		}
+		if(data[0] == 1 && typeof(cu) != 'undefined')
+		{
+			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
+			{
+				var id = generateID();
+				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, cu.player.rotation, cu.id, 20);
+
+				// TODO
+				//sendToAll("playerShooted", {psid: mysid, bsid: bsid});
+
+				cu.lastEvent.shoot = (new Date()).getTime();
+			}
 		}
 	});
 	socket.on('close', function (rawData, flags)
 	{
-		if(typeof socket.ownerID !== "undefined")
+		if(typeof(socket.ownerID) !== 'undefined')
 			delete users[socket.ownerID];
 	});
 // 	socket.on("move", function (data)
@@ -135,16 +148,6 @@ wss.on('connection', function (socket)
 // 		}
 // 	});
 //
-// 	socket.on("shoot", function (data)
-// 	{
-// 		if(!cp.dead && (new Date()).getTime() - cp.lastEvent.shoot > 120)//С това подсигурявам, че няма да спамя с булети
-// 		{
-// 			var bsid = generateSid("*"); 
-// 			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
-// 			sendToAll("playerShooted", {psid: mysid, bsid: bsid});
-// 			cp.lastEvent.shoot = (new Date()).getTime();
-// 		}
-// 	});
 //
 // 	socket.on("disconnect", function (data)
 // 	{

@@ -7,6 +7,7 @@ socket.onopen = function(event)
 	console.log('Connection succssesful');
 }
 
+/*
 // by "Joni", http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
 function toUTF8Array(str) {
     var utf8 = [];
@@ -38,6 +39,7 @@ function toUTF8Array(str) {
     }
     return utf8;
 }
+*/
 
 socket.onmessage = function(event)
 {
@@ -49,9 +51,11 @@ socket.onmessage = function(event)
 		{
 			loginName = prompt("Enter you username", "The maximal size is 12 characters!");
 		} while(loginName.length > 12 || loginName == "");
-		// Javascript stores strings in UTF-16
-		// We convert it to UTF-8 and send it back to the server
-		// var utf8LoginName = toUTF8Array(loginName);
+		/* TODO
+		* Javascript stores strings in UTF-16
+		* We convert it to UTF-8 and send it back to the server
+		* var utf8LoginName = toUTF8Array(loginName);
+		*/
 
 		var response_b = new ArrayBuffer(1 + loginName.length);
 		var response = new DataView(response_b);
@@ -93,11 +97,22 @@ socket.onmessage = function(event)
 	if(message.getUint8(0) == 5)
 	{
 		var id = message.getUint32(1, false);
-		myself = users[id]; // за да знам точно кой съм аз0
+		myself = users[id]; // used in game.js for drawing
 		console.log("Received joinGame event!");
 	}
-
 }
+
+function sendShootRequest()
+{
+	currentShootPeriod --;
+	if(keys[32] && currentShootPeriod <= 0)
+	{
+		var shootPacket = new Uint8Array([1]);
+		socket.send(shootPacket.buffer);
+		currentShootPeriod = maxShootPeriod;
+	}
+}
+setInterval(sendShootRequest, 20);
 /*
 socket.on("updatePlayerInformation", function (data)
 {
@@ -180,16 +195,6 @@ function sendMoveRequest()
 		socket.emit("move", {direction: "right"});
 }
 
-function sendShootRequest()
-{
-	currentShootPeriod --;
-	if(keys[32] && currentShootPeriod <= 0)
-	{
-		socket.emit("shoot", {});
-		currentShootPeriod=maxShootPeriod;
-	}
-}
 
 setInterval(sendMoveRequest, 50);
-setInterval(sendShootRequest, 20);
 */

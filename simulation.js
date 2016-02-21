@@ -3,8 +3,7 @@ var users = global.users;
 var walls = global.walls;
 var bullets = global.bullets; 
 var frame = global.frame;
-var sendToAll = global.sendToAll;
-var generateSid = global.generateSid;
+//var sendToAll = global.sendToAll;
 
 var classes = require('./classes.js');
 
@@ -77,9 +76,7 @@ function inWall(p)
 	{
 		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.inner)
 		{
-			
 			var angle;
-			
 			if (p.pos.y-walls[j].pos.y>0)
 			{
 				angle = Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
@@ -96,10 +93,10 @@ function inWall(p)
 					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.inner, inIner: 1}};
 				else 
 					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 0}};
-				
+
 			}
-			else 
-			{	
+			else
+			{
 				var center1 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
 					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner));
 				var center2 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
@@ -148,7 +145,7 @@ function movePlayers()
 	{
 		if( (users[i].player.speed > 0.01 || users[i].player.speed < -0.01) && !users[i].player.dead)
 		{	
-			var iw = inWall(users[i].player);// За да не се смята отново и отново
+			var iw = inWall(users[i].player);// Calculated only once
 			if(iw.index != -1){
 				var index = iw.index, objectCollided = iw.partCollided,r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
 
@@ -172,9 +169,9 @@ function movePlayers()
 
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
-			
-			//console.log("asd");
-			sendToAll("updatePlayerInformation", {sid: i, pos: users[i].player.pos, rotation: users[i].player.rotation});
+
+			//TODO
+			//sendToAll("updatePlayerInformation", {sid: i, pos: users[i].player.pos, rotation: users[i].player.rotation});
 		}
 	}
 }
@@ -192,53 +189,56 @@ function movebullets()
 
 		for(var j in users)
 		{
-			var cp = users[j].player;
-			if(j != bullets[i].shooter && !cp.dead && distanceBetween(bullets[i].pos, cp.pos) < bullets[i].radius + cp.radius)
+			//var cp = users[j].player;
+			var cu = users[j];
+			if(j != bullets[i].shooter && !cu.dead && distanceBetween(bullets[i].pos, cu.player.pos) < bullets[i].radius + cu.player.radius)
 			{
-				if((new Date()).getTime() - cp.lastEvent.respawn > 5000)
+				if((new Date()).getTime() - cu.lastEvent.respawn > 5000)
 				{
-					cp.hp -= bullets[i].damage;
+					cu.player.hp -= bullets[i].damage;
 				}
 
-				if(cp.hp > 0)
+				if(cu.player.hp > 0)
 				{
-					sendToAll("updatePlayerInformation", {sid: j, hp: cp.hp});
+					// TODO
+					// sendToAll("updatePlayerInformation", {sid: j, hp: cp.hp});
 				}
 
-				if(cp.hp <= 0)
+				if(cu.player.hp <= 0)
 				{
-					sendToAll("updatePlayerInformation", {sid: j, dead: true});
-					cp.dead = true;
-					cp.lastEvent.killed = (new Date()).getTime();
+					//TODO
+					//sendToAll("updatePlayerInformation", {sid: j, dead: true});
+					cu.dead = true;
+					cu.lastEvent.killed = (new Date()).getTime();
 
-					cp.deads ++;
-					sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
+					cu.deads ++;
+					//sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
 
-					var scndp = users[bullets[i].shooter].player; scndp.kills ++;
-					sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
-					sendToAll("addMessage", {message: (scndp.name + " killed " + cp.name) });
+					var scndp = users[bullets[i].shooter];
+					scndp.kills ++;
+					//sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
+					//sendToAll("addMessage", {message: (scndp.name + " killed " + cp.name) });
 				}
 
 				collision = true;
 			}
-		}	
-		
+		}
+
 		if(bullets[i].radius <= 0.5 || collision)
 		{
 			sendToAll("removeBullet", {sid: i});
 			delete bullets[i];
 		}else {
 			if (inWall(bullets[i]).index!=-1){
-				
 				var index = inWall(bullets[i]).index, objectCollided = inWall(bullets[i]).partCollided,r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
-				
+
 				if (!objectCollided.inIner)
 					putOutOf(bullets[i],objectCollided,r1+r2);
 				else
 					putOutOf(bullets[i],objectCollided,r2-r1);
-					
+
 				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
-			
+
 			}
 		}
 	}
@@ -248,22 +248,24 @@ function respawnusers()
 {
 	for(var i in users)
 	{
-		if(users[i].player.dead && (new Date).getTime() - users[i].player.lastEvent.killed > 5000)
+		if(users[i].dead && (new Date).getTime() - users[i].lastEvent.killed > 5000)
 		{
-			sendToAll("updatePlayerInformation", {sid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
+			// TODO
+			// sendToAll("updatePlayerInformation", {sid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
 			users[i].player.pos = new classes.Vector(400, 300);
 			users[i].player.hp = 100;
 			users[i].player.radius = 10;
 			users[i].player.speed = 0;
-			users[i].player.dead = false;
-			users[i].player.lastEvent.respawn = (new Date()).getTime();
+			users[i].dead = false;
+			users[i].lastEvent.respawn = (new Date()).getTime();
 		}
 	}
 }
 
-setInterval(movePlayers, 20);
-setInterval(movebullets, 20);
-setInterval(respawnusers, 1000);
+// TODO
+// setInterval(movePlayers, 20);
+// setInterval(movebullets, 20);
+// setInterval(respawnusers, 1000);
 
 function distanceBetween(one, two)
 {
@@ -276,11 +278,15 @@ function sync()
 {
 	for(var i in bullets)
 	{
+		// TODO
+		/*
 		sendToAll("updateBulletInformation", {sid: i,
 			rotation: bullets[i].rotation,
 			pos: bullets[i].pos,
 			radius: bullets[i].radius});
+			*/
 	}
 }
 
-setInterval(sync, 10000);
+// TODO, maybe no need for this
+// setInterval(sync, 10000);
