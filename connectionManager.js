@@ -24,6 +24,14 @@ function sendMap(user)
 	// }
 }
 
+function sendBullet(id)
+{
+	var packet = global.pm.createBulletPacket(id);
+	for(var i in global.users)
+		global.users[i].socket.send(packet);
+}
+
+
 function initGame(user)
 {
 	user.socket.send(global.pm.initGamePacket(user));
@@ -37,5 +45,6 @@ function broadcastMessage(msg) // TODO
 module.exports.broadcastNewUser = broadcastNewUser;
 module.exports.sendUsers = sendUsers;
 module.exports.sendMap = sendMap;
+module.exports.sendBullet = sendBullet;
 module.exports.initGame = initGame;
 module.exports.broadcastMessage = broadcastMessage;

@@ -5,15 +5,12 @@ function createUserPacket(user)
 	var newUserPacket = new DataView(newUserPacket_b);
 	newUserPacket.setUint8(0, 1); // pid
 
-	// name
 	newUserPacket.setUint8(1, user.name.length);
 	for(var i = 0;i < user.name.length;++ i)
 		newUserPacket.setUint8(2+i, user.name.charCodeAt(i));
 
-	// id
 	newUserPacket.setUint32(1+1+user.name.length, user.id, false);
 
-	// pos
 	var p1Offset = 1 + 1 + user.name.length + 4;
 	newUserPacket.setInt32(p1Offset + 0, user.player.pos.x, false);
 	newUserPacket.setInt32(p1Offset + 4, user.player.pos.y, false);
@@ -42,6 +39,26 @@ function createWallPacket(i)
 	return packet_b;
 }
 
+function createBulletPacket(id)
+{
+	// TODO send damage & more
+
+	// pid, bulletID, shooterID, pos, rotation
+	var packet_b = new ArrayBuffer(1 + 4 + 4 + 8 + 4);
+	var packet = new DataView(packet_b);
+	packet.setUint8(0, 3);
+
+	packet.setUint32(1, id, false);
+	packet.setUint32(5, global.bullets[id].shooter, false);
+
+	packet.setInt32(9, global.bullets[id].pos.x, false);
+	packet.setInt32(13, global.bullets[id].pos.y, false);
+
+	packet.setFloat32(17, global.bullets[id].rotation, false);
+
+	return packet_b;
+}
+
 function initGamePacket(user)
 {
 	var packet_b = new ArrayBuffer(1 + 4);
@@ -55,4 +72,5 @@ function initGamePacket(user)
 
 module.exports.createUserPacket = createUserPacket;
 module.exports.createWallPacket = createWallPacket;
+module.exports.createBulletPacket = createBulletPacket;
 module.exports.initGamePacket = initGamePacket;

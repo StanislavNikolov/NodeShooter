@@ -66,7 +66,7 @@ socket.onmessage = function(event)
 
 		socket.send(response_b);
 	}
-	if(message.getUint8(0) == 1)
+	if(message.getUint8(0) == 1) // new user
 	{
 		var name = "";
 		for(var i = 0;i < message.getUint8(1);++ i)
@@ -79,7 +79,7 @@ socket.onmessage = function(event)
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
 	}
-	if(message.getUint8(0) == 2)
+	if(message.getUint8(0) == 2) // new wall
 	{
 		var id = message.getUint32(1, false);
 
@@ -93,6 +93,18 @@ socket.onmessage = function(event)
 		var fa = message.getFloat32(22, false);
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
+	}
+	if(message.getUint8(0) == 3) // new bullet
+	{
+		var bid = message.getUint32(1, false);
+		var sid = message.getUint32(5, false);
+
+		var px = message.getInt32(9, false);
+		var py = message.getInt32(13, false);
+
+		var rt = message.getFloat32(17, false);
+
+		bullets[bid] = new Bullet(px, py, rt, sid, 20);
 	}
 	if(message.getUint8(0) == 5)
 	{

@@ -99,10 +99,7 @@ wss.on('connection', function (socket)
 			{
 				var id = generateID();
 				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, cu.player.rotation, cu.id, 20);
-
-				// TODO
-				//sendToAll("playerShooted", {psid: mysid, bsid: bsid});
-
+				cm.sendBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
