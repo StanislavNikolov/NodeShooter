@@ -1,36 +1,39 @@
-// shortcuts
 var users = global.users;
 var walls = global.walls;
-var bullets = global.bullets; 
+var bullets = global.bullets;
 var frame = global.frame;
-//var sendToAll = global.sendToAll;
+var classes = global.classes;
 
-var classes = require('./classes.js');
-
-var type = 2;
-if(type == 0)
+generateMap(Number(process.env.MAP_TYPE || 1));
+function generateMap(type)
 {
-	walls[generateID()] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
-	walls[generateID()] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
-	walls[generateID()] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
-	walls[generateID()] = new classes.Wall(400,550,130,160,0,Math.PI);
-	walls[generateID()] = new classes.Wall(400,300,570,600,0,Math.PI*2);
-
-} else if(type == 1)
-{
-	for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 )
-		walls[generateID()] = new classes.Wall(400,300,570,600,i,0.6+i);
-	for ( var i = 0 ; i < Math.PI*2 ; i += Math.PI*2/5 )
+	switch(type)
 	{
-		var angle = i - Math.PI/10 - 0.01;
-		walls[generateID()] = new classes.Wall(400 + Math.cos( angle )*(570/2 + 300),
-				300 + Math.sin( angle )*(570/2 + 300),
-				170, 190, 0, 2*Math.PI);
+		case 0:
+			walls[generateID()] = new classes.Wall(150,300,130,160,Math.PI*0.5,Math.PI*1.5);
+			walls[generateID()] = new classes.Wall(650,300,130,160,Math.PI*1.5,Math.PI*2.5);
+			walls[generateID()] = new classes.Wall(400,50,130,160,Math.PI,Math.PI*2);
+			walls[generateID()] = new classes.Wall(400,550,130,160,0,Math.PI);
+			walls[generateID()] = new classes.Wall(400,300,570,600,0,Math.PI*2);
+			break;
+
+		case 1:
+			for (var i = 0;i < Math.PI*2;i += Math.PI*2/5)
+				walls[generateID()] = new classes.Wall(400, 300, 570, 600, i, 0.6+i);
+			for (var i = 0;i < Math.PI*2;i += Math.PI*2/5)
+			{
+				var angle = i - Math.PI/10 - 0.01;
+				walls[generateID()] = new classes.Wall(400 + Math.cos( angle )*(570/2 + 300)
+						, 300 + Math.sin( angle )*(570/2 + 300)
+						, 170, 190, 0, 2*Math.PI);
+			}
+			walls[generateID()] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
+			break;
+
+		case 2:
+			generateRandomMap(25);
+			break;
 	}
-	walls[generateID()] = new classes.Wall( 400, 300 , 170,290,0,Math.PI);
-} else if(type == 2)
-{
-	generateRandomMap(25);
 }
 
 function isFree(x, y, r)
@@ -41,7 +44,6 @@ function isFree(x, y, r)
 		{
 			return false;
 		}
-
 	}
 	return true;
 }
@@ -55,7 +57,7 @@ function generateRandomMap(sp)
 		var a1 = Math.random() * Math.PI * 2; var a2 = a1 + Math.random() * Math.PI * 2;
 		var x = Math.floor(Math.random() * 1000 - 500);
 		var y = Math.floor(Math.random() * 1000 - 500);
-		var ang = a2 - a1; 
+		var ang = a2 - a1;
 		if(ang < Math.PI / 180 * 90 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2))
 		{
 			if(i < 29)
@@ -72,26 +74,30 @@ function generateRandomMap(sp)
 
 function inWall(p)
 {
-	for (var j in walls)
+	for(var j in walls)
 	{
-		if (distanceBetween(walls[j].pos,p.pos)<p.radius+walls[j].radius.outer && distanceBetween(walls[j].pos,p.pos)+p.radius>walls[j].radius.inner)
+		if(distanceBetween(walls[j].pos, p.pos) < p.radius + walls[j].radius.outer
+			&& distanceBetween(walls[j].pos, p.pos) + p.radius > walls[j].radius.inner)
 		{
 			var angle;
 			if (p.pos.y-walls[j].pos.y>0)
 			{
-				angle = Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
+				angle = Math.acos( (p.pos.x-walls[j].pos.x) / distanceBetween(walls[j].pos, p.pos) );
 			}
-			else 
+			else
 			{
-				angle = 2*Math.PI - Math.acos((p.pos.x-walls[j].pos.x)/distanceBetween(walls[j].pos,p.pos));
+				angle = 2*Math.PI - Math.acos( (p.pos.x-walls[j].pos.x) / distanceBetween(walls[j].pos,p.pos) );
 			}
-			
-			if ((angle>walls[j].angle.start && angle<walls[j].angle.finish) || 
-							(walls[j].angle.finish>2*Math.PI && angle+2*Math.PI>walls[j].angle.start && angle+2*Math.PI<walls[j].angle.finish)  )
+
+			if( (angle > walls[j].angle.start && angle < walls[j].angle.finish)
+				|| (walls[j].angle.finish > 2*Math.PI
+					&& angle + 2*Math.PI > walls[j].angle.start
+					&& angle + 2*Math.PI < walls[j].angle.finish)
+				)
 			{
-				if (distanceBetween(walls[j].pos,p.pos)<(walls[j].radius.inner+walls[j].radius.outer)/2)
+				if(distanceBetween(walls[j].pos, p.pos) < (walls[j].radius.inner + walls[j].radius.outer) / 2)
 					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.inner, inIner: 1}};
-				else 
+				else
 					return {index: j, partCollided: {pos: walls[j].pos, radius: walls[j].radius.outer, inIner: 0}};
 
 			}
@@ -101,10 +107,10 @@ function inWall(p)
 					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner));
 				var center2 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
 				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner));
-				
+
 				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
 				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
-			
+
 				if (col1)
 					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2, inIner: 0}};
 				if (col2)
@@ -133,10 +139,10 @@ function findNewAngle (p,w)
 	{
 		return Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
 	}
-	else 
+	else
 	{
 		return Math.PI*2-Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
-	}		
+	}
 }
 
 function movePlayers()
@@ -144,7 +150,7 @@ function movePlayers()
 	for(var i in users)
 	{
 		if( (users[i].player.speed > 0.01 || users[i].player.speed < -0.01) && !users[i].player.dead)
-		{	
+		{
 			var iw = inWall(users[i].player);// Calculated only once
 			if(iw.index != -1){
 				var index = iw.index, objectCollided = iw.partCollided,r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
@@ -153,10 +159,10 @@ function movePlayers()
 					putOutOf(users[i].player,objectCollided,r1+r2);
 				else
 					putOutOf(users[i].player,objectCollided,r2-r1);
-					
+
 				users[i].player.speed *= 0.8;
 				users[i].player.rotation = findNewAngle(users[i].player,objectCollided);
-				
+
 			}
 			else
 				users[i].player.speed *= 0.97;
