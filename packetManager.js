@@ -18,6 +18,17 @@ function createUserPacket(user)
 	return newUserPacket_b;
 }
 
+function removeUserPacket(user)
+{
+	var removeUserPacket_b = new ArrayBuffer(1 + 4);
+	removeUserPacket = new DataView(removeUserPacket_b);
+	removeUserPacket.setUint8(0, 4);
+
+	removeUserPacket.setUint32(1, user.id);
+
+	return removeUserPacket_b;
+}
+
 function createWallPacket(i)
 {
 	// pid, id, pos, radius, angle
@@ -71,6 +82,7 @@ function initGamePacket(user)
 }
 
 module.exports.createUserPacket = createUserPacket;
+module.exports.removeUserPacket = removeUserPacket;
 module.exports.createWallPacket = createWallPacket;
 module.exports.createBulletPacket = createBulletPacket;
 module.exports.initGamePacket = initGamePacket;

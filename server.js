@@ -111,7 +111,7 @@ wss.on('connection', function (socket)
 
 			// TODO
  			// sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
- 			// sendToAll("removeUser", {sid: socket.vars.sid }, false);
+			cm.broadcastRemoveUser(users[socket.ownerID]);
 			delete users[socket.ownerID];
 		}
 	});

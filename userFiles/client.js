@@ -106,11 +106,26 @@ socket.onmessage = function(event)
 
 		bullets[bid] = new Bullet(px, py, rt, sid, 20);
 	}
+	if(message.getUint8(0) == 4) // remove user
+	{
+		console.log('User disconected');
+		var id = message.getUint32(1);
+
+		for(var i in scoreBoard)
+		{
+			if(i != 0 && scoreBoard[i][0] == users[id].name)
+			{
+				scoreBoard.splice(i, 1);
+				break;
+			}
+		}
+
+		delete users[id];
+	}
 	if(message.getUint8(0) == 5)
 	{
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
-		console.log("Received joinGame event!");
 	}
 }
 
@@ -163,33 +178,9 @@ socket.on("updateScoreBoard", function (data)
 		x ++;
 	}
 });
-socket.on("removeUser", function (data) // kogato nqkoi se disconnectne, go maham
-{
-	console.log("Received removeUser event!");
-	
-	for(var i in scoreBoard)
-	{
-		if(i != 0 && scoreBoard[i][0] == users[data.sid].player.name)
-		{
-			scoreBoard.splice(i, 1);
-			break;
-		}
-	}
-
-	delete users[data.sid];
-});
 socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
 {
 	delete bullets[data.sid];
-});
-socket.on("playerShooted", function (data) // kogato nqkoi se disconnectne, go maham
-{
-	bullets[data.bsid] = new Bullet( users[data.psid].player.pos.x, users[data.psid].player.pos.y, users[data.psid].player.rotation, data.psid );
-});
-
-socket.on("initNewBullet", function (data) // kogato nqkoi se disconnectne, go maham
-{
-	bullets[data.bsid] = new Bullet( data.pos.x, data.pos.y, data.rotation, data.psid );
 });
 socket.on("addMessage", function (data)
 {
@@ -207,7 +198,6 @@ function sendMoveRequest()
 	if(keys[68] || keys[39])
 		socket.emit("move", {direction: "right"});
 }
-
 
 setInterval(sendMoveRequest, 50);
 */
