@@ -183,8 +183,8 @@ function draw()
 						, 3);
 
 				context.strokeStyle = context.fillStyle;
-				var textSize = 10 * users[i].player.name.length;
-				context.fillText(users[i].player.name, users[i].player.pos.x - offset.x - textSize/3, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
+				var textSize = 10 * users[i].name.length;
+				context.fillText(users[i].name, users[i].player.pos.x - offset.x - textSize/3, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
 
 				// draw the player
 				context.beginPath();

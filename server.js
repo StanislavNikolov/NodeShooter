@@ -92,10 +92,11 @@ wss.on('connection', function (socket)
 			}
 
 			cu = new classes.User(socket, name, generateID());
-			users[cu.sid] = cu;
+			users[cu.id] = cu;
 			socket.ownerID = cu.id;
 
 			cm.broadcastNewUser(cu);
+			cm.sendUsers(cu);
 			cm.sendMap(cu);
 			cm.initGame(cu);
 

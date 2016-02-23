@@ -73,8 +73,8 @@ socket.onmessage = function(event)
 			name += String.fromCharCode(message.getUint8(2+i));
 
 		var id = message.getUint32(2+name.length, false);
-		var x = message.getInt32(2+name.length+4 + 0,false);
-		var y = message.getInt32(2+name.length+4 + 4,false);
+		var x = message.getInt32(2+name.length+4 + 0, false);
+		var y = message.getInt32(2+name.length+4 + 4, false);
 
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;

@@ -24,6 +24,11 @@ function broadcastNewUser(user)
 		global.users[n].socket.send(newUserPacket_b);
 }
 
+function sendUsers(user)
+{
+
+}
+
 function sendMap(user)
 {
 	for(var i in global.walls)
@@ -71,6 +76,7 @@ function broadcastMessage(msg) // TODO
 }
 
 module.exports.broadcastNewUser = broadcastNewUser;
+module.exports.sendUsers = sendUser;
 module.exports.sendMap = sendMap;
 module.exports.initGame = initGame;
 module.exports.broadcastMessage = broadcastMessage;
