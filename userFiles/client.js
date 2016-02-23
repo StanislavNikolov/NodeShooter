@@ -127,6 +127,17 @@ socket.onmessage = function(event)
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
 	}
+	if(message.getUint8(0) == 6) // new info about player
+	{
+		var id = message.getUint32(1, false);
+
+		users[id].player.pos.x = message.getInt32(5, false);
+		users[id].player.pos.y = message.getInt32(9, false);
+
+		users[id].player.rotation = message.getFloat32(13, false);
+
+		users[id].player.speed = message.getFloat32(17, false);
+	}
 }
 
 function sendShootRequest()
@@ -141,20 +152,26 @@ function sendShootRequest()
 }
 setInterval(sendShootRequest, 20);
 
-/*
-socket.on("updatePlayerInformation", function (data)
+function sendMoveRequest()
 {
-	if(data.pos != undefined)
-		users[data.sid].player.pos = data.pos;
-	if(data.rotation != undefined)
-		users[data.sid].player.rotation = data.rotation;
-	if(data.radius != undefined)
-		users[data.sid].player.radius = data.radius;
-	if(data.hp != undefined)
-		users[data.sid].player.hp = data.hp;
-	if(data.dead != undefined)
-		users[data.sid].player.dead = data.dead;
-});
+	var packet = new Uint8Array(2);
+	packet[0] = 2;
+
+	if(keys[87] || keys[38]) // ahead
+		packet[1] = 10;
+	if(keys[83] || keys[40]) // back
+		packet[1] = 20;
+	if(keys[65] || keys[37]) // rotate left
+		packet[1] = 30;
+	if(keys[68] || keys[39]) // rotate down
+		packet[1] = 40;
+
+	if(packet[1] != 0)
+		socket.send(packet.buffer);
+}
+setInterval(sendMoveRequest, 50);
+
+/*
 socket.on("updateBulletInformation", function (data)
 {
 	if(data.pos != undefined)
@@ -186,18 +203,4 @@ socket.on("addMessage", function (data)
 {
 	messageBoard.push(data.message);
 });
-
-function sendMoveRequest()
-{
-	if(keys[87] || keys[38])
-		socket.emit("move", {direction: "up"});
-	if(keys[83] || keys[40])
-		socket.emit("move", {direction: "down"});
-	if(keys[65] || keys[37])
-		socket.emit("move", {direction: "left"});
-	if(keys[68] || keys[39])
-		socket.emit("move", {direction: "right"});
-}
-
-setInterval(sendMoveRequest, 50);
 */

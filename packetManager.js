@@ -24,9 +24,30 @@ function removeUserPacket(user)
 	removeUserPacket = new DataView(removeUserPacket_b);
 	removeUserPacket.setUint8(0, 4);
 
-	removeUserPacket.setUint32(1, user.id);
+	removeUserPacket.setUint32(1, user.id, false);
 
 	return removeUserPacket_b;
+}
+
+function basicPlayerStatPacket(user)
+{
+	// TODO hp, dead?...
+
+	// pid, userID, pos, rotation, speed
+	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 6);
+
+	dv.setUint32(1, user.id, false);
+
+	dv.setInt32(5, user.player.pos.x, false);
+	dv.setInt32(9, user.player.pos.y, false);
+
+	dv.setFloat32(13, user.player.rotation, false);
+
+	dv.setFloat32(17, user.player.speed, false);
+
+	return buffer;
 }
 
 function createWallPacket(i)
@@ -83,6 +104,7 @@ function initGamePacket(user)
 
 module.exports.createUserPacket = createUserPacket;
 module.exports.removeUserPacket = removeUserPacket;
+module.exports.basicPlayerStatPacket = basicPlayerStatPacket;
 module.exports.createWallPacket = createWallPacket;
 module.exports.createBulletPacket = createBulletPacket;
 module.exports.initGamePacket = initGamePacket;

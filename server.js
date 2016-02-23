@@ -103,6 +103,24 @@ wss.on('connection', function (socket)
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
+		if(data[0] == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		{
+			if((new Date()).getTime() - cu.lastEvent.move < 50)
+				return;
+
+			cu.lastEvent.move = (new Date()).getTime();
+
+			if(data[1] == 10)
+				cu.player.speed += 0.6;
+			if(data[1] == 20)
+				cu.player.speed *= 0.8;
+			if(data[1] == 30)
+				cu.player.rotation -= 0.2;
+			if(data[1] == 40)
+				cu.player.rotation += 0.2;
+
+			cm.broadcastBasicPlayerStat(cu);
+		}
 	});
 	socket.on('close', function (rawData, flags)
 	{
@@ -115,33 +133,6 @@ wss.on('connection', function (socket)
 			delete users[socket.ownerID];
 		}
 	});
-// 	socket.on("move", function (data)
-// 	{
-// 		if(mysid != undefined) // Нужно е за да съм сигурен, че cp и mysid съществуват
-// 		{
-// 			if(data.direction == "up" && (new Date()).getTime() - cp.lastEvent.move > 50)
-// 			{
-// 				cp.lastEvent.move = (new Date()).getTime();
-// 				cp.speed += 0.6;
-// 			}
-//
-// 			if(data.direction == "down")
-// 			{
-// 				cp.speed *= 0.8;
-// 			}
-//
-// 			if(data.direction == "left")
-// 			{
-// 				cp.rotation -= 0.2;
-// 				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
-// 			}
-// 			if(data.direction == "right")
-// 			{
-// 				cp.rotation += 0.2;
-// 				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
-// 			}
-// 		}
-// 	});
 });
 
 // Last file, because it calls functions written here

@@ -14,6 +14,14 @@ function broadcastRemoveUser(user)
 			global.users[n].socket.send(p);
 }
 
+function broadcastBasicPlayerStat(user)
+{
+	var p = global.pm.basicPlayerStatPacket(user);
+	for(var n in global.users)
+		global.users[n].socket.send(p);
+
+}
+
 function sendUsers(user)
 {
 	for(var n in global.users)
@@ -52,6 +60,7 @@ function broadcastMessage(msg) // TODO
 
 module.exports.broadcastNewUser = broadcastNewUser;
 module.exports.broadcastRemoveUser = broadcastRemoveUser;
+module.exports.broadcastBasicPlayerStat = broadcastBasicPlayerStat;
 module.exports.sendUsers = sendUsers;
 module.exports.sendMap = sendMap;
 module.exports.sendBullet = sendBullet;
