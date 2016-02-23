@@ -83,14 +83,14 @@ socket.onmessage = function(event)
 	{
 		var id = message.getUint32(1, false);
 
-		var x = message.getInt32(2, false);
-		var y = message.getInt32(6, false);
+		var x = message.getInt32(5, false);
+		var y = message.getInt32(9, false);
 
-		var ir = message.getFloat32(10, false);
-		var or = message.getFloat32(14, false);
+		var ir = message.getFloat32(13, false);
+		var or = message.getFloat32(17, false);
 
-		var sa = message.getFloat32(18, false);
-		var fa = message.getFloat32(22, false);
+		var sa = message.getFloat32(21, false);
+		var fa = message.getFloat32(25, false);
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
