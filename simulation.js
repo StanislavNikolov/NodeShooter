@@ -176,8 +176,7 @@ function movePlayers()
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
 
-			//TODO
-			//sendToAll("updatePlayerInformation", {sid: i, pos: users[i].player.pos, rotation: users[i].player.rotation});
+			global.cm.broadcastBasicPlayerStat(users[i]);
 		}
 	}
 }
@@ -269,7 +268,7 @@ function respawnusers()
 }
 
 // TODO
-// setInterval(movePlayers, 20);
+setInterval(movePlayers, 20);
 // setInterval(movebullets, 20);
 // setInterval(respawnusers, 1000);
 
