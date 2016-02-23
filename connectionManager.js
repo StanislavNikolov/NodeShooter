@@ -26,7 +26,7 @@ function sendMap(user)
 
 function initGame(user)
 {
-	user.socket.send(global.pm.createInitGamePacket(user));
+	user.socket.send(global.pm.initGamePacket(user));
 }
 
 function broadcastMessage(msg) // TODO

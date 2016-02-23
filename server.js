@@ -45,20 +45,6 @@ function generateID()
 }
 global.generateID = generateID;
 
-
-function removeUser(socket)
-{
-	delete users[socket.vars.sid];
-}
-
-function sendToAll(type, data, sendFrame)// функция която изпраща информация на всички вече логналите се
-{
-	for(var i in users)
-		users[i].socket.emit(type, data);
-}
-
-global.sendToAll = sendToAll;
-
 wss.on('connection', function (socket)
 {
 	var cu; // current user
@@ -124,7 +110,13 @@ wss.on('connection', function (socket)
 	socket.on('close', function (rawData, flags)
 	{
 		if(typeof(socket.ownerID) !== 'undefined')
+		{
+
+			// TODO
+ 			// sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
+ 			// sendToAll("removeUser", {sid: socket.vars.sid }, false);
 			delete users[socket.ownerID];
+		}
 	});
 // 	socket.on("move", function (data)
 // 	{
@@ -153,20 +145,7 @@ wss.on('connection', function (socket)
 // 			}
 // 		}
 // 	});
-//
-//
-// 	socket.on("disconnect", function (data)
-// 	{
-// 		if(socket.vars.logged) // Няма смисъл да казвам на всички, че някой е влязъл, ако не се е логнал
-// 		{
-// 			sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
-// 			sendToAll("removeUser", {sid: socket.vars.sid }, false);
-// 		}
-//
-// 		removeUser(socket);
-// 	});
 });
-
 
 // Last file, because it calls functions written here
 var simulation = require("./simulation.js");

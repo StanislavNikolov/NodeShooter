@@ -42,7 +42,7 @@ function createWallPacket(i)
 	return packet_b;
 }
 
-function createInitGamePacket(user)
+function initGamePacket(user)
 {
 	var packet_b = new ArrayBuffer(1 + 4);
 	var packet = new DataView(packet_b);
@@ -55,4 +55,4 @@ function createInitGamePacket(user)
 
 module.exports.createUserPacket = createUserPacket;
 module.exports.createWallPacket = createWallPacket;
-module.exports.createInitGamePacket = createInitGamePacket;
+module.exports.initGamePacket = initGamePacket;
