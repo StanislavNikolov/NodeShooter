@@ -3,8 +3,13 @@ var app = require('express')()
   , WebSocketServer = require('ws').Server
   , wss = new WebSocketServer({server: server})
   , fs = require('fs')
-  , classes = require('./classes.js')
-  , cm = require('./connectionManager.js');
+  , classes = require('./classes.js');
+
+global.cm = require('./connectionManager.js')
+global.pm = require('./packetManager.js');
+
+var cm = global.cm;
+var pm = global.pm;
 
 var port = Number(process.env.PORT || 5000);
 server.listen(port, function () { console.log('Listening on ' + server.address().port) });

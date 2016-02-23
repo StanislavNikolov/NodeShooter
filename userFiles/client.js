@@ -113,6 +113,7 @@ function sendShootRequest()
 	}
 }
 setInterval(sendShootRequest, 20);
+
 /*
 socket.on("updatePlayerInformation", function (data)
 {
