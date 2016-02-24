@@ -1,4 +1,4 @@
-function createUserPacket(user)
+module.exports.createUserPacket = function (user)
 {
 	// pid, name length, name itself, id, pos_x, pos_y
 	var buffer = new ArrayBuffer(1 + 1 + user.name.length + 4 + 4 + 4);
@@ -18,7 +18,7 @@ function createUserPacket(user)
 	return buffer;
 }
 
-function removeUserPacket(user)
+module.exports.removeUserPacket = function (user)
 {
 	var buffer = new ArrayBuffer(1 + 4);
 	dv = new DataView(buffer);
@@ -29,7 +29,7 @@ function removeUserPacket(user)
 	return buffer;
 }
 
-function basicPlayerStatPacket(user)
+module.exports.basicPlayerStatPacket = function (user)
 {
 	// TODO hp, dead?...
 
@@ -50,7 +50,7 @@ function basicPlayerStatPacket(user)
 	return buffer;
 }
 
-function createWallPacket(i)
+module.exports.createWallPacket = function (i)
 {
 	// pid, id, pos, radius, angle
 	var buffer = new ArrayBuffer(1 + 4 + 8 + 8 + 8);
@@ -71,7 +71,7 @@ function createWallPacket(i)
 	return buffer;
 }
 
-function createBulletPacket(id)
+module.exports.createBulletPacket = function (id)
 {
 	// TODO send damage & more
 
@@ -91,7 +91,7 @@ function createBulletPacket(id)
 	return buffer;
 }
 
-function removeBulletPacket(id)
+module.exports.removeBulletPacket = function (id)
 {
 	var buffer = new ArrayBuffer(1 + 4);
 	var dv = new DataView(buffer);
@@ -102,7 +102,7 @@ function removeBulletPacket(id)
 	return buffer;
 }
 
-function initGamePacket(user)
+module.exports.initGamePacket = function (user)
 {
 	var buffer = new ArrayBuffer(1 + 4);
 	var dv = new DataView(buffer);
@@ -112,11 +112,3 @@ function initGamePacket(user)
 
 	return buffer;
 }
-
-module.exports.createUserPacket = createUserPacket;
-module.exports.removeUserPacket = removeUserPacket;
-module.exports.basicPlayerStatPacket = basicPlayerStatPacket;
-module.exports.createWallPacket = createWallPacket;
-module.exports.createBulletPacket = createBulletPacket;
-module.exports.removeBulletPacket = removeBulletPacket;
-module.exports.initGamePacket = initGamePacket;
