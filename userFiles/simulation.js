@@ -1,3 +1,4 @@
+/*
 function inWall(p)
 {
 	for (var j in walls)
@@ -119,3 +120,4 @@ function distanceBetween(one, two)
     var beta = one.y - two.y;
     return Math.sqrt((alpha*alpha)+(beta*beta));
 }
+*/

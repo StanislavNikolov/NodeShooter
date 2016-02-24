@@ -137,6 +137,11 @@ socket.onmessage = function(event)
 
 		users[id].player.speed = message.getFloat32(17, false);
 	}
+	if(message.getUint8(0) == 7) // delete bullet
+	{
+		console.log(message.getUint32(1, false));
+		delete bullets[message.getUint32(1, false)];
+	}
 }
 
 function sendShootRequest()
@@ -153,38 +158,26 @@ setInterval(sendShootRequest, 20);
 
 function sendMoveRequest()
 {
-	var moved = false;
-	var packet_b = new ArrayBuffer(1+1+4);
-	var packet = new DataView(packet_b);
-	packet.setUint8(0, 2);
+	var data = 1;
 
-	if(keys[87] || keys[38]) // ahead
-	{
-		moved = true;
-		packet.setUint8(1, 0);
-	}
-	if(keys[83] || keys[40]) // back
-	{
-		moved = true;
-		packet.setUint8(1, 1);
-	}
-	if(keys[65] || keys[37]) // rotate left
-	{
-		moved = true;
-		packet.setUint8(1, 2);
-		myself.player.rotation -= 0.2;
-		packet.setFloat32(2, myself.player.rotation, false);
-	}
-	if(keys[68] || keys[39]) // rotate right
-	{
-		moved = true;
-		packet.setUint8(1, 2);
-		myself.player.rotation += 0.2;
-		packet.setFloat32(2, myself.player.rotation, false);
-	}
+	if(keys[87] || keys[38]) // up
+		data *= 2;
+	if(keys[83] || keys[40]) // down
+		data *= 3;
+	if(keys[65] || keys[37]) // left
+		data *= 5;
+	if(keys[68] || keys[39]) // right
+		data *= 7;
 
-	if(moved)
+	if(data != 1)
+	{
+		var packet_b = new ArrayBuffer(1+1);
+		var packet = new DataView(packet_b);
+		packet.setUint8(0, 2);
+		packet.setUint8(1, data);
+
 		socket.send(packet_b);
+	}
 }
 setInterval(sendMoveRequest, 50);
 

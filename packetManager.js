@@ -91,6 +91,17 @@ function createBulletPacket(id)
 	return buffer;
 }
 
+function removeBulletPacket(id)
+{
+	var buffer = new ArrayBuffer(1 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 7);
+
+	dv.setUint32(1, id, false);
+
+	return buffer;
+}
+
 function initGamePacket(user)
 {
 	var buffer = new ArrayBuffer(1 + 4);
@@ -107,4 +118,5 @@ module.exports.removeUserPacket = removeUserPacket;
 module.exports.basicPlayerStatPacket = basicPlayerStatPacket;
 module.exports.createWallPacket = createWallPacket;
 module.exports.createBulletPacket = createBulletPacket;
+module.exports.removeBulletPacket = removeBulletPacket;
 module.exports.initGamePacket = initGamePacket;

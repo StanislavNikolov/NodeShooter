@@ -113,7 +113,7 @@ wss.on('connection', function (socket)
 			{
 				var id = generateID();
 				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, cu.player.rotation, cu.id, 20);
-				cm.sendBullet(id);
+				cm.broadcastNewBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
@@ -124,13 +124,21 @@ wss.on('connection', function (socket)
 
 			cu.lastEvent.move = (new Date()).getTime();
 
-			if(data.getUint8(1) == 0)
-				cu.player.speed += 0.6;
-			if(data.getUint8(1) == 1)
-				cu.player.speed *= 0.8;
-			if(data.getUint8(1) == 2)
-				cu.player.rotation = data.getFloat32(2, false);
+			var dir = data.getUint8(1);
+			if(dir % 2 == 0)
+				cu.player.d.y -= 6;
+			if(dir % 3 == 0)
+				cu.player.d.y += 6;
+			if(dir % 5 == 0)
+				cu.player.d.x -= 6;
+			if(dir % 7 == 0)
+				cu.player.d.x += 6;
 
+			cm.broadcastBasicPlayerStat(cu);
+		}
+		if(data.getUint8(0) == 3 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		{
+			cu.player.rotation = data.getFloat32(1, false);
 			cm.broadcastBasicPlayerStat(cu);
 		}
 	});

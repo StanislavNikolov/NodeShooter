@@ -7,9 +7,27 @@ function resize()
 	canvas.height = window.innerHeight;
 	canvas.getContext("2d").fillText("Resizeing...", canvas.width / 2, canvas.height / 2);
 }
-
 resize();
+
+function getPlayerRotation(event)
+{
+	if(typeof(myself) != 'undefined')
+	{
+		var dx = event.clientX - canvas.width / 2;
+		var dy = event.clientY - canvas.height / 2;
+		var angle = Math.atan2(dy, dx);
+
+		var packet_b = new ArrayBuffer(1+4);
+		var packet = new DataView(packet_b);
+		packet.setUint8(0, 3);
+		myself.player.rotation = angle;
+		packet.setFloat32(1, myself.player.rotation, false);
+
+		socket.send(packet_b);
+	}
+}
 window.addEventListener("resize", resize, false);
+window.addEventListener("mousemove", getPlayerRotation, false);
 
 var walls = {};
 var users = {};

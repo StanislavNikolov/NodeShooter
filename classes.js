@@ -4,7 +4,7 @@ function Vector(x, y)
 	this.y = y;
 }
 
-Vector.prototype.multiply = function VectorMultiply (num) {
+Vector.prototype.mul = function VectorMultiply (num) {
 	this.x *= num;
 	this.y *= num;
 }
