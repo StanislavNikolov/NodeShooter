@@ -40,8 +40,8 @@ function basicPlayerStatPacket(user)
 
 	dv.setUint32(1, user.id, false);
 
-	dv.setInt32(5, user.player.pos.x, false);
-	dv.setInt32(9, user.player.pos.y, false);
+	dv.setFloat32(5, user.player.pos.x, false);
+	dv.setFloat32(9, user.player.pos.y, false);
 
 	dv.setFloat32(13, user.player.rotation, false);
 

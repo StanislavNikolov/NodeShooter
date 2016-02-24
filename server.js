@@ -28,6 +28,8 @@ userFiles.map(function (file)
 	});
 });
 
+var MAX_BUFF_SIZE = [1+12, 0, 5];
+
 global.users = {};
 global.walls = {};
 global.bullets = {};
@@ -54,13 +56,25 @@ wss.on('connection', function (socket)
 
 	socket.on('message', function(rawData, flags)
 	{
-		var data = new Uint8Array(rawData);
-		if(data[0] == 0)
+/*
+ * 'rawData' is of type 'Buffer', but we need the standart javascript ArrayBuffer.
+ * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server by sending a huge packet.
+ * This is what this 'if' is for, pun not intended.
+ */
+		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1)
+			return;
+
+		var data_b = new ArrayBuffer(rawData.length);
+		var data = new DataView(data_b);
+		for(var i = 0;i < rawData.length;++ i)
+			data.setUint8(i, rawData[i]);
+
+		if(data.getUint8(0) == 0)
 		{
 			if(typeof(cu) != 'undefined' && typeof(cu.name) == 'string')
 				return; // This user already has a name
 
-			if(data.length > 12+1 || data.length <= 1) // Invalid name
+			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
 			{
 				var authRequest = new Uint8Array(1);
 				socket.send(authRequest.buffer);
@@ -68,8 +82,8 @@ wss.on('connection', function (socket)
 			}
 
 			var name = "";
-			for(var i = 0;i < data.length-1;++ i)
-				name += String.fromCharCode(data[i+1]);
+			for(var i = 0;i < data.byteLength-1;++ i)
+				name += String.fromCharCode(data.getUint8(1+i));
 
 			// Check if there's already a user with that name
 			for(var i in global.users)
@@ -93,7 +107,7 @@ wss.on('connection', function (socket)
 
 			cm.broadcastMessage('Player %s joined.', cu.name);
 		}
-		if(data[0] == 1 && typeof(cu) != 'undefined')
+		if(data.getUint8(0) == 1 && typeof(cu) != 'undefined')
 		{
 			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
 			{
@@ -103,21 +117,19 @@ wss.on('connection', function (socket)
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
-		if(data[0] == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		if(data.getUint8(0) == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
 		{
 			if((new Date()).getTime() - cu.lastEvent.move < 50)
 				return;
 
 			cu.lastEvent.move = (new Date()).getTime();
 
-			if(data[1] == 10)
+			if(data.getUint8(1) == 0)
 				cu.player.speed += 0.6;
-			if(data[1] == 20)
+			if(data.getUint8(1) == 1)
 				cu.player.speed *= 0.8;
-			if(data[1] == 30)
-				cu.player.rotation -= 0.2;
-			if(data[1] == 40)
-				cu.player.rotation += 0.2;
+			if(data.getUint8(1) == 2)
+				cu.player.rotation = data.getFloat32(2, false);
 
 			cm.broadcastBasicPlayerStat(cu);
 		}

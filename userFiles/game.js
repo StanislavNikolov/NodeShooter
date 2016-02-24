@@ -80,7 +80,7 @@ window.addEventListener("keyup", function (args)
 }, false);
 
 function drawWall(current, offset)
-{	
+{
 	if(offset != undefined)
 	{
 		current.pos.x -= offset.x;
@@ -133,9 +133,9 @@ function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
 	context.globalAlpha = 1;
 	context.fillStyle = def;
 }
-	
+
 function draw()
-{	
+{
 	if(myself == undefined)
 		return;
 	if(!myself.dead)
@@ -218,7 +218,7 @@ function draw()
 	{
 		for(var j in scoreBoard[i])
 		{
-			context.globalAlpha = 0.5; 
+			context.globalAlpha = 0.5;
 			context.fillStyle = "black";
 			context.fillRect(canvas.width - (scoreBoard[i].length - j) * 102, i * 15 + 20, 100, 14);
 			context.globalAlpha = 1; context.fillStyle = "yellow";

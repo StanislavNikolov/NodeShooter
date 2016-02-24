@@ -108,7 +108,6 @@ socket.onmessage = function(event)
 	}
 	if(message.getUint8(0) == 4) // remove user
 	{
-		console.log('User disconected');
 		var id = message.getUint32(1);
 
 		for(var i in scoreBoard)
@@ -131,8 +130,8 @@ socket.onmessage = function(event)
 	{
 		var id = message.getUint32(1, false);
 
-		users[id].player.pos.x = message.getInt32(5, false);
-		users[id].player.pos.y = message.getInt32(9, false);
+		users[id].player.pos.x = message.getFloat32(5, false);
+		users[id].player.pos.y = message.getFloat32(9, false);
 
 		users[id].player.rotation = message.getFloat32(13, false);
 
@@ -154,20 +153,38 @@ setInterval(sendShootRequest, 20);
 
 function sendMoveRequest()
 {
-	var packet = new Uint8Array(2);
-	packet[0] = 2;
+	var moved = false;
+	var packet_b = new ArrayBuffer(1+1+4);
+	var packet = new DataView(packet_b);
+	packet.setUint8(0, 2);
 
 	if(keys[87] || keys[38]) // ahead
-		packet[1] = 10;
+	{
+		moved = true;
+		packet.setUint8(1, 0);
+	}
 	if(keys[83] || keys[40]) // back
-		packet[1] = 20;
+	{
+		moved = true;
+		packet.setUint8(1, 1);
+	}
 	if(keys[65] || keys[37]) // rotate left
-		packet[1] = 30;
-	if(keys[68] || keys[39]) // rotate down
-		packet[1] = 40;
+	{
+		moved = true;
+		packet.setUint8(1, 2);
+		myself.player.rotation -= 0.2;
+		packet.setFloat32(2, myself.player.rotation, false);
+	}
+	if(keys[68] || keys[39]) // rotate right
+	{
+		moved = true;
+		packet.setUint8(1, 2);
+		myself.player.rotation += 0.2;
+		packet.setFloat32(2, myself.player.rotation, false);
+	}
 
-	if(packet[1] != 0)
-		socket.send(packet.buffer);
+	if(moved)
+		socket.send(packet_b);
 }
 setInterval(sendMoveRequest, 50);
 
