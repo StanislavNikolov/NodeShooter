@@ -44,7 +44,7 @@ function toUTF8Array(str) {
 socket.onmessage = function(event)
 {
 	var message = new DataView(event.data);
-	if(message.getUint8(0) == 0) // auth reqest
+	if(message.getUint8(0) == 001) // auth reqest
 	{
 		var loginName = "";
 		do
@@ -66,7 +66,12 @@ socket.onmessage = function(event)
 
 		socket.send(response_b);
 	}
-	if(message.getUint8(0) == 1) // new user
+	if(message.getUint8(0) == 002)
+	{
+		var id = message.getUint32(1, false);
+		myself = users[id]; // used in game.js for drawing
+	}
+	if(message.getUint8(0) == 011) // add user
 	{
 		var name = "";
 		for(var i = 0;i < message.getUint8(1);++ i)
@@ -79,34 +84,7 @@ socket.onmessage = function(event)
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
 	}
-	if(message.getUint8(0) == 2) // new wall
-	{
-		var id = message.getUint32(1, false);
-
-		var x = message.getInt32(5, false);
-		var y = message.getInt32(9, false);
-
-		var ir = message.getFloat32(13, false);
-		var or = message.getFloat32(17, false);
-
-		var sa = message.getFloat32(21, false);
-		var fa = message.getFloat32(25, false);
-
-		walls[id] = new Wall(x, y, ir, or, sa, fa);
-	}
-	if(message.getUint8(0) == 3) // new bullet
-	{
-		var bid = message.getUint32(1, false);
-		var sid = message.getUint32(5, false);
-
-		var px = message.getInt32(9, false);
-		var py = message.getInt32(13, false);
-
-		var rt = message.getFloat32(17, false);
-
-		bullets[bid] = new Bullet(px, py, rt, sid, 20);
-	}
-	if(message.getUint8(0) == 4) // remove user
+	if(message.getUint8(0) == 012) // remove user
 	{
 		var id = message.getUint32(1);
 
@@ -121,12 +99,7 @@ socket.onmessage = function(event)
 
 		delete users[id];
 	}
-	if(message.getUint8(0) == 5)
-	{
-		var id = message.getUint32(1, false);
-		myself = users[id]; // used in game.js for drawing
-	}
-	if(message.getUint8(0) == 6) // new info about player
+	if(message.getUint8(0) == 013) // basic player info
 	{
 		var id = message.getUint32(1, false);
 
@@ -137,10 +110,36 @@ socket.onmessage = function(event)
 
 		users[id].player.speed = message.getFloat32(17, false);
 	}
-	if(message.getUint8(0) == 7) // delete bullet
+	if(message.getUint8(0) == 021) // add bullet
 	{
-		console.log(message.getUint32(1, false));
+		var bid = message.getUint32(1, false);
+		var sid = message.getUint32(5, false);
+
+		var px = message.getInt32(9, false);
+		var py = message.getInt32(13, false);
+
+		var rt = message.getFloat32(17, false);
+
+		bullets[bid] = new Bullet(px, py, rt, sid, 20);
+	}
+	if(message.getUint8(0) == 022) // remove bullet
+	{
 		delete bullets[message.getUint32(1, false)];
+	}
+	if(message.getUint8(0) == 031) // add wall
+	{
+		var id = message.getUint32(1, false);
+
+		var x = message.getInt32(5, false);
+		var y = message.getInt32(9, false);
+
+		var ir = message.getFloat32(13, false);
+		var or = message.getFloat32(17, false);
+
+		var sa = message.getFloat32(21, false);
+		var fa = message.getFloat32(25, false);
+
+		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
 }
 

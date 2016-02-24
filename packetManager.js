@@ -1,9 +1,29 @@
+// 00 - authentication
+module.exports.nameReqPacket = function ()
+{
+	var buffer = new ArrayBuffer(1 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 001);
+	return buffer;
+}
+module.exports.initGamePacket = function (user)
+{
+	var buffer = new ArrayBuffer(1 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 002);
+
+	dv.setUint32(1, user.id, false);
+
+	return buffer;
+}
+
+// 01 - users
 module.exports.createUserPacket = function (user)
 {
 	// pid, name length, name itself, id, pos_x, pos_y
 	var buffer = new ArrayBuffer(1 + 1 + user.name.length + 4 + 4 + 4);
 	var dv = new DataView(buffer);
-	dv.setUint8(0, 1); // pid
+	dv.setUint8(0, 011); // pid
 
 	dv.setUint8(1, user.name.length);
 	for(var i = 0;i < user.name.length;++ i)
@@ -17,18 +37,16 @@ module.exports.createUserPacket = function (user)
 
 	return buffer;
 }
-
 module.exports.removeUserPacket = function (user)
 {
 	var buffer = new ArrayBuffer(1 + 4);
 	dv = new DataView(buffer);
-	dv.setUint8(0, 4);
+	dv.setUint8(0, 012);
 
 	dv.setUint32(1, user.id, false);
 
 	return buffer;
 }
-
 module.exports.basicPlayerStatPacket = function (user)
 {
 	// TODO hp, dead?...
@@ -36,7 +54,7 @@ module.exports.basicPlayerStatPacket = function (user)
 	// pid, userID, pos, rotation, speed
 	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4);
 	var dv = new DataView(buffer);
-	dv.setUint8(0, 6);
+	dv.setUint8(0, 013);
 
 	dv.setUint32(1, user.id, false);
 
@@ -50,27 +68,7 @@ module.exports.basicPlayerStatPacket = function (user)
 	return buffer;
 }
 
-module.exports.createWallPacket = function (i)
-{
-	// pid, id, pos, radius, angle
-	var buffer = new ArrayBuffer(1 + 4 + 8 + 8 + 8);
-	var dv = new DataView(buffer);
-	dv.setUint8(0, 2);
-
-	dv.setUint32(1, i); // id = wall id
-
-	dv.setInt32(5, global.walls[i].pos.x, false);
-	dv.setInt32(9, global.walls[i].pos.y, false);
-
-	dv.setFloat32(13, global.walls[i].radius.inner, false);
-	dv.setFloat32(17, global.walls[i].radius.outer, false);
-
-	dv.setFloat32(21, global.walls[i].angle.start, false);
-	dv.setFloat32(25, global.walls[i].angle.finish, false);
-
-	return buffer;
-}
-
+// 02 - bullets
 module.exports.createBulletPacket = function (id)
 {
 	// TODO send damage & more
@@ -78,7 +76,7 @@ module.exports.createBulletPacket = function (id)
 	// pid, bulletID, shooterID, pos, rotation
 	var buffer = new ArrayBuffer(1 + 4 + 4 + 8 + 4);
 	var dv = new DataView(buffer);
-	dv.setUint8(0, 3);
+	dv.setUint8(0, 021);
 
 	dv.setUint32(1, id, false);
 	dv.setUint32(5, global.bullets[id].shooter, false);
@@ -90,25 +88,35 @@ module.exports.createBulletPacket = function (id)
 
 	return buffer;
 }
-
 module.exports.removeBulletPacket = function (id)
 {
 	var buffer = new ArrayBuffer(1 + 4);
 	var dv = new DataView(buffer);
-	dv.setUint8(0, 7);
+	dv.setUint8(0, 022);
 
 	dv.setUint32(1, id, false);
 
 	return buffer;
 }
 
-module.exports.initGamePacket = function (user)
+// 03 - map
+module.exports.createWallPacket = function (i)
 {
-	var buffer = new ArrayBuffer(1 + 4);
+	// pid, id, pos, radius, angle
+	var buffer = new ArrayBuffer(1 + 4 + 8 + 8 + 8);
 	var dv = new DataView(buffer);
-	dv.setUint8(0, 5);
+	dv.setUint8(0, 031);
 
-	dv.setUint32(1, user.id, false);
+	dv.setUint32(1, i); // id = wall id
+
+	dv.setInt32(5, global.walls[i].pos.x, false);
+	dv.setInt32(9, global.walls[i].pos.y, false);
+
+	dv.setFloat32(13, global.walls[i].radius.inner, false);
+	dv.setFloat32(17, global.walls[i].radius.outer, false);
+
+	dv.setFloat32(21, global.walls[i].angle.start, false);
+	dv.setFloat32(25, global.walls[i].angle.finish, false);
 
 	return buffer;
 }

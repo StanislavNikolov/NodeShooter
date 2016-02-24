@@ -51,7 +51,7 @@ wss.on('connection', function (socket)
 {
 	var cu; // current user
 
-	var authRequest = new Uint8Array(1);
+	var authRequest = new Uint8Array([1]);
 	socket.send(authRequest.buffer);
 
 	socket.on('message', function(rawData, flags)
@@ -76,7 +76,7 @@ wss.on('connection', function (socket)
 
 			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
 			{
-				var authRequest = new Uint8Array(1);
+				var authRequest = new Uint8Array([1]);
 				socket.send(authRequest.buffer);
 				return;
 			}
