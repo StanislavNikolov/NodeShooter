@@ -1,179 +1,157 @@
 var app = require('express')()
   , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server)
-  , fs = require('fs')
-  , classes = require('./classes.js');
+  , WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({server: server});
 
-io.set('log level', 1);// Remove unneeded debug messages
+global.classes = require('./classes.js');
+global.cm = require('./connectionManager.js')
+global.pm = require('./packetManager.js');
+
+var cm = global.cm;
+var pm = global.pm;
+var classes = global.classes;
+
 var port = Number(process.env.PORT || 5000);
-server.listen(port);
+server.listen(port, function () { console.log('Listening on ' + server.address().port) });
 
 app.get('/', function (req, res)
 {
 	res.sendfile(__dirname + '/userFiles/index.html');
 });
 
-var userFiles = ['client.js', 'game.js', 'style.css', 'simulation.js'];
-userFiles.map(function(file)
+var userFiles = ['client.js', 'game.js', 'styles.css', 'simulation.js'];
+userFiles.map(function (file)
 {
 	app.get('/userFiles/' + file, function (req, res)
 	{
-		res.sendFile(__dirname + '/userFiles/' + file);
+		res.sendfile(__dirname + '/userFiles/' + file);
 	});
 });
 
-//Записвам го така за да може да се достигат тези променливи от други файлове
-global.users = {};// мап с всички плеъри и сокети
-global.walls = {};// масив с стените
-global.bullets = {};// мап с куршумите
+var MAX_BUFF_SIZE = [1+12, 0, 5];
+
+global.users = {};
+global.walls = {};
+global.bullets = {};
 global.frame = 0;
 
 var users = global.users;
 var walls = global.walls;
-var bullets = global.bullets; 
+var bullets = global.bullets;
 var frame = global.frame;
 
-function generateSid(prefix)//За юзър той е _, а за куршуми e *, за стена е +
+var nextID = 0;
+function generateID()
 {
-	return prefix + Math.random().toString(36).substring(2, 8);
+	return nextID ++;
 }
-global.generateSid = generateSid;
+global.generateID = generateID;
 
-function addUser(socket, name)// Записва човека в масива с потребители
+wss.on('connection', function (socket)
 {
-	var sid = generateSid("_");
-	socket.vars.logged = true;
-	socket.vars.sid = sid;
+	var cu; // current user
 
-	users[sid] = {};
-	users[sid].socket = socket;
-	users[sid].player = new classes.Player( new classes.Vector(400, 300), name );
+	var authRequest = new Uint8Array([1]);
+	socket.send(authRequest.buffer);
 
-	return sid;
-}
-
-function removeUser(socket)
-{
-	delete users[socket.vars.sid];
-}
-
-function sendToAll(type, data, sendFrame)// функция която изпраща информация на всички вече логналите се
-{
-	for(var i in users)
-		users[i].socket.emit(type, data);
-}
-
-global.sendToAll = sendToAll;
-
-io.sockets.on("connection", function (socket) //Почти цялата документация с клиентите
-{
-	/*
-	users = {}
-		* .player = new Player()
-		* .socket = socket ------------^ Референция към този сокет
-		* .account = 
-	*/
-
-	socket.vars = {};
-	socket.vars.logged = false;
-	var cp, mysid;
-
-	socket.emit("enterUsername", {});
-	
-	socket.on("login", function (data)
+	socket.on('message', function(rawData, flags)
 	{
-		if(data == undefined || data.name == undefined || data.name.length > 12 || data.name == "")
-		{
-			socket.emit("enterUsername", {});
+/*
+ * 'rawData' is of type 'Buffer', but we need the standart javascript ArrayBuffer.
+ * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server by sending a huge packet.
+ * This is what this 'if' is for, pun not intended.
+ */
+		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1)
 			return;
-		}
 
-		for(var i in users)
+		var data_b = new ArrayBuffer(rawData.length);
+		var data = new DataView(data_b);
+		for(var i = 0;i < rawData.length;++ i)
+			data.setUint8(i, rawData[i]);
+
+		if(data.getUint8(0) == 0)
 		{
-			if(users[i].player.name == data.name)
+			if(typeof(cu) != 'undefined' && typeof(cu.name) == 'string')
+				return; // This user already has a name
+
+			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
 			{
-				socket.emit("enterUsername", {});
+				var authRequest = new Uint8Array([1]);
+				socket.send(authRequest.buffer);
 				return;
 			}
-		}
 
-		if(!socket.vars.logged) // Ако изпрати няколко логин-а, го слагам само първия път
-		{
-			mysid = addUser(socket, data.name);
-			cp = users[ mysid ].player; // currentPlayer - референция към users[mysid].player
+			var name = "";
+			for(var i = 0;i < data.byteLength-1;++ i)
+				name += String.fromCharCode(data.getUint8(1+i));
 
-			console.log("User logged! Name: " + data.name + " with sid: " + mysid);
-			
-			sendToAll("initNewPlayer", {sid: mysid, player: cp}, false); // пращам на всички (и на мен) информацията за играча, без .socket
-
-			//пращам на новия всички останали, но без него самия защото той вече се има
-			for(var i in users)
+			// Check if there's already a user with that name
+			for(var i in global.users)
 			{
-				if(i != mysid)
-					socket.emit("initNewPlayer", {sid: i, player: users[i].player}, false);
+				if(global.users[i].name == name)
+				{
+					var authRequest = new Uint8Array(1);
+					socket.send(authRequest.buffer);
+					return;
+				}
 			}
 
-			for (var i in walls)
-				socket.emit("initNewWall", { sid: i, wall: walls[i] }); // може да се замести с users[mysid].socket.emit("init..., но няма смисъл
+			cu = new classes.User(socket, name, generateID());
+			users[cu.id] = cu;
+			socket.ownerID = cu.id;
 
-			for (var i in bullets)
-				socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].shooter });
+			cm.broadcastNewUser(cu);
+			cm.sendUsers(cu);
+			cm.sendMap(cu);
+			cm.initGame(cu);
 
-			//казвам му кой по-точно е той съмия
-			socket.emit("joinGame", {sid: mysid });
-			sendToAll("addMessage", {message: ("Player " + data.name + " joined.") });
+			cm.broadcastMessage('Player ' + cu.name + ' joined');
+		}
+		if(data.getUint8(0) == 1 && typeof(cu) != 'undefined')
+		{
+			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
+			{
+				var id = generateID();
+				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, cu.player.rotation, cu.id, 20);
+				cm.broadcastNewBullet(id);
+				cu.lastEvent.shoot = (new Date()).getTime();
+			}
+		}
+		if(data.getUint8(0) == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		{
+			if((new Date()).getTime() - cu.lastEvent.move < 50)
+				return;
+
+			cu.lastEvent.move = (new Date()).getTime();
+
+			var dir = data.getUint8(1);
+			if(dir % 2 == 0)
+				cu.player.d.y -= 6;
+			if(dir % 3 == 0)
+				cu.player.d.y += 6;
+			if(dir % 5 == 0)
+				cu.player.d.x -= 6;
+			if(dir % 7 == 0)
+				cu.player.d.x += 6;
+
+			cm.broadcastBasicPlayerStat(cu);
+		}
+		if(data.getUint8(0) == 3 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		{
+			cu.player.rotation = data.getFloat32(1, false);
+			cm.broadcastBasicPlayerStat(cu);
 		}
 	});
-
-	socket.on("move", function (data)
+	socket.on('close', function (rawData, flags)
 	{
-		if(mysid != undefined) // Нужно е за да съм сигурен, че cp и mysid съществуват 
+		if(typeof(socket.ownerID) !== 'undefined')
 		{
-			if(data.direction == "up" && (new Date()).getTime() - cp.lastEvent.move > 50)
-			{
-				cp.lastEvent.move = (new Date()).getTime();
-				cp.speed += 0.6;
-			}
-
-			if(data.direction == "down")
-			{
-				cp.speed *= 0.8;
-			}
-
-			if(data.direction == "left")
-			{
-				cp.rotation -= 0.2;
-				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
-			}
-			if(data.direction == "right")
-			{
-				cp.rotation += 0.2;
-				sendToAll("updatePlayerInformation", {sid: mysid, rotation: cp.rotation});
-			}
+			cm.broadcastMessage(users[socket.ownerID].name + ' quit');
+			cm.broadcastRemoveUser(users[socket.ownerID]);
+			delete users[socket.ownerID];
 		}
-	});
-
-	socket.on("shoot", function (data)
-	{
-		if(!cp.dead && (new Date()).getTime() - cp.lastEvent.shoot > 120)//С това подсигурявам, че няма да спамя с булети
-		{
-			var bsid = generateSid("*"); 
-			bullets[bsid] = new classes.Bullet(cp.pos.x, cp.pos.y, cp.rotation, mysid, 20);
-			sendToAll("playerShooted", {psid: mysid, bsid: bsid});
-			cp.lastEvent.shoot = (new Date()).getTime();
-		}
-	});
-
-	socket.on("disconnect", function (data)
-	{
-		if(socket.vars.logged) // Няма смисъл да казвам на всички, че някой е влязъл, ако не се е логнал
-		{
-			sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
-			sendToAll("removeUser", {sid: socket.vars.sid }, false);
-		}
-
-		removeUser(socket);
 	});
 });
 
-var simulation = require("./simulation.js"); // последен файл, защото вика функции написани в този
+// Last file, because it calls functions written here
+var simulation = require("./simulation.js");

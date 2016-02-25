@@ -4,7 +4,7 @@ function Vector(x, y)
 	this.y = y;
 }
 
-Vector.prototype.multiply = function VectorMultiply (num) {
+Vector.prototype.mul = function VectorMultiply (num) {
 	this.x *= num;
 	this.y *= num;
 }
@@ -18,17 +18,16 @@ Vector.prototype.len = this.len = function VectorLength() {
 	return Math.sqrt(this.x*this.x+this.y*this.y);
 }
 
-function Wall(x, y, inerRadius, outerRadius, startAngle, finishAngle)
+function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
 {
 	this.pos = new Vector(x, y);
-	this.radius = {iner:inerRadius, outer:outerRadius};
+	this.radius = {inner:innerRadius, outer:outerRadius};
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
-function Player(p, n)
+function Player(p)
 {
-	this.pos = p; // трябва да е Vector
-	this.name = n;
+	this.pos = p; // must be Vector
 	this.radius = 10;
 	this.rotation = 0;
 	this.speed = 0;
@@ -36,15 +35,26 @@ function Player(p, n)
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
 	this.lastEvent = {move: 0, shoot: 0, respawn: 0, killed: 0};
+}
+
+function User(socket, name, id)
+{
+	this.socket = socket;
+	this.name = name;
+	this.id = id;
 	this.kills = 0;
-	this.deads = 0;
+	this.deaths = 0;
+	this.dead = false;
+	this.lastEvent = {shoot: 0, killed: 0, respawn: 0, move: 0};
+
+	this.player = new Player(new Vector(400, 300));
 }
 
 function Bullet(x, y, r, shr, damage)
 {
 	this.pos = new Vector(x, y);
 	this.rotation = r;
-	this.radius = 2;
+	this.radius = 4;
 	this.shooter = shr;
 	this.d = new Vector(Math.cos(r), Math.sin(r));
 	this.damage = damage;
@@ -53,4 +63,5 @@ function Bullet(x, y, r, shr, damage)
 module.exports.Vector = Vector;
 module.exports.Wall = Wall;
 module.exports.Player = Player;
+module.exports.User = User;
 module.exports.Bullet = Bullet;
