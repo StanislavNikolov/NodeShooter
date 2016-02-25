@@ -126,6 +126,16 @@ socket.onmessage = function(event)
 	{
 		delete bullets[message.getUint32(1, false)];
 	}
+	if(message.getUint8(0) == 023) // basic bullet stat
+	{
+		var id = message.getUint32(1, false);
+
+		bullets[id].pos.x = message.getInt32(5, false);
+		bullets[id].pos.y = message.getInt32(9, false);
+
+		bullets[id].rotation = message.getFloat32(13, false);
+		bullets[id].radius = message.getFloat32(17, false);
+	}
 	if(message.getUint8(0) == 031) // add wall
 	{
 		var id = message.getUint32(1, false);

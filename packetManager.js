@@ -98,6 +98,22 @@ module.exports.removeBulletPacket = function (id)
 
 	return buffer;
 }
+module.exports.basicBulletStatPacket = function (id)
+{
+	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 023);
+
+	dv.setUint32(1, id, false);
+
+	dv.setInt32(5, global.bullets[id].pos.x, false);
+	dv.setInt32(9, global.bullets[id].pos.y, false);
+
+	dv.setFloat32(13, global.bullets[id].rotation, false);
+	dv.setFloat32(17, global.bullets[id].radius, false);
+
+	return buffer;
+}
 
 // 03 - map
 module.exports.createWallPacket = function (i)

@@ -10,14 +10,15 @@ The first 8 bits of every packet are used to identify it's purpose. They are ref
 
 Send by the server:  
 001 - request for a [new] name  
-002 - start game, connection complete
+002 - start game, connection complete  
 
-011 - user joined
-012 - user disconnected
-013 - basic player info
+011 - user joined  
+012 - user disconnected  
+013 - basic player info  
 
-021 - add bullet
-022 - remove bullet
+021 - add bullet  
+022 - remove bullet  
+023 - basic bullet info  
 
-031 - add wall
+031 - add wall  
 

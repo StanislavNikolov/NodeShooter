@@ -23,8 +23,7 @@ function generateMap(type)
 			for (var i = 0;i < Math.PI*2;i += Math.PI*2/5)
 			{
 				var angle = i - Math.PI/10 - 0.01;
-				walls[generateID()] = new classes.Wall(400 + Math.cos(angle)*(570/2 + 300), 300 + Math.sin(angle)*(570/2 + 300)
-, 170, 190, 0, 2*Math.PI);
+				walls[generateID()] = new classes.Wall(400 + Math.cos(angle)*(570/2 + 300), 300 + Math.sin(angle)*(570/2 + 300) , 170, 190, 0, 2*Math.PI);
 			}
 			walls[generateID()] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
 			break;
@@ -186,15 +185,16 @@ function moveBullets()
 		bullets[i].pos.x += bullets[i].d.x;
 		bullets[i].pos.y += bullets[i].d.y;
 
+		// Check if the bullet hit soembody
 		for(var j in users)
 		{
 			var cu = users[j];
-			if(j != bullets[i].shooter && !cu.dead && distanceBetween(bullets[i].pos, cu.player.pos) < bullets[i].radius + cu.player.radius)
+			if(j != bullets[i].shooter && !cu.dead
+					&& distanceBetween(bullets[i].pos, cu.player.pos) < bullets[i].radius + cu.player.radius)
 			{
+				// The first 5 seconds after respawn the user can't take damage
 				if((new Date()).getTime() - cu.lastEvent.respawn > 5000)
-				{
 					cu.player.hp -= bullets[i].damage;
-				}
 
 				if(cu.player.hp > 0)
 				{
@@ -204,16 +204,17 @@ function moveBullets()
 
 				if(cu.player.hp <= 0)
 				{
-					//TODO
-					//sendToAll("updatePlayerInformation", {sid: j, dead: true});
 					cu.dead = true;
 					cu.lastEvent.killed = (new Date()).getTime();
-
 					cu.deads ++;
+
+					if(typeof(users[bullets[i].shooter]) != 'undefined')
+						users[bullets[i].shooter].kills ++;
+
+					//TODO
+					//sendToAll("updatePlayerInformation", {sid: j, dead: true});
 					//sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
 
-					var scndp = users[bullets[i].shooter];
-					scndp.kills ++;
 					//sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
 					//sendToAll("addMessage", {message: (scndp.name + " killed " + cp.name) });
 				}
@@ -229,8 +230,11 @@ function moveBullets()
 		}
 		else
 		{
-			if (inWall(bullets[i]).index!=-1){
-				var index = inWall(bullets[i]).index, objectCollided = inWall(bullets[i]).partCollided,r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
+			if(inWall(bullets[i]).index!=-1)
+			{
+				var index = inWall(bullets[i]).index;
+				var objectCollided = inWall(bullets[i]).partCollided;
+				var r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
 
 				if (!objectCollided.inIner)
 					putOutOf(bullets[i],objectCollided,r1+r2);
@@ -238,8 +242,8 @@ function moveBullets()
 					putOutOf(bullets[i],objectCollided,r2-r1);
 
 				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
-
 			}
+			global.cm.broadcastBasicBulletStat(i);
 		}
 	}
 }

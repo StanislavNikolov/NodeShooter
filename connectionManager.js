@@ -1,4 +1,4 @@
-function broadcastNewUser(user)
+module.exports.broadcastNewUser = function (user)
 {
 	var p = global.pm.createUserPacket(user);
 	for(var n in global.users)
@@ -6,7 +6,7 @@ function broadcastNewUser(user)
 			global.users[n].socket.send(p);
 }
 
-function broadcastRemoveUser(user)
+module.exports.broadcastRemoveUser = function (user)
 {
 	var p = global.pm.removeUserPacket(user);
 	for(var n in global.users)
@@ -14,7 +14,7 @@ function broadcastRemoveUser(user)
 			global.users[n].socket.send(p);
 }
 
-function broadcastBasicPlayerStat(user)
+module.exports.broadcastBasicPlayerStat = function (user)
 {
 	var p = global.pm.basicPlayerStatPacket(user);
 	for(var n in global.users)
@@ -22,28 +22,34 @@ function broadcastBasicPlayerStat(user)
 
 }
 
-function broadcastNewBullet(id)
+module.exports.broadcastNewBullet = function (id)
 {
 	var packet = global.pm.createBulletPacket(id);
 	for(var i in global.users)
 		global.users[i].socket.send(packet);
 }
 
-function broadcastRemoveBullet(id)
+module.exports.broadcastRemoveBullet = function (id)
 {
 	var packet = global.pm.removeBulletPacket(id);
 	for(var i in global.users)
 		global.users[i].socket.send(packet);
-
 }
 
-function sendUsers(user)
+module.exports.broadcastBasicBulletStat = function (id)
+{
+	var packet = global.pm.basicBulletStatPacket(id);
+	for(var i in global.users)
+		global.users[i].socket.send(packet);
+}
+
+module.exports.sendUsers = function (user)
 {
 	for(var n in global.users)
 		user.socket.send(global.pm.createUserPacket(global.users[n]));
 }
 
-function sendMap(user)
+module.exports.sendMap = function (user)
 {
 	for(var i in global.walls)
 		user.socket.send(global.pm.createWallPacket(i));
@@ -55,22 +61,12 @@ function sendMap(user)
 	// }
 }
 
-function initGame(user)
+module.exports.initGame = function (user)
 {
 	user.socket.send(global.pm.initGamePacket(user));
 }
 
-function broadcastMessage(msg) // TODO
+module.exports.broadcastMessage = function (msg) // TODO
 {
 
 }
-
-module.exports.broadcastNewUser = broadcastNewUser;
-module.exports.broadcastRemoveUser = broadcastRemoveUser;
-module.exports.broadcastBasicPlayerStat = broadcastBasicPlayerStat;
-module.exports.broadcastNewBullet = broadcastNewBullet;
-module.exports.broadcastRemoveBullet = broadcastRemoveBullet;
-module.exports.sendUsers = sendUsers;
-module.exports.sendMap = sendMap;
-module.exports.initGame = initGame;
-module.exports.broadcastMessage = broadcastMessage;
