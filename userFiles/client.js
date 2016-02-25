@@ -155,6 +155,14 @@ socket.onmessage = function(event)
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
+	if(message.getUint8(0) == 041)
+	{
+		var msg = '';
+		var s = message.getUint32(1, false);
+		for(var i = 0;i < s;++ i)
+			msg += String.fromCharCode(message.getUint8(5+i));
+		messageBoard.push(msg);
+	}
 }
 
 function sendShootRequest()
@@ -207,9 +215,5 @@ socket.on("updateScoreBoard", function (data)
 		}
 		x ++;
 	}
-});
-socket.on("addMessage", function (data)
-{
-	messageBoard.push(data.message);
 });
 */

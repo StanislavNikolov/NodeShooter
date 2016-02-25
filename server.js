@@ -105,7 +105,7 @@ wss.on('connection', function (socket)
 			cm.sendMap(cu);
 			cm.initGame(cu);
 
-			cm.broadcastMessage('Player %s joined.', cu.name);
+			cm.broadcastMessage('Player ' + cu.name + ' joined');
 		}
 		if(data.getUint8(0) == 1 && typeof(cu) != 'undefined')
 		{

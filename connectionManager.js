@@ -68,7 +68,7 @@ module.exports.sendMap = function (user)
 	for(var i in global.walls)
 		user.socket.send(global.pm.createWallPacket(i));
 
-	for (var i in bullets)
+	for(var i in global.bullets)
 		user.socket.send(global.pm.createBulletPacket(i));
 }
 
@@ -77,7 +77,9 @@ module.exports.initGame = function (user)
 	user.socket.send(global.pm.initGamePacket(user));
 }
 
-module.exports.broadcastMessage = function (msg) // TODO
+module.exports.broadcastMessage = function (msg)
 {
-
+	var p = global.pm.addMessagePacket(msg);
+	for(var i in users)
+		global.users[i].socket.send(p);
 }

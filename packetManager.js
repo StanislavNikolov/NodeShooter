@@ -151,3 +151,17 @@ module.exports.createWallPacket = function (i)
 
 	return buffer;
 }
+
+// 04 - messages
+module.exports.addMessagePacket = function (msg)
+{
+	var buffer = new ArrayBuffer(1 + 4 + msg.length);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 041);
+
+	dv.setUint32(1, msg.length, false);
+	for(var i = 0;i < msg.length;++ i)
+		dv.setUint8(5+i, msg.charCodeAt(i));
+
+	return buffer;
+}
