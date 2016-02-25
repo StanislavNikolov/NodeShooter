@@ -163,7 +163,7 @@ function sendShootRequest()
 		currentShootPeriod = maxShootPeriod;
 	}
 }
-setInterval(sendShootRequest, 10);
+setInterval(sendShootRequest, 20);
 
 function sendMoveRequest()
 {
@@ -191,16 +191,6 @@ function sendMoveRequest()
 setInterval(sendMoveRequest, 50);
 
 /*
-socket.on("updateBulletInformation", function (data)
-{
-	if(data.pos != undefined)
-		bullets[data.sid].pos = data.pos;
-	if(data.rotation != undefined)
-		bullets[data.sid].rotation = data.rotation;
-	if(data.radius != undefined)
-		bullets[data.sid].radius = data.radius;
-});
-
 socket.on("updateScoreBoard", function (data)
 {
 	var x = 1;
@@ -213,10 +203,6 @@ socket.on("updateScoreBoard", function (data)
 		}
 		x ++;
 	}
-});
-socket.on("removeBullet", function (data) // kogato nqkoi se disconnectne, go maham
-{
-	delete bullets[data.sid];
 });
 socket.on("addMessage", function (data)
 {
