@@ -15,6 +15,8 @@ Send by the server:
 011 - user joined  
 012 - user disconnected  
 013 - basic player info  
+014 - player died  
+015 - player respawned  
 
 021 - add bullet  
 022 - remove bullet  
