@@ -187,13 +187,11 @@ function draw()
 
 		for ( var i in users )
 		{
-			if(!users[i].player.dead)
+			if(!users[i].dead)
 			{
 				context.fillStyle = "red";
 				if (myself.id == i)
-				{
 					context.fillStyle = "blue";
-				}
 				drawHpBar(users[i].player
 						, 20
 						, users[i].player.pos.x - offset.x - users[i].player.radius

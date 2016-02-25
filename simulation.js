@@ -211,10 +211,10 @@ function moveBullets()
 					if(typeof(users[bullets[i].shooter]) != 'undefined')
 						users[bullets[i].shooter].kills ++;
 
-					//TODO
-					//sendToAll("updatePlayerInformation", {sid: j, dead: true});
-					//sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
+					global.cm.broadcastPlayerDied(cu);
 
+					//TODO
+					//sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
 					//sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
 					//sendToAll("addMessage", {message: (scndp.name + " killed " + cp.name) });
 				}
@@ -250,28 +250,26 @@ function moveBullets()
 	}
 }
 
-function respawnusers()
+function respawnUsers()
 {
 	for(var i in users)
 	{
 		if(users[i].dead && (new Date).getTime() - users[i].lastEvent.killed > 5000)
 		{
-			// TODO
-			// sendToAll("updatePlayerInformation", {sid: i, dead: false, pos: new classes.Vector(400, 300), radius: 10, speed: 0, hp: 100});
-			users[i].player.pos = new classes.Vector(400, 300);
 			users[i].player.hp = 100;
 			users[i].player.radius = 10;
 			users[i].player.speed = 0;
 			users[i].dead = false;
 			users[i].lastEvent.respawn = (new Date()).getTime();
+			global.cm.broadcastBasicPlayerStat(users[i]);
+			global.cm.broadcastPlayerRespawned(users[i]);
 		}
 	}
 }
 
-// TODO
 setInterval(movePlayers, 20);
 setInterval(moveBullets, 20);
-// setInterval(respawnusers, 1000);
+setInterval(respawnUsers, 1000);
 
 function distanceBetween(one, two)
 {

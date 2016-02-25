@@ -64,6 +64,26 @@ module.exports.basicPlayerStatPacket = function (user)
 
 	return buffer;
 }
+module.exports.playerDiedPacket = function (user)
+{
+	var buffer = new ArrayBuffer(1 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 014);
+
+	dv.setUint32(1, user.id, false);
+
+	return buffer;
+}
+module.exports.playerRespawnedPacket = function (user)
+{
+	var buffer = new ArrayBuffer(1 + 4);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 015);
+
+	dv.setUint32(1, user.id, false);
+
+	return buffer;
+}
 
 // 02 - bullets
 module.exports.createBulletPacket = function (id)

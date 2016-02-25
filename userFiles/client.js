@@ -110,6 +110,10 @@ socket.onmessage = function(event)
 
 		users[id].player.speed = message.getFloat32(17, false);
 	}
+	if(message.getUint8(0) == 014) // player died
+		users[message.getUint32(1, false)].dead = true;
+	if(message.getUint8(0) == 015) // player respawned
+		users[message.getUint32(1, false)].dead = false;
 	if(message.getUint8(0) == 021) // add bullet
 	{
 		var bid = message.getUint32(1, false);

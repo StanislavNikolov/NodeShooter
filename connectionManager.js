@@ -21,6 +21,20 @@ module.exports.broadcastBasicPlayerStat = function (user)
 		global.users[n].socket.send(p);
 
 }
+module.exports.broadcastPlayerDied = function (user)
+{
+	var p = global.pm.playerDiedPacket(user);
+	for(var n in global.users)
+		global.users[n].socket.send(p);
+
+}
+module.exports.broadcastPlayerRespawned = function (user)
+{
+	var p = global.pm.playerRespawnedPacket(user);
+	for(var n in global.users)
+		global.users[n].socket.send(p);
+
+}
 
 module.exports.broadcastNewBullet = function (id)
 {
