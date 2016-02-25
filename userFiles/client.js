@@ -87,16 +87,6 @@ socket.onmessage = function(event)
 	if(message.getUint8(0) == 012) // remove user
 	{
 		var id = message.getUint32(1);
-
-		for(var i in scoreBoard)
-		{
-			if(i != 0 && scoreBoard[i][0] == users[id].name)
-			{
-				scoreBoard.splice(i, 1);
-				break;
-			}
-		}
-
 		delete users[id];
 	}
 	if(message.getUint8(0) == 013) // basic player info
@@ -160,6 +150,16 @@ socket.onmessage = function(event)
 			msg += String.fromCharCode(message.getUint8(5+i));
 		messageBoard.push(msg);
 	}
+	if(message.getUint8(0) == 042)
+	{
+		var id = message.getUint32(1, false);
+		var value = message.getInt32(5, false);
+		var y = message.getUint8(9);
+		if(y == 0)
+			users[id].kills = value;
+		if(y == 1)
+			users[id].deaths = value;
+	}
 }
 
 function sendShootRequest()
@@ -198,19 +198,3 @@ function sendMoveRequest()
 	}
 }
 setInterval(sendMoveRequest, 50);
-
-/*
-socket.on("updateScoreBoard", function (data)
-{
-	var x = 1;
-	for(var i in users)
-	{
-		if(i == data.sid)
-		{
-			scoreBoard[x][data.y] = data.value;
-			return;
-		}
-		x ++;
-	}
-});
-*/

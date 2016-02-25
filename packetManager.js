@@ -165,3 +165,16 @@ module.exports.addMessagePacket = function (msg)
 
 	return buffer;
 }
+module.exports.scoreboardUpdatePacket = function (user, value, y)
+{
+	var buffer = new ArrayBuffer(1 + 4 + 4 + 1);
+	var dv = new DataView(buffer);
+	dv.setUint8(0, 042);
+
+	dv.setUint32(1, user.id, false);
+	dv.setInt32(5, value, false);
+	dv.setUint8(9, y);
+
+
+	return buffer;
+}

@@ -37,8 +37,6 @@ var keys = []; // saves the keyboard state
 var myself; // reference to the our player
 
 var maxShootPeriod = 6, currentShootPeriod = 0; // For correcting the shoot speed
-var scoreBoard = [];
-scoreBoard[0] = ["Name:", "Kills:", "Deaths:"];
 var messageBoard = [];
 
 function Bullet(shr)
@@ -229,17 +227,41 @@ function draw()
 		context.fillText("You were killed!", 50, 50);
 	}
 
+	// Score board
 	context.font = "13px Arial";
-	for(var i in scoreBoard)
+
+	var x = 0.80 * canvas.width;
+	var y = 0.05 * canvas.height;
+	var sizeX = 0.05 * canvas.width;
+	var sizeY = sizeX / 5;
+
+	context.globalAlpha = 0.5;
+	context.fillStyle = 'black';
+	context.fillRect(x + 0*(sizeX+5), y, sizeX, sizeY);
+	context.fillRect(x + 1*(sizeX+5), y, sizeX, sizeY);
+	context.fillRect(x + 2*(sizeX+5), y, sizeX, sizeY);
+
+	context.globalAlpha = 1;
+	context.fillStyle = 'yellow';
+	context.fillText('Name', x+ 0*(sizeX+5), y+sizeY - 2);
+	context.fillText('Kills', x+ 1*(sizeX+5), y+sizeY - 2);
+	context.fillText('Deaths', x+ 2*(sizeX+5), y+sizeY - 2);
+	var row = 0;
+	for(var i in users)
 	{
-		for(var j in scoreBoard[i])
-		{
-			context.globalAlpha = 0.5;
-			context.fillStyle = "black";
-			context.fillRect(canvas.width - (scoreBoard[i].length - j) * 102, i * 15 + 20, 100, 14);
-			context.globalAlpha = 1; context.fillStyle = "yellow";
-			context.fillText(scoreBoard[i][j], canvas.width - (scoreBoard[i].length - j) * 102, i * 15 + 32);
-		}
+		row ++;
+		context.globalAlpha = 0.5;
+		context.fillStyle = 'black';
+		context.fillRect(x + 0*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
+		context.fillRect(x + 1*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
+		context.fillRect(x + 2*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
+
+		context.globalAlpha = 1;
+		context.fillStyle = 'yellow';
+		context.fillText(users[i].name, x+ 0*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
+		context.fillText(users[i].kills, x+ 1*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
+		context.fillText(users[i].deaths, x+ 2*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
+
 	}
 
 	var drawY = canvas.height - 75;

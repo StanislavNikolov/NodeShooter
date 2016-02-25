@@ -83,3 +83,9 @@ module.exports.broadcastMessage = function (msg)
 	for(var i in users)
 		global.users[i].socket.send(p, function err(){});
 }
+module.exports.broadcastScoreboardUpdate = function (user, value, y)
+{
+	var p = global.pm.scoreboardUpdatePacket(user, value, y);
+	for(var i in users)
+		global.users[i].socket.send(p, function err(){});
+}

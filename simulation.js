@@ -203,19 +203,18 @@ function moveBullets()
 				{
 					cu.dead = true;
 					cu.lastEvent.killed = (new Date()).getTime();
-					cu.deads ++;
+					cu.deaths ++;
 
 					global.cm.broadcastPlayerDied(cu);
+					global.cm.broadcastScoreboardUpdate(cu, cu.deaths, 1);
 
-					if(typeof(users[bullets[i].shooter]) != 'undefined')
+					var killer = users[bullets[i].shooter];
+					if(typeof(killer) != 'undefined')
 					{
-						users[bullets[i].shooter].kills ++;
-						global.cm.broadcastMessage(users[bullets[i].shooter].name + ' killed ' + cu.name);
+						killer.kills ++;
+						global.cm.broadcastMessage(killer.name + ' killed ' + cu.name);
+						global.cm.broadcastScoreboardUpdate(killer, killer.kills, 0);
 					}
-
-					//TODO
-					//sendToAll("updateScoreBoard", {sid: j, value: cp.deads, y: 2});
-					//sendToAll("updateScoreBoard", {sid: bullets[i].shooter, value: scndp.kills, y: 1});
 				}
 
 				collision = true;

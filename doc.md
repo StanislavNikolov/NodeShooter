@@ -24,3 +24,5 @@ Send by the server:
 
 031 - add wall  
 
+041 - new message  
+042 - update scoreboard  
