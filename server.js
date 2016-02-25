@@ -146,9 +146,7 @@ wss.on('connection', function (socket)
 	{
 		if(typeof(socket.ownerID) !== 'undefined')
 		{
-
-			// TODO
- 			// sendToAll("addMessage", {message: ("Player " + cp.name + " disconnected.") });
+			cm.broadcastMessage(user[socket.ownerID].name + ' quit');
 			cm.broadcastRemoveUser(users[socket.ownerID]);
 			delete users[socket.ownerID];
 		}

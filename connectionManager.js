@@ -68,11 +68,8 @@ module.exports.sendMap = function (user)
 	for(var i in global.walls)
 		user.socket.send(global.pm.createWallPacket(i));
 
-	// TODO maybe we don't really need this
-	// for (var i in bullets)
-	// {
-	// 	socket.emit("initNewBullet", {bsid: i, pos: bullets[i].pos, rotation: bullets[i].rotation, psid: bullets[i].s// hooter });
-	// }
+	for (var i in bullets)
+		user.socket.send(global.pm.createBulletPacket(i));
 }
 
 module.exports.initGame = function (user)
