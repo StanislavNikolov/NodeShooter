@@ -179,7 +179,7 @@ function moveBullets()
 	for(var i in bullets)
 	{
 		var collision = false;
-		bullets[i].radius -= 0.02;
+		bullets[i].radius -= 0.01;
 		bullets[i].d.x = Math.cos(bullets[i].rotation) * 10;
 		bullets[i].d.y = Math.sin(bullets[i].rotation) * 10;
 		bullets[i].pos.x += bullets[i].d.x;
@@ -223,12 +223,7 @@ function moveBullets()
 			}
 		}
 
-		if(bullets[i].radius <= 0.5 || collision)
-		{
-			global.cm.broadcastRemoveBullet(i);
-			delete bullets[i];
-		}
-		else
+		if(!collision)
 		{
 			if(inWall(bullets[i]).index!=-1)
 			{
@@ -242,8 +237,15 @@ function moveBullets()
 					putOutOf(bullets[i],objectCollided,r2-r1);
 
 				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
+				bullets[i].radius -= 1;
 			}
 			global.cm.broadcastBasicBulletStat(i);
+		}
+
+		if(bullets[i].radius <= 0.5)
+		{
+			global.cm.broadcastRemoveBullet(i);
+			delete bullets[i];
 		}
 	}
 }
@@ -277,20 +279,3 @@ function distanceBetween(one, two)
     var beta = one.y - two.y;
     return Math.sqrt((alpha*alpha)+(beta*beta));
 }
-
-function sync()
-{
-	for(var i in bullets)
-	{
-		// TODO
-		/*
-		sendToAll("updateBulletInformation", {sid: i,
-			rotation: bullets[i].rotation,
-			pos: bullets[i].pos,
-			radius: bullets[i].radius});
-			*/
-	}
-}
-
-// TODO, maybe no need for this
-// setInterval(sync, 10000);

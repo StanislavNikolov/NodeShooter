@@ -36,19 +36,19 @@ var bullets = {};
 var keys = []; // saves the keyboard state
 var myself; // reference to the our player
 
-var maxShootPeriod = 6, currentShootPeriod = 0; // For correcting the shoot speed
+var maxShootPeriod = 5, currentShootPeriod = 0; // For correcting the shoot speed
 var scoreBoard = [];
 scoreBoard[0] = ["Name:", "Kills:", "Deaths:"];
 var messageBoard = [];
 
-function Bullet(x, y, r, shr, damage)
+function Bullet(shr)
 {
-	this.pos = new Vector(x, y);
-	this.rotation = r;
-	this.radius = 2;
+	this.pos = new Vector(0, 0);
+	this.rotation = 0;
+	this.radius = 0;
 	this.shooter = shr;
-	this.d = new Vector(Math.cos(r), Math.sin(r));
-	this.damage = damage;
+	this.d = new Vector(Math.cos(0), Math.sin(0));
+	this.damage = 0;
 }
 
 function Vector(x, y)

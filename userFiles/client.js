@@ -114,13 +114,13 @@ socket.onmessage = function(event)
 	{
 		var bid = message.getUint32(1, false);
 		var sid = message.getUint32(5, false);
+		bullets[bid] = new Bullet(sid);
 
-		var px = message.getInt32(9, false);
-		var py = message.getInt32(13, false);
-
-		var rt = message.getFloat32(17, false);
-
-		bullets[bid] = new Bullet(px, py, rt, sid, 20);
+		bullets[bid].pos.x = message.getInt32(9, false);
+		bullets[bid].pos.y = message.getInt32(13, false);
+		bullets[bid].rotation = message.getFloat32(17, false);
+		bullets[bid].radius = message.getFloat32(21, false);
+		bullets[bid].damage = message.getInt32(25, false);
 	}
 	if(message.getUint8(0) == 022) // remove bullet
 	{
@@ -163,7 +163,7 @@ function sendShootRequest()
 		currentShootPeriod = maxShootPeriod;
 	}
 }
-setInterval(sendShootRequest, 20);
+setInterval(sendShootRequest, 10);
 
 function sendMoveRequest()
 {

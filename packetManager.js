@@ -57,12 +57,9 @@ module.exports.basicPlayerStatPacket = function (user)
 	dv.setUint8(0, 013);
 
 	dv.setUint32(1, user.id, false);
-
 	dv.setFloat32(5, user.player.pos.x, false);
 	dv.setFloat32(9, user.player.pos.y, false);
-
 	dv.setFloat32(13, user.player.rotation, false);
-
 	dv.setFloat32(17, user.player.speed, false);
 
 	return buffer;
@@ -71,20 +68,18 @@ module.exports.basicPlayerStatPacket = function (user)
 // 02 - bullets
 module.exports.createBulletPacket = function (id)
 {
-	// TODO send damage & more
-
-	// pid, bulletID, shooterID, pos, rotation
-	var buffer = new ArrayBuffer(1 + 4 + 4 + 8 + 4);
+	// pid, bulletID, shooterID, pos, rotation, radius, damage
+	var buffer = new ArrayBuffer(1 + 4 + 4 + 8 + 4 + 4 + 4);
 	var dv = new DataView(buffer);
 	dv.setUint8(0, 021);
 
 	dv.setUint32(1, id, false);
 	dv.setUint32(5, global.bullets[id].shooter, false);
-
 	dv.setInt32(9, global.bullets[id].pos.x, false);
 	dv.setInt32(13, global.bullets[id].pos.y, false);
-
 	dv.setFloat32(17, global.bullets[id].rotation, false);
+	dv.setFloat32(21, global.bullets[id].radius, false);
+	dv.setInt32(25, global.bullets[id].damage, false);
 
 	return buffer;
 }
