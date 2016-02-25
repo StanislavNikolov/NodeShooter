@@ -105,10 +105,10 @@ socket.onmessage = function(event)
 
 		users[id].player.pos.x = message.getFloat32(5, false);
 		users[id].player.pos.y = message.getFloat32(9, false);
-
 		users[id].player.rotation = message.getFloat32(13, false);
-
 		users[id].player.speed = message.getFloat32(17, false);
+		users[id].player.hp = message.getInt32(21, false);
+		users[id].player.maxhp = message.getInt32(25, false);
 	}
 	if(message.getUint8(0) == 014) // player died
 		users[message.getUint32(1, false)].dead = true;
@@ -136,7 +136,6 @@ socket.onmessage = function(event)
 
 		bullets[id].pos.x = message.getInt32(5, false);
 		bullets[id].pos.y = message.getInt32(9, false);
-
 		bullets[id].rotation = message.getFloat32(13, false);
 		bullets[id].radius = message.getFloat32(17, false);
 	}
@@ -146,10 +145,8 @@ socket.onmessage = function(event)
 
 		var x = message.getInt32(5, false);
 		var y = message.getInt32(9, false);
-
 		var ir = message.getFloat32(13, false);
 		var or = message.getFloat32(17, false);
-
 		var sa = message.getFloat32(21, false);
 		var fa = message.getFloat32(25, false);
 

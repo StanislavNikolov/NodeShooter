@@ -49,10 +49,8 @@ module.exports.removeUserPacket = function (user)
 }
 module.exports.basicPlayerStatPacket = function (user)
 {
-	// TODO hp, dead?...
-
-	// pid, userID, pos, rotation, speed
-	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4);
+	// pid, userID, pos, rotation, speed, hp/maxhp
+	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4 + 8);
 	var dv = new DataView(buffer);
 	dv.setUint8(0, 013);
 
@@ -61,6 +59,8 @@ module.exports.basicPlayerStatPacket = function (user)
 	dv.setFloat32(9, user.player.pos.y, false);
 	dv.setFloat32(13, user.player.rotation, false);
 	dv.setFloat32(17, user.player.speed, false);
+	dv.setInt32(21, user.player.hp, false);
+	dv.setInt32(25, user.player.maxhp, false);
 
 	return buffer;
 }

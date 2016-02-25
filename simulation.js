@@ -197,10 +197,7 @@ function moveBullets()
 					cu.player.hp -= bullets[i].damage;
 
 				if(cu.player.hp > 0)
-				{
-					// TODO
-					// sendToAll("updatePlayerInformation", {sid: j, hp: cp.hp});
-				}
+					cm.broadcastBasicPlayerStat(cu);
 
 				if(cu.player.hp <= 0)
 				{

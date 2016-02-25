@@ -146,7 +146,7 @@ wss.on('connection', function (socket)
 	{
 		if(typeof(socket.ownerID) !== 'undefined')
 		{
-			cm.broadcastMessage(user[socket.ownerID].name + ' quit');
+			cm.broadcastMessage(users[socket.ownerID].name + ' quit');
 			cm.broadcastRemoveUser(users[socket.ownerID]);
 			delete users[socket.ownerID];
 		}
