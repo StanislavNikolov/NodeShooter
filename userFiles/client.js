@@ -84,10 +84,7 @@ socket.onmessage = function(event)
 		users[user.id] = user;
 	}
 	if(message.getUint8(0) == 012) // remove user
-	{
-		var id = message.getUint32(1);
-		delete users[id];
-	}
+		delete users[message.getUint32(1)];
 	if(message.getUint8(0) == 013) // basic player info
 	{
 		var id = message.getUint32(1, false);
@@ -121,12 +118,16 @@ socket.onmessage = function(event)
 	}
 	if(message.getUint8(0) == 023) // basic bullet stat
 	{
-		var id = message.getUint32(1, false);
+		var count = message.getUint32(1, false);
+		for(var i = 0;i < count;++ i)
+		{
+			var id = message.getUint32(5 + i * 20, false);
 
-		bullets[id].pos.x = message.getInt32(5, false);
-		bullets[id].pos.y = message.getInt32(9, false);
-		bullets[id].rotation = message.getFloat32(13, false);
-		bullets[id].radius = message.getFloat32(17, false);
+			bullets[id].pos.x = message.getInt32(9 + i * 20, false);
+			bullets[id].pos.y = message.getInt32(13 + i * 20, false);
+			bullets[id].rotation = message.getFloat32(17 + i * 20, false);
+			bullets[id].radius = message.getFloat32(21 + i * 20, false);
+		}
 	}
 	if(message.getUint8(0) == 031) // add wall
 	{

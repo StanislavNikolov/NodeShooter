@@ -185,6 +185,7 @@ function movePlayers()
 
 function moveBullets()
 {
+	var toBroadcast = [];
 	for(var i in bullets)
 	{
 		var collision = false;
@@ -246,7 +247,7 @@ function moveBullets()
 				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
 				bullets[i].radius -= 1;
 			}
-			global.cm.broadcastBasicBulletStat(i);
+			//global.cm.broadcastBasicBulletStat(i);
 		}
 
 		if(bullets[i].radius <= 0.5)
@@ -254,7 +255,12 @@ function moveBullets()
 			global.cm.broadcastRemoveBullet(i);
 			delete bullets[i];
 		}
+		else
+		{
+			toBroadcast.push(i);
+		}
 	}
+	global.cm.broadcastBasicBulletStat(toBroadcast);
 }
 
 function respawnUsers()

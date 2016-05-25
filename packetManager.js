@@ -113,19 +113,27 @@ module.exports.removeBulletPacket = function (id)
 
 	return buffer;
 }
-module.exports.basicBulletStatPacket = function (id)
+module.exports.basicBulletStatPacket = function (arr)
 {
-	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4);
+	var buffer = new ArrayBuffer(1 + 4 + arr.length * (4 + 8 + 4 + 4));
 	var dv = new DataView(buffer);
 	dv.setUint8(0, 023);
 
-	dv.setUint32(1, id, false);
+	dv.setUint32(1, arr.length, false);
 
-	dv.setInt32(5, global.bullets[id].pos.x, false);
-	dv.setInt32(9, global.bullets[id].pos.y, false);
+	var count = 0;
+	for(var id of arr)
+	{
+		dv.setUint32(5 + count * 20, id, false);
 
-	dv.setFloat32(13, global.bullets[id].rotation, false);
-	dv.setFloat32(17, global.bullets[id].radius, false);
+		dv.setInt32(9 + count * 20, global.bullets[id].pos.x, false);
+		dv.setInt32(13 + count * 20, global.bullets[id].pos.y, false);
+
+		dv.setFloat32(17 + count * 20, global.bullets[id].rotation, false);
+		dv.setFloat32(21 + count * 20, global.bullets[id].radius, false);
+
+		count ++;
+	}
 
 	return buffer;
 }

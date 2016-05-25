@@ -50,9 +50,12 @@ module.exports.broadcastRemoveBullet = function (id)
 		global.users[i].socket.send(packet, function err(){});
 }
 
-module.exports.broadcastBasicBulletStat = function (id)
+module.exports.broadcastBasicBulletStat = function (arr)
 {
-	var packet = global.pm.basicBulletStatPacket(id);
+	if(Array.isArray(arr) !== true)
+		arr = [arr];
+
+	var packet = global.pm.basicBulletStatPacket(arr);
 	for(var i in global.users)
 		global.users[i].socket.send(packet, function err(){});
 }

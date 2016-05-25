@@ -16,12 +16,12 @@ function getPlayerRotation(event)
 		var dx = event.clientX - canvas.width / 2;
 		var dy = event.clientY - canvas.height / 2;
 		var angle = Math.atan2(dy, dx);
+		myself.player.rotation = angle;
 
 		var packet_b = new ArrayBuffer(1+4);
 		var packet = new DataView(packet_b);
 		packet.setUint8(0, 3);
-		myself.player.rotation = angle;
-		packet.setFloat32(1, myself.player.rotation, false);
+		packet.setFloat32(1, angle, false);
 
 		socket.send(packet_b);
 	}
