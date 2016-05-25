@@ -1,5 +1,5 @@
-var serverIP = 'localhost:5000';
-var socket = new WebSocket('ws://' + serverIP);
+var socket = new WebSocket('ws://' + location.host);
+console.log('ws://' + location.host);
 socket.binaryType = 'arraybuffer';
 
 socket.onopen = function(event)
@@ -174,6 +174,7 @@ function sendShootRequest()
 }
 setInterval(sendShootRequest, 20);
 
+var lastSentMoveDirection = 1;
 function sendMoveRequest()
 {
 	var data = 1;
@@ -187,7 +188,7 @@ function sendMoveRequest()
 	if(keys[68] || keys[39]) // right
 		data *= 7;
 
-	if(data != 1)
+	if(data != lastSentMoveDirection)
 	{
 		var packet_b = new ArrayBuffer(1+1);
 		var packet = new DataView(packet_b);
@@ -195,6 +196,7 @@ function sendMoveRequest()
 		packet.setUint8(1, data);
 
 		socket.send(packet_b);
+		lastSentMoveDirection = data;
 	}
 }
 setInterval(sendMoveRequest, 50);

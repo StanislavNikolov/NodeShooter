@@ -34,7 +34,8 @@ function Player(p)
 	this.hp = 100;
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
-	this.lastEvent = {move: 0, shoot: 0, respawn: 0, killed: 0};
+	this.lastEvent = {shoot: 0, respawn: 0, killed: 0};
+	this.direction = 1;
 }
 
 function User(socket, name, id)

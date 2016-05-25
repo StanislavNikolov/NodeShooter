@@ -144,6 +144,15 @@ function movePlayers()
 	for(var i in users)
 	{
 		users[i].player.d.mul(0.8);
+		if(users[i].player.direction % 2 == 0)
+			users[i].player.d.y -= 2;
+		if(users[i].player.direction % 3 == 0)
+			users[i].player.d.y += 2;
+		if(users[i].player.direction % 5 == 0)
+			users[i].player.d.x -= 2;
+		if(users[i].player.direction % 7 == 0)
+			users[i].player.d.x += 2;
+
 		for(var c = 0;c < 5;++ c)
 		{
 			users[i].player.pos.x += users[i].player.d.x;

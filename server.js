@@ -119,22 +119,7 @@ wss.on('connection', function (socket)
 		}
 		if(data.getUint8(0) == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
 		{
-			if((new Date()).getTime() - cu.lastEvent.move < 50)
-				return;
-
-			cu.lastEvent.move = (new Date()).getTime();
-
-			var dir = data.getUint8(1);
-			if(dir % 2 == 0)
-				cu.player.d.y -= 6;
-			if(dir % 3 == 0)
-				cu.player.d.y += 6;
-			if(dir % 5 == 0)
-				cu.player.d.x -= 6;
-			if(dir % 7 == 0)
-				cu.player.d.x += 6;
-
-			cm.broadcastBasicPlayerStat(cu);
+			cu.player.direction = data.getUint8(1);
 		}
 		if(data.getUint8(0) == 3 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
 		{

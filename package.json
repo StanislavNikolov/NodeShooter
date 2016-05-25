@@ -4,6 +4,7 @@
   "description": "Simple 2D multiplayer shooter",
   "main": "server.js",
   "dependencies": {
+    "bufferutil": "^1.2.1",
     "express": "^3.4.8",
     "ws": "^1.0.1"
   },
