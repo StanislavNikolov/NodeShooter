@@ -18,12 +18,14 @@ function getPlayerRotation(event)
 		var angle = Math.atan2(dy, dx);
 		myself.player.rotation = angle;
 
+		/*
 		var packet_b = new ArrayBuffer(1+4);
 		var packet = new DataView(packet_b);
 		packet.setUint8(0, 3);
 		packet.setFloat32(1, angle, false);
 
 		socket.send(packet_b);
+		*/
 	}
 }
 window.addEventListener("resize", resize, false);
@@ -204,7 +206,8 @@ function draw()
 				context.beginPath();
 
 				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y, users[i].player.radius, users[i].player.rotation, Math.PI * 2 + users[i].player.rotation);
-				context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
+				if (myself.id == i)
+					context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
 
 				context.globalAlpha = 0.1; context.fill();
 				context.globalAlpha = 1; context.stroke();

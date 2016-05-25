@@ -29,7 +29,6 @@ function Player(p)
 {
 	this.pos = p; // must be Vector
 	this.radius = 10;
-	this.rotation = 0;
 	this.speed = 0;
 	this.hp = 100;
 	this.maxhp = 100;

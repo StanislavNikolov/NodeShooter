@@ -28,7 +28,8 @@ userFiles.map(function (file)
 	});
 });
 
-var MAX_BUFF_SIZE = [1+12, 0, 5];
+var MAX_BUFF_SIZE = [1+12, 5, 2];
+var MIN_BUFF_SIZE = [2, 5, 2];
 
 global.users = {};
 global.walls = {};
@@ -61,7 +62,7 @@ wss.on('connection', function (socket)
  * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server by sending a huge packet.
  * This is what this 'if' is for, pun not intended.
  */
-		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1)
+		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1 || rawData.length < MIN_BUFF_SIZE[rawData[0]])
 			return;
 
 		var data_b = new ArrayBuffer(rawData.length);
@@ -112,7 +113,7 @@ wss.on('connection', function (socket)
 			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
 			{
 				var id = generateID();
-				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, cu.player.rotation, cu.id, 20);
+				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, data.getFloat32(1, false), cu.id, 20);
 				cm.broadcastNewBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
@@ -120,11 +121,6 @@ wss.on('connection', function (socket)
 		if(data.getUint8(0) == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
 		{
 			cu.player.direction = data.getUint8(1);
-		}
-		if(data.getUint8(0) == 3 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
-		{
-			cu.player.rotation = data.getFloat32(1, false);
-			cm.broadcastBasicPlayerStat(cu);
 		}
 	});
 	socket.on('close', function (rawData, flags)

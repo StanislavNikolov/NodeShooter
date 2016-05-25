@@ -50,17 +50,16 @@ module.exports.removeUserPacket = function (user)
 module.exports.basicPlayerStatPacket = function (user)
 {
 	// pid, userID, pos, rotation, speed, hp/maxhp
-	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 4 + 8);
+	var buffer = new ArrayBuffer(1 + 4 + 8 + 4 + 8);
 	var dv = new DataView(buffer);
 	dv.setUint8(0, 013);
 
 	dv.setUint32(1, user.id, false);
 	dv.setFloat32(5, user.player.pos.x, false);
 	dv.setFloat32(9, user.player.pos.y, false);
-	dv.setFloat32(13, user.player.rotation, false);
-	dv.setFloat32(17, user.player.speed, false);
-	dv.setInt32(21, user.player.hp, false);
-	dv.setInt32(25, user.player.maxhp, false);
+	dv.setFloat32(13, user.player.speed, false);
+	dv.setInt32(17, user.player.hp, false);
+	dv.setInt32(21, user.player.maxhp, false);
 
 	return buffer;
 }

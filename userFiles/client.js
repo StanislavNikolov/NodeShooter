@@ -91,10 +91,9 @@ socket.onmessage = function(event)
 
 		users[id].player.pos.x = message.getFloat32(5, false);
 		users[id].player.pos.y = message.getFloat32(9, false);
-		users[id].player.rotation = message.getFloat32(13, false);
-		users[id].player.speed = message.getFloat32(17, false);
-		users[id].player.hp = message.getInt32(21, false);
-		users[id].player.maxhp = message.getInt32(25, false);
+		users[id].player.speed = message.getFloat32(13, false);
+		users[id].player.hp = message.getInt32(17, false);
+		users[id].player.maxhp = message.getInt32(21, false);
 	}
 	if(message.getUint8(0) == 014) // player died
 		users[message.getUint32(1, false)].dead = true;
@@ -167,9 +166,13 @@ function sendShootRequest()
 	currentShootPeriod --;
 	if(keys[32] && currentShootPeriod <= 0)
 	{
-		var shootPacket = new Uint8Array([1]);
-		socket.send(shootPacket.buffer);
 		currentShootPeriod = maxShootPeriod;
+
+		var packet_b = new ArrayBuffer(5);
+		var packet = new DataView(packet_b);
+		packet.setUint8(0, 1);
+		packet.setFloat32(1, myself.player.rotation, false);
+		socket.send(packet_b);
 	}
 }
 setInterval(sendShootRequest, 20);
