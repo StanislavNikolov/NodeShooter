@@ -109,12 +109,14 @@ function drawWall(current, offset)
 	context.beginPath();
 
 	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.inner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.inner);
-	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/100) {
+	for (var i = current.angle.start ; i <= current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/50) {
 		context.lineTo(current.pos.x+Math.cos(i)*current.radius.inner,current.pos.y+Math.sin(i)*current.radius.inner);
 	}
-	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/100) {
+	context.lineTo(current.pos.x+Math.cos(current.angle.finish)*current.radius.inner,current.pos.y+Math.sin(current.angle.finish)*current.radius.inner);
+	for (var i = current.angle.finish ; i >= current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/50) {
 		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
 	}
+	context.lineTo(current.pos.x+Math.cos(current.angle.start)*current.radius.outer,current.pos.y+Math.sin(current.angle.start)*current.radius.outer);
 
 	context.closePath();
 	context.fill();
