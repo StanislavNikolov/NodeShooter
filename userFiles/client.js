@@ -1,5 +1,4 @@
-var socket = new WebSocket('ws://' + location.host);
-console.log('ws://' + location.host);
+var socket = new WebSocket('ws://' + location.host + location.pathname);
 socket.binaryType = 'arraybuffer';
 
 socket.onopen = function(event)
