@@ -5,6 +5,7 @@ socket.onopen = function(event)
 {
 	console.log('Connection succssesful');
 }
+var packs = 0;
 
 /*
 // by "Joni", http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
@@ -43,7 +44,8 @@ function toUTF8Array(str) {
 socket.onmessage = function(event)
 {
 	var message = new DataView(event.data);
-	if(message.getUint8(0) == 001) // auth reqest
+	packs ++;
+	if(message.getUint8(0) == 1) // auth reqest
 	{
 		var loginName = "";
 		do
@@ -65,12 +67,12 @@ socket.onmessage = function(event)
 
 		socket.send(response_b);
 	}
-	if(message.getUint8(0) == 002)
+	if(message.getUint8(0) == 2)
 	{
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
 	}
-	if(message.getUint8(0) == 011) // add user
+	if(message.getUint8(0) == 11) // add user
 	{
 		var name = "";
 		for(var i = 0;i < message.getUint8(1);++ i)
@@ -83,23 +85,27 @@ socket.onmessage = function(event)
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
 	}
-	if(message.getUint8(0) == 012) // remove user
+	if(message.getUint8(0) == 12) // remove user
 		delete users[message.getUint32(1)];
-	if(message.getUint8(0) == 013) // basic player info
+	if(message.getUint8(0) == 13) // basic player info
 	{
-		var id = message.getUint32(1, false);
+		var count = message.getUint32(1, false);
 
-		users[id].player.pos.x = message.getFloat32(5, false);
-		users[id].player.pos.y = message.getFloat32(9, false);
-		users[id].player.speed = message.getFloat32(13, false);
-		users[id].player.hp = message.getInt32(17, false);
-		users[id].player.maxhp = message.getInt32(21, false);
+		for(var i = 0;i < count;++ i)
+		{
+			var id = message.getUint32(5 + i * 24, false);
+			users[id].player.pos.x = message.getFloat32(9 + i * 24, false);
+			users[id].player.pos.y = message.getFloat32(13 + i * 24, false);
+			users[id].player.speed = message.getFloat32(17 + i * 24, false);
+			users[id].player.hp = message.getInt32(21 + i * 24, false);
+			users[id].player.maxhp = message.getInt32(25 + i * 24, false);
+		}
 	}
-	if(message.getUint8(0) == 014) // player died
+	if(message.getUint8(0) == 14) // player died
 		users[message.getUint32(1, false)].dead = true;
-	if(message.getUint8(0) == 015) // player respawned
+	if(message.getUint8(0) == 15) // player respawned
 		users[message.getUint32(1, false)].dead = false;
-	if(message.getUint8(0) == 021) // add bullet
+	if(message.getUint8(0) == 21) // add bullet
 	{
 		var bid = message.getUint32(1, false);
 		var sid = message.getUint32(5, false);
@@ -111,11 +117,11 @@ socket.onmessage = function(event)
 		bullets[bid].radius = message.getFloat32(21, false);
 		bullets[bid].damage = message.getInt32(25, false);
 	}
-	if(message.getUint8(0) == 022) // remove bullet
+	if(message.getUint8(0) == 22) // remove bullet
 	{
 		delete bullets[message.getUint32(1, false)];
 	}
-	if(message.getUint8(0) == 023) // basic bullet stat
+	if(message.getUint8(0) == 23) // basic bullet stat
 	{
 		var count = message.getUint32(1, false);
 		for(var i = 0;i < count;++ i)
@@ -128,7 +134,7 @@ socket.onmessage = function(event)
 			bullets[id].radius = message.getFloat32(21 + i * 20, false);
 		}
 	}
-	if(message.getUint8(0) == 031) // add wall
+	if(message.getUint8(0) == 31) // add wall
 	{
 		var id = message.getUint32(1, false);
 
@@ -141,7 +147,7 @@ socket.onmessage = function(event)
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
-	if(message.getUint8(0) == 041)
+	if(message.getUint8(0) == 41)
 	{
 		var msg = '';
 		var s = message.getUint32(1, false);
@@ -149,7 +155,7 @@ socket.onmessage = function(event)
 			msg += String.fromCharCode(message.getUint8(5+i));
 		messageBoard.push(msg);
 	}
-	if(message.getUint8(0) == 042)
+	if(message.getUint8(0) == 42)
 	{
 		var id = message.getUint32(1, false);
 		var value = message.getInt32(5, false);
@@ -203,3 +209,10 @@ function sendMoveRequest()
 	}
 }
 setInterval(sendMoveRequest, 50);
+
+function stats()
+{
+	console.log('Packets since last log:', packs);
+	packs = 0;
+}
+setInterval(stats, 1000);

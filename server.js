@@ -1,4 +1,6 @@
-var app = require('express')()
+'use strict';
+
+let app = require('express')()
   , server = require('http').createServer(app)
   , WebSocketServer = require('ws').Server
   , wss = new WebSocketServer({server: server});
@@ -7,11 +9,11 @@ global.classes = require('./classes.js');
 global.cm = require('./connectionManager.js')
 global.pm = require('./packetManager.js');
 
-var cm = global.cm;
-var pm = global.pm;
-var classes = global.classes;
+let cm = global.cm;
+let pm = global.pm;
+let classes = global.classes;
 
-var port = Number(process.env.PORT || 5000);
+const port = Number(process.env.PORT || 5000);
 server.listen(port, function () { console.log('Listening on ' + server.address().port) });
 
 app.get('/', function (req, res)
@@ -19,7 +21,7 @@ app.get('/', function (req, res)
 	res.sendfile(__dirname + '/userFiles/index.html');
 });
 
-var userFiles = ['client.js', 'game.js', 'styles.css', 'simulation.js'];
+let userFiles = ['client.js', 'game.js', 'styles.css', 'simulation.js'];
 userFiles.map(function (file)
 {
 	app.get('/userFiles/' + file, function (req, res)
@@ -28,20 +30,20 @@ userFiles.map(function (file)
 	});
 });
 
-var MAX_BUFF_SIZE = [1+12, 5, 2];
-var MIN_BUFF_SIZE = [2, 5, 2];
+const MAX_BUFF_SIZE = [1+12, 5, 2];
+const MIN_BUFF_SIZE = [2, 5, 2];
 
 global.users = {};
 global.walls = {};
 global.bullets = {};
 global.frame = 0;
 
-var users = global.users;
-var walls = global.walls;
-var bullets = global.bullets;
-var frame = global.frame;
+let users = global.users;
+let walls = global.walls;
+let bullets = global.bullets;
+let frame = global.frame;
 
-var nextID = 0;
+let nextID = 0;
 function generateID()
 {
 	return nextID ++;
@@ -50,9 +52,9 @@ global.generateID = generateID;
 
 wss.on('connection', function (socket)
 {
-	var cu; // current user
+	let cu; // current user
 
-	var authRequest = new Uint8Array([1]);
+	let authRequest = new Uint8Array([1]);
 	socket.send(authRequest.buffer);
 
 	socket.on('message', function(rawData, flags)
@@ -65,9 +67,9 @@ wss.on('connection', function (socket)
 		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1 || rawData.length < MIN_BUFF_SIZE[rawData[0]])
 			return;
 
-		var data_b = new ArrayBuffer(rawData.length);
-		var data = new DataView(data_b);
-		for(var i = 0;i < rawData.length;++ i)
+		let data_b = new ArrayBuffer(rawData.length);
+		let data = new DataView(data_b);
+		for(let i = 0;i < rawData.length;++ i)
 			data.setUint8(i, rawData[i]);
 
 		if(data.getUint8(0) == 0)
@@ -77,21 +79,21 @@ wss.on('connection', function (socket)
 
 			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
 			{
-				var authRequest = new Uint8Array([1]);
+				let authRequest = new Uint8Array([1]);
 				socket.send(authRequest.buffer);
 				return;
 			}
 
-			var name = "";
-			for(var i = 0;i < data.byteLength-1;++ i)
+			let name = "";
+			for(let i = 0;i < data.byteLength-1;++ i)
 				name += String.fromCharCode(data.getUint8(1+i));
 
 			// Check if there's already a user with that name
-			for(var i in global.users)
+			for(let i in global.users)
 			{
 				if(global.users[i].name == name)
 				{
-					var authRequest = new Uint8Array(1);
+					let authRequest = new Uint8Array(1);
 					socket.send(authRequest.buffer);
 					return;
 				}
@@ -112,8 +114,13 @@ wss.on('connection', function (socket)
 		{
 			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
 			{
-				var id = generateID();
-				bullets[id] = new classes.Bullet(cu.player.pos.x, cu.player.pos.y, data.getFloat32(1, false), cu.id, 20);
+				let id = generateID();
+				bullets[id] = new classes.Bullet(
+						  cu.player.pos.x
+						, cu.player.pos.y
+						, data.getFloat32(1, false)
+						, cu.id, 20);
+
 				cm.broadcastNewBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}

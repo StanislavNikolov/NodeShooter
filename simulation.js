@@ -1,10 +1,11 @@
-var users = global.users;
-var walls = global.walls;
-var bullets = global.bullets;
-var frame = global.frame;
-var classes = global.classes;
+'use strict';
+let users = global.users;
+let walls = global.walls;
+let bullets = global.bullets;
+let classes = global.classes;
 
 generateMap(Number(process.env.MAP_TYPE || 1));
+
 function generateMap(type)
 {
 	switch(type)
@@ -18,66 +19,65 @@ function generateMap(type)
 			break;
 
 		case 1:
-			for (var i = 0;i < Math.PI*2;i += Math.PI*2/5)
+			for (let i = 0;i < Math.PI*2;i += Math.PI*2/5)
 				walls[generateID()] = new classes.Wall(400, 300, 570, 600, i, 0.6+i);
-			for (var i = 0;i < Math.PI*2;i += Math.PI*2/5)
+			for (let i = 0;i < Math.PI*2;i += Math.PI*2/5)
 			{
-				var angle = i - Math.PI/10 - 0.01;
-				walls[generateID()] = new classes.Wall(400 + Math.cos(angle)*(570/2 + 300), 300 + Math.sin(angle)*(570/2 + 300) , 170, 190, 0, 2*Math.PI);
+				let angle = i - Math.PI/10 - 0.01;
+				walls[generateID()] = new classes.Wall(
+						  400 + Math.cos(angle) * (570 / 2 + 300) // x
+						, 300 + Math.sin(angle) * (570 / 2 + 300) // y
+						, 170, 190, 0, 2 * Math.PI);
 			}
 			walls[generateID()] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
 			break;
 
 		case 2:
-			generateRandomMap(25);
+			generateRandomMap(65);
 			break;
 	}
 }
 
 function isFree(x, y, r)
 {
-	for(var i in walls)
-	{
+	for(let i in walls)
 		if(distanceBetween({x: x, y: y}, walls[i].pos) < walls[i].radius.outer + r)
-		{
 			return false;
-		}
-	}
+
 	return true;
 }
 
 function generateRandomMap(sp)
 {
-	var wallsCount = 0;
-	for(var i = 0;i < 100000 && wallsCount < sp;i ++)
+	let wallsCount = 0;
+	for(let i = 0;i < 100000 && wallsCount < sp;i ++)
 	{
-		var r1 = Math.random() * 200 + 40; var r2 = r1 + Math.random() * 10 + 20;
-		var a1 = Math.random() * Math.PI * 2; var a2 = a1 + Math.random() * Math.PI * 2;
-		var x = Math.floor(Math.random() * 1000 - 500);
-		var y = Math.floor(Math.random() * 1000 - 500);
-		var ang = a2 - a1;
-		if(ang < Math.PI / 180 * 90 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2))
+		let r1 = Math.random() * 200 + 40;
+		let r2 = r1 + Math.random() * 10 + 20;
+		let a1 = Math.random() * Math.PI * 2;
+		let a2 = a1 + Math.random() * Math.PI * 2;
+		let x = Math.floor(Math.random() * 1000 - 500);
+		let y = Math.floor(Math.random() * 1000 - 500);
+		let ang = a2 - a1;
+		if(ang < Math.PI / 180 * 45 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2))
 		{
-			if(i < 29)
-				i --;
 			continue;
 		}
 		walls[generateID()] = new classes.Wall(x, y, r1, r2, a1, a2);
 		wallsCount ++;
 	}
-
 	walls[generateID()] = new classes.Wall(0, 0, 800, 840, 0, Math.PI * 2);
 }
 
 
 function inWall(p)
 {
-	for(var j in walls)
+	for(let j in walls)
 	{
 		if(distanceBetween(walls[j].pos, p.pos) < p.radius + walls[j].radius.outer
 			&& distanceBetween(walls[j].pos, p.pos) + p.radius > walls[j].radius.inner)
 		{
-			var angle;
+			let angle;
 			if (p.pos.y-walls[j].pos.y>0)
 			{
 				angle = Math.acos( (p.pos.x-walls[j].pos.x) / distanceBetween(walls[j].pos, p.pos) );
@@ -101,13 +101,13 @@ function inWall(p)
 			}
 			else
 			{
-				var center1 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
+				let center1 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
 					walls[j].pos.y+Math.sin(walls[j].angle.finish)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner));
-				var center2 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
+				let center2 = new classes.Vector(walls[j].pos.x+(Math.cos(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner)),
 				walls[j].pos.y+Math.sin(walls[j].angle.start)*(Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2+walls[j].radius.inner));
 
-				var col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
-				var col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
+				let col1 = distanceBetween(p.pos,center1)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
+				let col2 = distanceBetween(p.pos,center2)<p.radius+Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2;
 
 				if (col1)
 					return {index: j, partCollided:{pos: center1, radius: Math.abs(walls[j].radius.outer-walls[j].radius.inner)/2, inIner: 0}};
@@ -127,23 +127,32 @@ function putOutOf(o1,o2,distance)
 
 function findNewAngle(p, w)
 {
-	var vx=p.d.x,vy=p.d.y,tpx=(w.pos.x-p.pos.x),tpy=(w.pos.y-p.pos.y),p;
-	var bx = w.pos.x,by = w.pos.y, px = p.pos.x , py = p.pos.y;
+	let vx = p.d.x;
+	let vy = p.d.y;
+	let tpx = (w.pos.x-p.pos.x);
+	let tpy = (w.pos.y-p.pos.y)
+	let bx = w.pos.x
+	let by = w.pos.y;
+	let px = p.pos.x;
+	let py = p.pos.y;
 
 	p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
-	vx=(vx-p*tpx);//
-	vy=(vy-p*tpy);//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
-	if (vy>0)
-		return Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
+	vx = vx - p * tpx;
+	vy = vy - p * tpy;//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
+
+	if (vy > 0)
+		return Math.acos(vx / Math.sqrt(vx * vx + vy * vy));
 	else
-		return Math.PI*2-Math.acos(vx/(Math.sqrt(vx*vx+vy*vy)));
+		return Math.PI * 2 - Math.acos(vx / Math.sqrt(vx * vx + vy * vy));
 }
 
 function movePlayers()
 {
-	for(var i in users)
+	let toBroadcast = [];
+	for(let i in users)
 	{
 		users[i].player.d.mul(0.8);
+
 		if(users[i].player.direction % 2 == 0)
 			users[i].player.d.y -= 2;
 		if(users[i].player.direction % 3 == 0)
@@ -153,16 +162,24 @@ function movePlayers()
 		if(users[i].player.direction % 7 == 0)
 			users[i].player.d.x += 2;
 
-		for(var c = 0;c < 5;++ c)
+		if(Math.abs(users[i].player.d.x) < 0.05)
+			users[i].player.d.x = 0;
+		if(Math.abs(users[i].player.d.y) < 0.05)
+			users[i].player.d.y = 0;
+
+		if(users[i].player.d.x === 0 && users[i].player.d.y === 0)
+			continue;
+
+		for(let c = 0;c < 5;++ c)
 		{
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
-			var iw = inWall(users[i].player);
+			let iw = inWall(users[i].player);
 			if(iw.index != -1)
 			{
-				var index = iw.index;
-				var objectCollided = iw.partCollided;
-				var r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
+				let index = iw.index;
+				let objectCollided = iw.partCollided;
+				let r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
 
 				users[i].player.pos.x -= users[i].player.d.x;
 				users[i].player.pos.y -= users[i].player.d.y;
@@ -178,17 +195,19 @@ function movePlayers()
 				break;
 			}
 		}
-
-		global.cm.broadcastBasicPlayerStat(users[i]);
+		toBroadcast.push(i);
 	}
+	if(toBroadcast.length > 0)
+		global.cm.broadcastBasicPlayerStatPack(toBroadcast);
 }
 
 function moveBullets()
 {
-	var toBroadcast = [];
-	for(var i in bullets)
+	let bulletsToBroadcast = [];
+	let usersToBroadcast = [];
+	for(let i in bullets)
 	{
-		var collision = false;
+		let collision = false;
 		bullets[i].radius -= 0.01;
 		bullets[i].d.x = Math.cos(bullets[i].rotation) * 10;
 		bullets[i].d.y = Math.sin(bullets[i].rotation) * 10;
@@ -196,9 +215,9 @@ function moveBullets()
 		bullets[i].pos.y += bullets[i].d.y;
 
 		// Check if the bullet hit soembody
-		for(var j in users)
+		for(let j in users)
 		{
-			var cu = users[j];
+			let cu = users[j];
 			if(j != bullets[i].shooter && !cu.dead
 					&& distanceBetween(bullets[i].pos, cu.player.pos) < bullets[i].radius + cu.player.radius)
 			{
@@ -207,7 +226,7 @@ function moveBullets()
 					cu.player.hp -= bullets[i].damage;
 
 				if(cu.player.hp > 0)
-					cm.broadcastBasicPlayerStat(cu);
+					usersToBroadcast.push(j);
 
 				if(cu.player.hp <= 0)
 				{
@@ -218,7 +237,7 @@ function moveBullets()
 					global.cm.broadcastPlayerDied(cu);
 					global.cm.broadcastScoreboardUpdate(cu, cu.deaths, 1);
 
-					var killer = users[bullets[i].shooter];
+					let killer = users[bullets[i].shooter];
 					if(typeof(killer) != 'undefined')
 					{
 						killer.kills ++;
@@ -235,19 +254,18 @@ function moveBullets()
 		{
 			if(inWall(bullets[i]).index!=-1)
 			{
-				var index = inWall(bullets[i]).index;
-				var objectCollided = inWall(bullets[i]).partCollided;
-				var r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
+				let index = inWall(bullets[i]).index;
+				let objectCollided = inWall(bullets[i]).partCollided;
+				let r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
 
 				if (!objectCollided.inIner)
 					putOutOf(bullets[i],objectCollided,r1+r2);
 				else
 					putOutOf(bullets[i],objectCollided,r2-r1);
 
-				bullets[i].rotation = findNewAngle(bullets[i],objectCollided);
+				bullets[i].rotation = findNewAngle(bullets[i], objectCollided);
 				bullets[i].radius -= 1;
 			}
-			//global.cm.broadcastBasicBulletStat(i);
 		}
 
 		if(bullets[i].radius <= 0.5)
@@ -257,15 +275,18 @@ function moveBullets()
 		}
 		else
 		{
-			toBroadcast.push(i);
+			bulletsToBroadcast.push(i);
 		}
 	}
-	global.cm.broadcastBasicBulletStat(toBroadcast);
+	if(bulletsToBroadcast.length > 0)
+		global.cm.broadcastBasicBulletStat(bulletsToBroadcast);
+	if(usersToBroadcast.length > 0)
+		cm.broadcastBasicPlayerStatPack(usersToBroadcast);
 }
 
 function respawnUsers()
 {
-	for(var i in users)
+	for(let i in users)
 	{
 		if(users[i].dead && (new Date).getTime() - users[i].lastEvent.killed > 5000)
 		{
@@ -274,19 +295,20 @@ function respawnUsers()
 			users[i].player.speed = 0;
 			users[i].dead = false;
 			users[i].lastEvent.respawn = (new Date()).getTime();
-			global.cm.broadcastBasicPlayerStat(users[i]);
+			global.cm.broadcastBasicPlayerStatPack([i]);
 			global.cm.broadcastPlayerRespawned(users[i]);
 		}
 	}
 }
 
-setInterval(movePlayers, 20);
-setInterval(moveBullets, 20);
+setInterval(movePlayers, 1000/30);
+setInterval(moveBullets, 1000/30);
 setInterval(respawnUsers, 1000);
 
 function distanceBetween(one, two)
 {
-    var alpha = one.x - two.x;
-    var beta = one.y - two.y;
-    return Math.sqrt((alpha*alpha)+(beta*beta));
+    let alpha = one.x - two.x;
+    let beta = one.y - two.y;
+    return Math.sqrt((alpha * alpha) + (beta * beta));
 }
+
