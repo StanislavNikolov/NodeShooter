@@ -146,6 +146,10 @@ function findNewAngle(p, w)
 		return Math.PI * 2 - Math.acos(vx / Math.sqrt(vx * vx + vy * vy));
 }
 
+// the final division is a constant to keep speedMultiplier setting "simpler"
+let playerSpeed = 1000 / global.config.players.ticksPerSecond
+						* global.config.players.speedMultiplier / 10;
+
 function movePlayers()
 {
 	let toBroadcast = [];
@@ -154,13 +158,13 @@ function movePlayers()
 		users[i].player.d.mul(0.8);
 
 		if(users[i].player.direction % 2 == 0)
-			users[i].player.d.y -= 2;
+			users[i].player.d.y -= playerSpeed;
 		if(users[i].player.direction % 3 == 0)
-			users[i].player.d.y += 2;
+			users[i].player.d.y += playerSpeed;
 		if(users[i].player.direction % 5 == 0)
-			users[i].player.d.x -= 2;
+			users[i].player.d.x -= playerSpeed;
 		if(users[i].player.direction % 7 == 0)
-			users[i].player.d.x += 2;
+			users[i].player.d.x += playerSpeed;
 
 		if(Math.abs(users[i].player.d.x) < 0.05)
 			users[i].player.d.x = 0;
@@ -201,6 +205,14 @@ function movePlayers()
 		global.cm.broadcastBasicPlayerStatPack(toBroadcast);
 }
 
+let bulletSpeed = 1000 / global.config.bullets.ticksPerSecond
+					* global.config.bullets.speedMultiplier;
+
+// the final division is a constant to keep speedMultiplier setting "simpler"
+let bulletDecayRate = 1000 / global.config.bullets.ticksPerSecond
+					* global.config.bullets.decayRateMultiplier / 1000;
+
+let bulletSimFrame = 0; // incremented every frame
 function moveBullets()
 {
 	let bulletsToBroadcast = [];
@@ -208,9 +220,9 @@ function moveBullets()
 	for(let i in bullets)
 	{
 		let collision = false;
-		bullets[i].radius -= 0.01;
-		bullets[i].d.x = Math.cos(bullets[i].rotation) * 10;
-		bullets[i].d.y = Math.sin(bullets[i].rotation) * 10;
+		bullets[i].radius -= bulletDecayRate;
+		bullets[i].d.x = Math.cos(bullets[i].rotation) * bulletSpeed;
+		bullets[i].d.y = Math.sin(bullets[i].rotation) * bulletSpeed;
 		bullets[i].pos.x += bullets[i].d.x;
 		bullets[i].pos.y += bullets[i].d.y;
 
@@ -275,13 +287,16 @@ function moveBullets()
 		}
 		else
 		{
-			bulletsToBroadcast.push(i);
+			if(bulletSimFrame % 3 == 0)
+				bulletsToBroadcast.push(i);
 		}
 	}
 	if(bulletsToBroadcast.length > 0)
 		global.cm.broadcastBasicBulletStat(bulletsToBroadcast);
 	if(usersToBroadcast.length > 0)
 		cm.broadcastBasicPlayerStatPack(usersToBroadcast);
+
+	bulletSimFrame ++;
 }
 
 function respawnUsers()
@@ -301,8 +316,8 @@ function respawnUsers()
 	}
 }
 
-setInterval(movePlayers, 1000/30);
-setInterval(moveBullets, 1000/30);
+setInterval(movePlayers, 1000 / global.config.players.ticksPerSecond);
+setInterval(moveBullets, 1000 / global.config.bullets.ticksPerSecond);
 setInterval(respawnUsers, 1000);
 
 function distanceBetween(one, two)
@@ -311,4 +326,3 @@ function distanceBetween(one, two)
     let beta = one.y - two.y;
     return Math.sqrt((alpha * alpha) + (beta * beta));
 }
-

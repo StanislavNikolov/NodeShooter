@@ -207,9 +207,7 @@ function draw()
 				// draw the player
 				context.beginPath();
 
-				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y, users[i].player.radius, users[i].player.rotation, Math.PI * 2 + users[i].player.rotation);
-				if (myself.id == i)
-					context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
+				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y, users[i].player.radius, users[i].player.rotation, Math.PI * 2 + users[i].player.rotation); if (myself.id == i) context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
 
 				context.globalAlpha = 0.1; context.fill();
 				context.globalAlpha = 1; context.stroke();
@@ -285,4 +283,4 @@ function draw()
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 }
 
-setInterval(draw, 1000/30);
+setInterval(draw, 1000/60);

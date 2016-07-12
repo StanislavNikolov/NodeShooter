@@ -3,7 +3,22 @@
 let app = require('express')()
   , server = require('http').createServer(app)
   , WebSocketServer = require('ws').Server
-  , wss = new WebSocketServer({server: server});
+  , wss = new WebSocketServer({server: server})
+  , config = require('./config.json');
+
+// Default values if such in the config are missing
+if(config == null) { config = {}; }
+
+if(config.bullets == null) { config.bullets = {}; }
+if(config.bullets.ticksPerSecond == null) { config.bullets.ticksPerSecond = 120; }
+if(config.bullets.speedMultiplier == null) { config.bullets.speedMultiplier = 1.2; }
+if(config.bullets.decayRateMultiplier == null) { config.bullets.decayRateMultiplier = 2; }
+
+if(config.players == null) { config.players = {}; }
+if(config.players.ticksPerSecond == null) { config.players.ticksPerSecond = 40; }
+if(config.players.speedMultiplier == null) { config.players.speedMultiplier = 1; }
+
+global.config = config;
 
 global.classes = require('./classes.js');
 global.cm = require('./connectionManager.js')
