@@ -59,10 +59,14 @@ function generateRandomMap(sp)
 		let x = Math.floor(Math.random() * 1000 - 500);
 		let y = Math.floor(Math.random() * 1000 - 500);
 		let ang = a2 - a1;
-		if(ang < Math.PI / 180 * 45 || (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360) || !isFree(x, y, r2))
+
+		if(ang < Math.PI / 180 * 45
+				|| (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360)
+				|| !isFree(x, y, r2))
 		{
 			continue;
 		}
+
 		walls[generateID()] = new classes.Wall(x, y, r1, r2, a1, a2);
 		wallsCount ++;
 	}
@@ -78,19 +82,21 @@ function inWall(p)
 			&& distanceBetween(walls[j].pos, p.pos) + p.radius > walls[j].radius.inner)
 		{
 			let angle;
-			if (p.pos.y-walls[j].pos.y>0)
+			if(p.pos.y - walls[j].pos.y > 0)
 			{
-				angle = Math.acos( (p.pos.x-walls[j].pos.x) / distanceBetween(walls[j].pos, p.pos) );
+				angle = Math.acos(
+						(p.pos.x - walls[j].pos.x) / distanceBetween(walls[j].pos, p.pos) );
 			}
 			else
 			{
-				angle = 2*Math.PI - Math.acos( (p.pos.x-walls[j].pos.x) / distanceBetween(walls[j].pos,p.pos) );
+				angle = 2 * Math.PI - Math.acos(
+						(p.pos.x - walls[j].pos.x) / distanceBetween(walls[j].pos, p.pos) );
 			}
 
 			if( (angle > walls[j].angle.start && angle < walls[j].angle.finish)
-				|| (walls[j].angle.finish > 2*Math.PI
-					&& angle + 2*Math.PI > walls[j].angle.start
-					&& angle + 2*Math.PI < walls[j].angle.finish)
+				|| (walls[j].angle.finish > 2 * Math.PI
+					&& angle + 2 * Math.PI > walls[j].angle.start
+					&& angle + 2 * Math.PI < walls[j].angle.finish)
 				)
 			{
 				if(distanceBetween(walls[j].pos, p.pos) < (walls[j].radius.inner + walls[j].radius.outer) / 2)
@@ -119,10 +125,10 @@ function inWall(p)
 	return {index: -1};
 }
 
-function putOutOf(o1,o2,distance)
+function putOutOf(o1, o2, distance)
 {
-	o1.pos.x = o2.pos.x + (o1.pos.x-o2.pos.x)*distance/(distanceBetween(o1.pos,o2.pos));
-	o1.pos.y = o2.pos.y + (o1.pos.y-o2.pos.y)*distance/(distanceBetween(o1.pos,o2.pos));
+	o1.pos.x = o2.pos.x + (o1.pos.x-o2.pos.x) * distance / (distanceBetween(o1.pos,o2.pos));
+	o1.pos.y = o2.pos.y + (o1.pos.y-o2.pos.y) * distance / (distanceBetween(o1.pos,o2.pos));
 }
 
 function findNewAngle(p, w)
@@ -136,9 +142,9 @@ function findNewAngle(p, w)
 	let px = p.pos.x;
 	let py = p.pos.y;
 
-	p = 2*(vx*tpx+vy*tpy)/(tpx*tpx+tpy*tpy);
+	p = 2 * (vx*tpx+vy*tpy) / (tpx*tpx+tpy*tpy);
 	vx = vx - p * tpx;
-	vy = vy - p * tpy;//*(Math.abs(vy*tpx-vx*tpy)/(0.1+0.9*Math.sqrt(vx*vx+vy*vy)*Math.sqrt(tpx*tpx+tpy*tpy)));
+	vy = vy - p * tpy;
 
 	if (vy > 0)
 		return Math.acos(vx / Math.sqrt(vx * vx + vy * vy));
@@ -231,7 +237,8 @@ function moveBullets()
 		{
 			let cu = users[j];
 			if(j != bullets[i].shooter && !cu.dead
-					&& distanceBetween(bullets[i].pos, cu.player.pos) < bullets[i].radius + cu.player.radius)
+					&& distanceBetween(bullets[i].pos, cu.player.pos)
+					< bullets[i].radius + cu.player.radius)
 			{
 				// The first 5 seconds after respawn the user can't take damage
 				if((new Date()).getTime() - cu.lastEvent.respawn > 5000)
@@ -250,7 +257,7 @@ function moveBullets()
 					global.cm.broadcastScoreboardUpdate(cu, cu.deaths, 1);
 
 					let killer = users[bullets[i].shooter];
-					if(typeof(killer) != 'undefined')
+					if(killer != null)
 					{
 						killer.kills ++;
 						global.cm.broadcastMessage(killer.name + ' killed ' + cu.name);
