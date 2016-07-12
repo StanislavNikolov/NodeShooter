@@ -276,7 +276,7 @@ function moveBullets()
 					putOutOf(bullets[i],objectCollided,r2-r1);
 
 				bullets[i].rotation = findNewAngle(bullets[i], objectCollided);
-				bullets[i].radius -= 1;
+				bullets[i].radius -= global.config.bullets.decayOnRicochetMultiplier;
 			}
 		}
 
@@ -287,7 +287,7 @@ function moveBullets()
 		}
 		else
 		{
-			if(bulletSimFrame % 3 == 0)
+			if(bulletSimFrame % global.config.bullets.sendTicksDivisor == 0)
 				bulletsToBroadcast.push(i);
 		}
 	}
