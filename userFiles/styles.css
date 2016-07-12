@@ -5,7 +5,3 @@ body, html {
 	padding: 0;
 	overflow: hidden;
 }
-
-mainCanvas {
-	position: absolute;
-}
