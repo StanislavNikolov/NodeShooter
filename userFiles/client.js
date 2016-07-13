@@ -6,6 +6,7 @@ socket.onopen = function(event)
 	console.log('Connection succssesful');
 }
 var packs = 0;
+var bulletsPerSecond = 1;
 
 /*
 // by "Joni", http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
@@ -72,8 +73,8 @@ socket.onmessage = function(event)
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
 
-		var bps = message.getFloat32(5, false);
-		setInterval(sendShootRequest, 1000 / bps);
+		bulletsPerSecond = message.getFloat32(5, false);
+		setInterval(sendShootRequest, 10);
 	}
 	if(message.getUint8(0) == 11) // add user
 	{
@@ -170,15 +171,18 @@ socket.onmessage = function(event)
 	}
 }
 
+var lastShootTime = 0;
 function sendShootRequest()
 {
-	if(keys[32])
+	if(keys[32] && (new Date).getTime() - lastShootTime > 1000 / bulletsPerSecond)
 	{
 		var packet_b = new ArrayBuffer(5);
 		var packet = new DataView(packet_b);
 		packet.setUint8(0, 1);
 		packet.setFloat32(1, myself.player.rotation, false);
 		socket.send(packet_b);
+
+		lastShootTime = (new Date).getTime();
 	}
 }
 
