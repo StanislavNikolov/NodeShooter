@@ -9,6 +9,9 @@ let app = require('express')()
 // Default values if such in the config are missing
 if(config == null) { config = {}; }
 
+if(config.server == null) { config.server = {}; }
+config.server.port = process.env.PORT || config.server.port || 5000;
+
 if(config.bullets == null) { config.bullets = {}; }
 if(config.bullets.ticksPerSecond == null) { config.bullets.ticksPerSecond = 120; }
 if(config.bullets.sendTicksDivisor == null) { config.bullets.sendTicksDivisor = 2; }
@@ -26,15 +29,14 @@ if(config.players.bulletsPerSecond == null) { config.players.bulletsPerSecond = 
 global.config = config;
 
 global.classes = require('./classes.js');
-global.cm = require('./connectionManager.js')
+global.cm = require('./connectionManager.js');
 global.pm = require('./packetManager.js');
 
 let cm = global.cm;
 let pm = global.pm;
 let classes = global.classes;
 
-const port = Number(process.env.PORT || 5000);
-server.listen(port, function () { console.log('Listening on ' + server.address().port) });
+server.listen(config.server.port, function () { console.log('Listening on ' + server.address().port) });
 
 app.get('/', function (req, res)
 {
