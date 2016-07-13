@@ -9,11 +9,12 @@ module.exports.nameReqPacket = function ()
 }
 module.exports.initGamePacket = function (user)
 {
-	let buffer = new ArrayBuffer(1 + 4);
+	let buffer = new ArrayBuffer(1 + 4 + 4);
 	let dv = new DataView(buffer);
 	dv.setUint8(0, 2);
 
 	dv.setUint32(1, user.id, false);
+	dv.setFloat32(5, global.config.players.bulletsPerSecond, false);
 
 	return buffer;
 }

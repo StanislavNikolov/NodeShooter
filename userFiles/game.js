@@ -38,7 +38,6 @@ var bullets = {};
 var keys = []; // saves the keyboard state
 var myself; // reference to the our player
 
-var maxShootPeriod = 6, currentShootPeriod = 0; // For correcting the shoot speed
 var messageBoard = [];
 
 function Bullet(shr)

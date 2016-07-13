@@ -71,6 +71,9 @@ socket.onmessage = function(event)
 	{
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
+
+		var bps = message.getFloat32(5, false);
+		setInterval(sendShootRequest, 1000 / bps);
 	}
 	if(message.getUint8(0) == 11) // add user
 	{
@@ -169,11 +172,8 @@ socket.onmessage = function(event)
 
 function sendShootRequest()
 {
-	currentShootPeriod --;
-	if(keys[32] && currentShootPeriod <= 0)
+	if(keys[32])
 	{
-		currentShootPeriod = maxShootPeriod;
-
 		var packet_b = new ArrayBuffer(5);
 		var packet = new DataView(packet_b);
 		packet.setUint8(0, 1);
@@ -181,7 +181,6 @@ function sendShootRequest()
 		socket.send(packet_b);
 	}
 }
-setInterval(sendShootRequest, 20);
 
 var lastSentMoveDirection = 1;
 function sendMoveRequest()

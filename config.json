@@ -1,4 +1,17 @@
 {
-	"bullets": {"ticksPerSecond": 120, "sendTicksDivisor": 3, "speedMultiplier": 1.2, "decayRateMultiplier": 2, "decayOnRicochetMultiplier": 0.4},
-	"players": {"ticksPerSecond": 40, "speedMultiplier": 1}
+	"bullets":
+	{
+		"ticksPerSecond": 120,
+		"sendTicksDivisor": 2,
+		"speedMultiplier": 1.2,
+		"decayRateMultiplier": 2,
+		"decayOnRicochetMultiplier": 0.4,
+		"damage": 2
+	},
+	"players":
+	{
+		"ticksPerSecond": 40,
+		"speedMultiplier": 1,
+		"bulletsPerSecond": 15
+	}
 }

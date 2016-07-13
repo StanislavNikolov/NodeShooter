@@ -13,10 +13,14 @@ if(config.bullets == null) { config.bullets = {}; }
 if(config.bullets.ticksPerSecond == null) { config.bullets.ticksPerSecond = 120; }
 if(config.bullets.speedMultiplier == null) { config.bullets.speedMultiplier = 1.2; }
 if(config.bullets.decayRateMultiplier == null) { config.bullets.decayRateMultiplier = 2; }
+if(config.bullets.decayOnRicochetMultiplier == null)
+{ config.bullets.decayOnRicochetMultiplierplier = 2; }
+if(config.bullets.damage == null) { config.bullets.damage = 2; }
 
 if(config.players == null) { config.players = {}; }
 if(config.players.ticksPerSecond == null) { config.players.ticksPerSecond = 40; }
 if(config.players.speedMultiplier == null) { config.players.speedMultiplier = 1; }
+if(config.players.bulletsPerSecond == null) { config.players.bulletsPerSecond = 15; }
 
 global.config = config;
 
@@ -127,14 +131,15 @@ wss.on('connection', function (socket)
 		}
 		if(data.getUint8(0) == 1 && typeof(cu) != 'undefined')
 		{
-			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > 120)
+			let minTimeBetweenBullets = 1000 / config.players.bulletsPerSecond;
+			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > minTimeBetweenBullets)
 			{
 				let id = generateID();
 				bullets[id] = new classes.Bullet(
 						  cu.player.pos.x
 						, cu.player.pos.y
 						, data.getFloat32(1, false)
-						, cu.id, 20);
+						, cu.id, global.config.bullets.damage);
 
 				cm.broadcastNewBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
