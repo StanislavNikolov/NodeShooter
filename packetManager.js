@@ -84,30 +84,13 @@ module.exports.playerRespawnedPacket = function (user)
 {
 	let buffer = new ArrayBuffer(1 + 4);
 	let dv = new DataView(buffer);
-	dv.setUint8(0, 15); 
+	dv.setUint8(0, 15);
 	dv.setUint32(1, user.id, false);
 
 	return buffer;
 }
 
 // 02 - bullets
-module.exports.createBulletPacket = function (id)
-{
-	// pid, bulletID, shooterID, pos, rotation, radius, damage
-	let buffer = new ArrayBuffer(1 + 4 + 4 + 8 + 4 + 4 + 4);
-	let dv = new DataView(buffer);
-	dv.setUint8(0, 21);
-
-	dv.setUint32(1, id, false);
-	dv.setUint32(5, global.bullets[id].shooter, false);
-	dv.setInt32(9, global.bullets[id].pos.x, false);
-	dv.setInt32(13, global.bullets[id].pos.y, false);
-	dv.setFloat32(17, global.bullets[id].rotation, false);
-	dv.setFloat32(21, global.bullets[id].radius, false);
-	dv.setInt32(25, global.bullets[id].damage, false);
-
-	return buffer;
-}
 module.exports.removeBulletPacket = function (id)
 {
 	let buffer = new ArrayBuffer(1 + 4);
@@ -120,7 +103,7 @@ module.exports.removeBulletPacket = function (id)
 }
 module.exports.basicBulletStatPacket = function (arr)
 {
-	let buffer = new ArrayBuffer(1 + 4 + arr.length * (4 + 8 + 4 + 4));
+	let buffer = new ArrayBuffer(1 + 4 + arr.length * (4 + 4 + 4 + 4));
 	let dv = new DataView(buffer);
 	dv.setUint8(0, 23);
 
@@ -129,13 +112,12 @@ module.exports.basicBulletStatPacket = function (arr)
 	let count = 0;
 	for(let id of arr)
 	{
-		dv.setUint32(5 + count * 20, id, false);
+		dv.setUint32(5 + count * 16, id, false);
 
-		dv.setInt32(9 + count * 20, global.bullets[id].pos.x, false);
-		dv.setInt32(13 + count * 20, global.bullets[id].pos.y, false);
+		dv.setInt32(9 + count * 16, global.bullets[id].pos.x, false);
+		dv.setInt32(13 + count * 16, global.bullets[id].pos.y, false);
 
-		dv.setFloat32(17 + count * 20, global.bullets[id].rotation, false);
-		dv.setFloat32(21 + count * 20, global.bullets[id].radius, false);
+		dv.setFloat32(17 + count * 16, global.bullets[id].radius, false);
 
 		count ++;
 	}

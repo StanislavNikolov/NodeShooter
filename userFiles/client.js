@@ -5,7 +5,11 @@ socket.onopen = function(event)
 {
 	console.log('Connection succssesful');
 }
-var packs = 0;
+
+var debug = new Array(256);
+for(var i = 0;i < 256;++ i)
+	debug[i] = 0;
+
 var bulletsPerSecond = 1;
 
 /*
@@ -45,8 +49,11 @@ function toUTF8Array(str) {
 socket.onmessage = function(event)
 {
 	var message = new DataView(event.data);
-	packs ++;
-	if(message.getUint8(0) == 1) // auth reqest
+	var packID = message.getUint8(0);
+
+	debug[packID] ++; // for performance debugging
+
+	if(packID === 1) // auth reqest
 	{
 		var loginName = "";
 		do
@@ -68,7 +75,7 @@ socket.onmessage = function(event)
 
 		socket.send(response_b);
 	}
-	if(message.getUint8(0) == 2)
+	if(packID === 2)
 	{
 		var id = message.getUint32(1, false);
 		myself = users[id]; // used in game.js for drawing
@@ -76,7 +83,7 @@ socket.onmessage = function(event)
 		bulletsPerSecond = message.getFloat32(5, false);
 		setInterval(sendShootRequest, 10);
 	}
-	if(message.getUint8(0) == 11) // add user
+	if(packID === 11) // add user
 	{
 		var name = "";
 		for(var i = 0;i < message.getUint8(1);++ i)
@@ -89,9 +96,9 @@ socket.onmessage = function(event)
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
 	}
-	if(message.getUint8(0) == 12) // remove user
+	if(packID === 12) // remove user
 		delete users[message.getUint32(1)];
-	if(message.getUint8(0) == 13) // basic player info
+	if(packID === 13) // basic player info
 	{
 		var count = message.getUint32(1, false);
 
@@ -105,40 +112,30 @@ socket.onmessage = function(event)
 			users[id].player.maxhp = message.getInt32(25 + i * 24, false);
 		}
 	}
-	if(message.getUint8(0) == 14) // player died
+	if(packID === 14) // player died
 		users[message.getUint32(1, false)].dead = true;
-	if(message.getUint8(0) == 15) // player respawned
+	if(packID === 15) // player respawned
 		users[message.getUint32(1, false)].dead = false;
-	if(message.getUint8(0) == 21) // add bullet
-	{
-		var bid = message.getUint32(1, false);
-		var sid = message.getUint32(5, false);
-		bullets[bid] = new Bullet(sid);
-
-		bullets[bid].pos.x = message.getInt32(9, false);
-		bullets[bid].pos.y = message.getInt32(13, false);
-		bullets[bid].rotation = message.getFloat32(17, false);
-		bullets[bid].radius = message.getFloat32(21, false);
-		bullets[bid].damage = message.getInt32(25, false);
-	}
-	if(message.getUint8(0) == 22) // remove bullet
+	if(packID === 22) // remove bullet
 	{
 		delete bullets[message.getUint32(1, false)];
 	}
-	if(message.getUint8(0) == 23) // basic bullet stat
+	if(packID === 23) // basic bullet stat
 	{
 		var count = message.getUint32(1, false);
 		for(var i = 0;i < count;++ i)
 		{
-			var id = message.getUint32(5 + i * 20, false);
+			var id = message.getUint32(5 + i * 16, false);
 
-			bullets[id].pos.x = message.getInt32(9 + i * 20, false);
-			bullets[id].pos.y = message.getInt32(13 + i * 20, false);
-			bullets[id].rotation = message.getFloat32(17 + i * 20, false);
-			bullets[id].radius = message.getFloat32(21 + i * 20, false);
+			if(bullets[id] == null)
+				bullets[id] = new Bullet('');
+
+			bullets[id].pos.x = message.getInt32(9 + i * 16, false);
+			bullets[id].pos.y = message.getInt32(13 + i * 16, false);
+			bullets[id].radius = message.getFloat32(17 + i * 16, false);
 		}
 	}
-	if(message.getUint8(0) == 31) // add wall
+	if(packID === 31) // add wall
 	{
 		var id = message.getUint32(1, false);
 
@@ -151,7 +148,7 @@ socket.onmessage = function(event)
 
 		walls[id] = new Wall(x, y, ir, or, sa, fa);
 	}
-	if(message.getUint8(0) == 41)
+	if(packID === 41)
 	{
 		var msg = '';
 		var s = message.getUint32(1, false);
@@ -159,7 +156,7 @@ socket.onmessage = function(event)
 			msg += String.fromCharCode(message.getUint8(5+i));
 		messageBoard.push(msg);
 	}
-	if(message.getUint8(0) == 42)
+	if(packID === 42)
 	{
 		var id = message.getUint32(1, false);
 		var value = message.getInt32(5, false);
@@ -213,9 +210,19 @@ function sendMoveRequest()
 }
 setInterval(sendMoveRequest, 50);
 
-function stats()
+function debugLog()
 {
-	console.log('Packets since last log:', packs);
-	packs = 0;
+	console.log('=============');
+	var sum = 0;
+	for(var i = 0;i < 256;++ i)
+	{
+		if(debug[i] > 0)
+		{
+			console.log(i, ': ', debug[i]);
+			sum += debug[i];
+			debug[i] = 0;
+		}
+	}
+	console.log('sum: ', sum);
 }
-setInterval(stats, 1000);
+setInterval(debugLog, 1000);

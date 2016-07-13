@@ -43,11 +43,7 @@ var messageBoard = [];
 function Bullet(shr)
 {
 	this.pos = new Vector(0, 0);
-	this.rotation = 0;
 	this.radius = 0;
-	this.shooter = shr;
-	this.d = new Vector(Math.cos(0), Math.sin(0));
-	this.damage = 0;
 }
 
 function Vector(x, y)

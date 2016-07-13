@@ -37,13 +37,6 @@ module.exports.broadcastPlayerRespawned = function (user)
 
 }
 
-module.exports.broadcastNewBullet = function (id)
-{
-	let packet = global.pm.createBulletPacket(id);
-	for(let i in global.users)
-		global.users[i].socket.send(packet, function err(){});
-}
-
 module.exports.broadcastRemoveBullet = function (id)
 {
 	let packet = global.pm.removeBulletPacket(id);

@@ -11,16 +11,17 @@ if(config == null) { config = {}; }
 
 if(config.bullets == null) { config.bullets = {}; }
 if(config.bullets.ticksPerSecond == null) { config.bullets.ticksPerSecond = 120; }
+if(config.bullets.sendTicksDivisor == null) { config.bullets.sendTicksDivisor = 2; }
 if(config.bullets.speedMultiplier == null) { config.bullets.speedMultiplier = 1.2; }
 if(config.bullets.decayRateMultiplier == null) { config.bullets.decayRateMultiplier = 2; }
 if(config.bullets.decayOnRicochetMultiplier == null)
-{ config.bullets.decayOnRicochetMultiplierplier = 2; }
-if(config.bullets.damage == null) { config.bullets.damage = 2; }
+{ config.bullets.decayOnRicochetMultiplier = 0.4; }
+if(config.bullets.damage == null) { config.bullets.damage = 5; }
 
 if(config.players == null) { config.players = {}; }
 if(config.players.ticksPerSecond == null) { config.players.ticksPerSecond = 40; }
 if(config.players.speedMultiplier == null) { config.players.speedMultiplier = 1; }
-if(config.players.bulletsPerSecond == null) { config.players.bulletsPerSecond = 15; }
+if(config.players.bulletsPerSecond == null) { config.players.bulletsPerSecond = 10; }
 
 global.config = config;
 
@@ -141,7 +142,6 @@ wss.on('connection', function (socket)
 						, data.getFloat32(1, false)
 						, cu.id, global.config.bullets.damage);
 
-				cm.broadcastNewBullet(id);
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
