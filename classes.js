@@ -4,18 +4,18 @@ function Vector(x, y)
 	this.y = y;
 }
 
-Vector.prototype.mul = function VectorMultiply (num) {
+Vector.prototype.mul = function VectorMultiply(num) {
 	this.x *= num;
 	this.y *= num;
 }
 
-Vector.prototype.add = this.add = function VectorAdd (b) {
-	this.x += b.x;
-	this.y += b.y;
+Vector.prototype.add = this.add = function VectorAdd(other) {
+	this.x += other.x;
+	this.y += other.y;
 }
 
 Vector.prototype.len = this.len = function VectorLength() {
-	return Math.sqrt(this.x*this.x+this.y*this.y);
+	return Math.sqrt(this.x*this.x + this.y*this.y);
 }
 
 function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
@@ -25,7 +25,7 @@ function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
-function Player(p)
+function Player(p) // The part of the "user" that's used by the simulation
 {
 	this.pos = p; // must be Vector
 	this.radius = 10;
@@ -33,7 +33,6 @@ function Player(p)
 	this.hp = 100;
 	this.maxhp = 100;
 	this.d = new Vector(0, 0);
-	this.lastEvent = {shoot: 0, respawn: 0, killed: 0};
 	this.direction = 1;
 }
 
@@ -45,7 +44,7 @@ function User(socket, name, id)
 	this.kills = 0;
 	this.deaths = 0;
 	this.dead = false;
-	this.lastEvent = {shoot: 0, killed: 0, respawn: 0, move: 0};
+	this.lastEvent = {shoot: 0, killed: 0, respawn: 0};
 
 	this.player = new Player(new Vector(400, 300));
 }

@@ -96,7 +96,7 @@ wss.on('connection', function (socket)
 
 		if(data.getUint8(0) == 0)
 		{
-			if(typeof(cu) != 'undefined' && typeof(cu.name) == 'string')
+			if(cu != null && cu.name != null)
 				return; // This user already has a name
 
 			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
@@ -132,7 +132,7 @@ wss.on('connection', function (socket)
 
 			cm.broadcastMessage('Player ' + cu.name + ' joined');
 		}
-		if(data.getUint8(0) == 1 && typeof(cu) != 'undefined')
+		if(data.getUint8(0) == 1 && cu != null)
 		{
 			let minTimeBetweenBullets = 1000 / config.players.bulletsPerSecond;
 			if(!cu.dead && (new Date()).getTime() - cu.lastEvent.shoot > minTimeBetweenBullets)
@@ -147,14 +147,14 @@ wss.on('connection', function (socket)
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
-		if(data.getUint8(0) == 2 && typeof(cu) != 'undefined' && typeof(cu.player) != 'undefined')
+		if(data.getUint8(0) == 2 && cu != null && cu.player != null)
 		{
 			cu.player.direction = data.getUint8(1);
 		}
 	});
 	socket.on('close', function (rawData, flags)
 	{
-		if(typeof(socket.ownerID) !== 'undefined')
+		if(socket.ownerID != null)
 		{
 			cm.broadcastMessage(users[socket.ownerID].name + ' quit');
 			cm.broadcastRemoveUser(users[socket.ownerID]);

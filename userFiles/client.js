@@ -6,9 +6,9 @@ socket.onopen = function(event)
 	console.log('Connection succssesful');
 }
 
-var debug = new Array(256);
+var debugData = new Array(256);
 for(var i = 0;i < 256;++ i)
-	debug[i] = 0;
+	debugData[i] = 0;
 
 var bulletsPerSecond = 1;
 
@@ -51,7 +51,7 @@ socket.onmessage = function(event)
 	var message = new DataView(event.data);
 	var packID = message.getUint8(0);
 
-	debug[packID] ++; // for performance debugging
+	debugData[packID] ++; // for performance debugging
 
 	if(packID === 1) // auth reqest
 	{
@@ -216,11 +216,11 @@ function debugLog()
 	var sum = 0;
 	for(var i = 0;i < 256;++ i)
 	{
-		if(debug[i] > 0)
+		if(debugData[i] > 0)
 		{
-			console.log(i, ': ', debug[i]);
-			sum += debug[i];
-			debug[i] = 0;
+			console.log(i, ': ', debugData[i]);
+			sum += debugData[i];
+			debugData[i] = 0;
 		}
 	}
 	console.log('sum: ', sum);

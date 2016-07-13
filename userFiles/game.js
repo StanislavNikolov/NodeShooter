@@ -5,7 +5,7 @@ function resize()
 {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
-	canvas.getContext("2d").fillText("Resizeing...", canvas.width / 2, canvas.height / 2);
+	draw();
 }
 resize();
 
@@ -17,15 +17,6 @@ function getPlayerRotation(event)
 		var dy = event.clientY - canvas.height / 2;
 		var angle = Math.atan2(dy, dx);
 		myself.player.rotation = angle;
-
-		/*
-		var packet_b = new ArrayBuffer(1+4);
-		var packet = new DataView(packet_b);
-		packet.setUint8(0, 3);
-		packet.setFloat32(1, angle, false);
-
-		socket.send(packet_b);
-		*/
 	}
 }
 window.addEventListener("resize", resize, false);
@@ -40,7 +31,7 @@ var myself; // reference to the our player
 
 var messageBoard = [];
 
-function Bullet(shr)
+function Bullet()
 {
 	this.pos = new Vector(0, 0);
 	this.radius = 0;

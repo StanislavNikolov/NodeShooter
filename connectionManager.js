@@ -22,6 +22,7 @@ module.exports.broadcastBasicPlayerStatPack = function (users)
 		global.users[n].socket.send(p, function err(){});
 
 }
+
 module.exports.broadcastPlayerDied = function (user)
 {
 	let p = global.pm.playerDiedPacket(user);
@@ -29,6 +30,7 @@ module.exports.broadcastPlayerDied = function (user)
 		global.users[n].socket.send(p, function err(){});
 
 }
+
 module.exports.broadcastPlayerRespawned = function (user)
 {
 	let p = global.pm.playerRespawnedPacket(user);
@@ -77,6 +79,7 @@ module.exports.broadcastMessage = function (msg)
 	for(let i in users)
 		global.users[i].socket.send(p, function err(){});
 }
+
 module.exports.broadcastScoreboardUpdate = function (user, value, y)
 {
 	let p = global.pm.scoreboardUpdatePacket(user, value, y);
