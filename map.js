@@ -36,7 +36,7 @@ function generateMap(type)
 			generateRandomMap(65);
 			break;
 		case 3:
-			for(var i = 1;i < 11;++ i)
+			for(var i = 1;i < 101;++ i)
 			{
 				var ang1 = Math.random() * Math.PI * 2;
 				var ang2 = ang1 + Math.PI;

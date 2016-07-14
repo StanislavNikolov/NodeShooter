@@ -54,10 +54,15 @@ module.exports.sendUsers = function (user)
 		user.socket.send(global.pm.createUserPacket(global.users[n]), function err(){});
 }
 
-module.exports.sendMap = function (user)
+module.exports.sendWalls = function (user, walls)
 {
-	for(let i in global.walls)
-		user.socket.send(global.pm.createWallPacket(i), function err(){});
+	let packet = global.pm.wallsPacket(walls);
+	user.socket.send(packet);
+}
+module.exports.broadcastWalls = function (walls)
+{
+	let packet = global.pm.wallsPacket(walls);
+	broadcastPacket(packet);
 }
 
 module.exports.initGame = function (user)

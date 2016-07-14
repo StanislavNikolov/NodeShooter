@@ -120,7 +120,7 @@ wss.on('connection', function (socket)
 
 			cm.broadcastNewUser(cu);
 			cm.sendUsers(cu);
-			cm.sendMap(cu);
+			cm.sendWalls(cu, walls);
 			cm.initGame(cu);
 
 			cm.broadcastMessage('Player ' + cu.name + ' joined');

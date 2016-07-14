@@ -186,10 +186,7 @@ function rotateWalls()
 			walls[i].angle.finish -= Math.PI * 2;
 		}
 	}
-	for(let i in users)
-	{
-		cm.sendMap(users[i]);
-	}
+	cm.broadcastWalls(walls);
 }
 
 setInterval(rotateWalls, 50);
