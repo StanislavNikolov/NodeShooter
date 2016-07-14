@@ -159,7 +159,7 @@ socket.onmessage = function(event)
 		var s = message.getUint32(1, false);
 		for(var i = 0;i < s;++ i)
 			msg += String.fromCharCode(message.getUint8(5+i));
-		messageBoard.push(msg);
+		addMessageToMessageboard(msg);
 	}
 	if(packID === 42)
 	{

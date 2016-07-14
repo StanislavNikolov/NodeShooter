@@ -14,12 +14,24 @@ body {
 }
 
 #scoreboard {
-	position: absolute;
+	position: fixed;
 	right: 2%;
 	top: 2%;
 	width: 20em;
 	height: auto;
+}
 
+#messageboard {
+	position: fixed;
+	left: 2%;
+	bottom: 2%;
+	width: 20em;
+	height: auto;
+	max-height: 15%;
+	overflow: hidden;
+}
+
+#scoreboard, #messageboard {
 	background-color:rgba(176, 224, 230, 0.5);
 	font-family: monospace;
 }

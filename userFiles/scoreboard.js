@@ -1,4 +1,5 @@
 var scoreboard = document.getElementById('scoreboard');
+var messageboard = document.getElementById('messageboard');
 
 function refreshScoreboard()
 {
@@ -24,4 +25,10 @@ function removeUserFromScoreboard(id)
 {
 	var row = document.getElementById('scoreboard-' + id);
 	row.parentNode.removeChild(row);
+}
+
+function addMessageToMessageboard(msg)
+{
+	messageboard.innerHTML += msg + '<br>';
+	messageboard.scrollTop = messageboard.scrollTopMax
 }
