@@ -81,12 +81,14 @@ wss.on('connection', function (socket)
 
 	socket.on('message', function(rawData, flags)
 	{
-/*
- * 'rawData' is of type 'Buffer', but we need the standart javascript ArrayBuffer.
- * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server by sending a huge packet.
- * This is what this 'if' is for, pun not intended.
- */
-		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1 || rawData.length < MIN_BUFF_SIZE[rawData[0]])
+		/*
+		 * 'rawData' is of type 'Buffer', but we need the standart javascript ArrayBuffer.
+		 * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server
+		 * by sending a huge packet.  This is what this 'if' is for, pun not intended.
+		 */
+
+		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1
+			|| rawData.length < MIN_BUFF_SIZE[rawData[0]])
 			return;
 
 		let data_b = new ArrayBuffer(rawData.length);
@@ -96,8 +98,8 @@ wss.on('connection', function (socket)
 
 		if(data.getUint8(0) == 0)
 		{
-			if(cu != null && cu.name != null)
-				return; // This user already has a name
+			if(cu != null && cu.name != null) // This user already has a name
+				return;
 
 			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
 			{
