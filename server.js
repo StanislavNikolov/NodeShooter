@@ -13,18 +13,17 @@ if(config.server == null) { config.server = {}; }
 config.server.port = process.env.PORT || config.server.port || 5000;
 
 if(config.bullets == null) { config.bullets = {}; }
-if(config.bullets.ticksPerSecond == null) { config.bullets.ticksPerSecond = 120; }
-if(config.bullets.sendTicksDivisor == null) { config.bullets.sendTicksDivisor = 2; }
-if(config.bullets.speedMultiplier == null) { config.bullets.speedMultiplier = 1.2; }
-if(config.bullets.decayRateMultiplier == null) { config.bullets.decayRateMultiplier = 2; }
-if(config.bullets.decayOnRicochetMultiplier == null)
-{ config.bullets.decayOnRicochetMultiplier = 0.4; }
-if(config.bullets.damage == null) { config.bullets.damage = 5; }
+config.bullets.ticksPerSecond = config.bullets.ticksPerSecond || 120;
+config.bullets.sendTicksDivisor = config.bullets.sendTicksDivisor || 2;
+config.bullets.speedMultiplier = config.bullets.speedMultiplier || 1.2;
+config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 2;
+config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || 0.4;
+config.bullets.damage = config.bullets.damage || 5;
 
 if(config.players == null) { config.players = {}; }
-if(config.players.ticksPerSecond == null) { config.players.ticksPerSecond = 40; }
-if(config.players.speedMultiplier == null) { config.players.speedMultiplier = 1; }
-if(config.players.bulletsPerSecond == null) { config.players.bulletsPerSecond = 10; }
+config.players.ticksPerSecond = config.players.ticksPerSecond || 40;
+config.players.speedMultiplier = config.players.speedMultiplier || 1;
+config.players.bulletsPerSecond = config.players.bulletsPerSecond || 10;
 
 global.config = config;
 
@@ -166,4 +165,5 @@ wss.on('connection', function (socket)
 });
 
 // Last file, because it calls functions written here
+global.map = require('./map.js');
 var simulation = require("./simulation.js");
