@@ -26,14 +26,9 @@ config.players.speedMultiplier = config.players.speedMultiplier || 1;
 config.players.bulletsPerSecond = config.players.bulletsPerSecond || 10;
 
 global.config = config;
-
 global.classes = require('./classes.js');
 global.cm = require('./connectionManager.js');
 global.pm = require('./packetManager.js');
-
-let cm = global.cm;
-let pm = global.pm;
-let classes = global.classes;
 
 server.listen(config.server.port, function () { console.log('Listening on ' + server.address().port) });
 
@@ -57,12 +52,6 @@ const MIN_BUFF_SIZE = [2, 5, 2];
 global.users = {};
 global.walls = {};
 global.bullets = {};
-global.frame = 0;
-
-let users = global.users;
-let walls = global.walls;
-let bullets = global.bullets;
-let frame = global.frame;
 
 let nextID = 0;
 function generateID()
@@ -70,6 +59,8 @@ function generateID()
 	return nextID ++;
 }
 global.generateID = generateID;
+
+global.map = require('./map.js');
 
 wss.on('connection', function (socket)
 {
@@ -165,5 +156,4 @@ wss.on('connection', function (socket)
 });
 
 // Last file, because it calls functions written here
-global.map = require('./map.js');
 var simulation = require("./simulation.js");
