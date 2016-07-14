@@ -1,17 +1,9 @@
 var canvas = document.getElementById("mainCanvas");
 var context = canvas.getContext("2d");
 
-function resize()
-{
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	draw();
-}
-resize();
-
 function getPlayerRotation(event)
 {
-	if(typeof(myself) != 'undefined')
+	if(myself != null)
 	{
 		var dx = event.clientX - canvas.width / 2;
 		var dy = event.clientY - canvas.height / 2;
@@ -19,7 +11,6 @@ function getPlayerRotation(event)
 		myself.player.rotation = angle;
 	}
 }
-window.addEventListener("resize", resize, false);
 window.addEventListener("mousemove", getPlayerRotation, false);
 
 var walls = {};
@@ -27,9 +18,7 @@ var users = {};
 var bullets = {};
 
 var keys = []; // saves the keyboard state
-var myself; // reference to the our player
-
-var messageBoard = [];
+var myself; // reference to the 'current' player
 
 function Bullet()
 {

@@ -32,3 +32,13 @@ function addMessageToMessageboard(msg)
 	messageboard.innerHTML += msg + '<br>';
 	messageboard.scrollTop = messageboard.scrollTopMax
 }
+
+function resizeCanvas()
+{
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	draw();
+}
+
+window.addEventListener("resize", resizeCanvas, false);
+resizeCanvas();

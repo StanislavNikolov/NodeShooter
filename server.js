@@ -43,7 +43,7 @@ app.get('/', function (req, res)
 	res.sendfile(__dirname + '/userFiles/index.html');
 });
 
-let userFiles = ['client.js', 'game.js', 'styles.css', 'scoreboard.js', 'index.html'];
+let userFiles = ['client.js', 'game.js', 'styles.css', 'ui.js', 'index.html'];
 userFiles.map(function (file)
 {
 	app.get('/userFiles/' + file, function (req, res)
