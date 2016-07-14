@@ -35,6 +35,14 @@ function generateMap(type)
 		case 2:
 			generateRandomMap(65);
 			break;
+		case 3:
+			for(var i = 1;i < 11;++ i)
+			{
+				var ang1 = Math.random() * Math.PI * 2;
+				var ang2 = ang1 + Math.PI;
+				walls[generateID()] = new classes.Wall(400, 300, i*50, i*50+20, ang1, ang2);
+			}
+			break;
 	}
 }
 

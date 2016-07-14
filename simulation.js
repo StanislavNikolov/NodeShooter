@@ -31,9 +31,6 @@ function movePlayers()
 		if(Math.abs(users[i].player.d.y) < 0.05)
 			users[i].player.d.y = 0;
 
-		if(users[i].player.d.x === 0 && users[i].player.d.y === 0)
-			continue;
-
 		for(let c = 0;c < 5;++ c)
 		{
 			users[i].player.pos.x += users[i].player.d.x;
@@ -175,6 +172,27 @@ function respawnUsers()
 		}
 	}
 }
+
+function rotateWalls()
+{
+	for(let i in walls)
+	{
+		walls[i].angle.start += Math.PI / 180;
+		walls[i].angle.finish += Math.PI / 180;
+
+		if(walls[i].angle.start > Math.PI * 2)
+		{
+			walls[i].angle.start -= Math.PI * 2;
+			walls[i].angle.finish -= Math.PI * 2;
+		}
+	}
+	for(let i in users)
+	{
+		cm.sendMap(users[i]);
+	}
+}
+
+setInterval(rotateWalls, 50);
 
 setInterval(movePlayers, 1000 / config.players.ticksPerSecond);
 setInterval(moveBullets, 1000 / config.bullets.ticksPerSecond);
