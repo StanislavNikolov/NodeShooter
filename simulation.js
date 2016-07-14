@@ -7,6 +7,8 @@ let classes = global.classes;
 let cm = global.cm;
 let geometry = global.geometry;
 
+let wallActionArray = [];
+
 // the final division is a constant to keep speedMultiplier setting "simpler"
 let playerSpeed = 1000 / config.players.ticksPerSecond * config.players.speedMultiplier / 10;
 
@@ -134,6 +136,9 @@ function moveBullets()
 
 				bullets[i].rotation = geometry.findNewAngle(bullets[i], objectCollided);
 				bullets[i].radius -= config.bullets.decayOnRicochetMultiplier;
+
+				if(walls[index].events.rotationOnHit != 0)
+					wallActionArray.push(index);
 			}
 		}
 
@@ -173,23 +178,29 @@ function respawnUsers()
 	}
 }
 
-function rotateWalls()
+function reactOnWallEvents()
 {
-	for(let i in walls)
-	{
-		walls[i].angle.start += Math.PI / 180;
-		walls[i].angle.finish += Math.PI / 180;
+	if(wallActionArray.length == 0)
+		return;
 
-		if(walls[i].angle.start > Math.PI * 2)
+	for(let i in wallActionArray)
+	{
+		let id = wallActionArray[i];
+		walls[id].angle.start += Math.PI / 180;
+		walls[id].angle.finish += Math.PI / 180;
+
+		if(walls[id].angle.start > Math.PI * 2)
 		{
-			walls[i].angle.start -= Math.PI * 2;
-			walls[i].angle.finish -= Math.PI * 2;
+			walls[id].angle.start -= Math.PI * 2;
+			walls[id].angle.finish -= Math.PI * 2;
 		}
 	}
-	cm.broadcastWalls(walls);
+
+	cm.broadcastWalls(wallActionArray);
+	wallActionArray = [];
 }
 
-setInterval(rotateWalls, 50);
+setInterval(reactOnWallEvents, 50);
 
 setInterval(movePlayers, 1000 / config.players.ticksPerSecond);
 setInterval(moveBullets, 1000 / config.bullets.ticksPerSecond);

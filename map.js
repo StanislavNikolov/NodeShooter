@@ -29,7 +29,9 @@ function generateMap(type)
 						, 300 + Math.sin(angle) * (570 / 2 + 300) // y
 						, 170, 190, 0, 2 * Math.PI);
 			}
-			walls[generateID()] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
+			let id = generateID();
+			walls[id] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
+			walls[id].events.rotationOnHit = 1;
 			break;
 
 		case 2:
@@ -41,6 +43,7 @@ function generateMap(type)
 				var ang1 = Math.random() * Math.PI * 2;
 				var ang2 = ang1 + Math.PI;
 				walls[generateID()] = new classes.Wall(400, 300, i*50, i*50+20, ang1, ang2);
+				walls.events.onhit = movewall();
 			}
 			break;
 	}

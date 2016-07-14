@@ -144,18 +144,28 @@ module.exports.wallsPacket = function (obj)
 	dv.setUint32(1, len, false);
 
 	let count = 0;
-	for(let id in obj)
+	for(let i in obj)
 	{
-		dv.setUint32(5 + count * 28, id);
+		let wall, id;
+		if(Array.isArray(obj))
+		{
+			wall = walls[obj[i]];
+			dv.setUint32(5 + count * 28, obj[i]);
+		}
+		else
+		{
+			wall = obj[i];
+			dv.setUint32(5 + count * 28, i);
+		}
 
-		dv.setInt32(9 + count * 28, obj[id].pos.x, false);
-		dv.setInt32(13 + count * 28, obj[id].pos.y, false);
+		dv.setInt32(9 + count * 28, wall.pos.x, false);
+		dv.setInt32(13 + count * 28, wall.pos.y, false);
 
-		dv.setFloat32(17 + count * 28, obj[id].radius.inner, false);
-		dv.setFloat32(21 + count * 28, obj[id].radius.outer, false);
+		dv.setFloat32(17 + count * 28, wall.radius.inner, false);
+		dv.setFloat32(21 + count * 28, wall.radius.outer, false);
 
-		dv.setFloat32(25 + count * 28, obj[id].angle.start, false);
-		dv.setFloat32(29 + count * 28, obj[id].angle.finish, false);
+		dv.setFloat32(25 + count * 28, wall.angle.start, false);
+		dv.setFloat32(29 + count * 28, wall.angle.finish, false);
 
 		count ++;
 	}

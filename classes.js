@@ -23,6 +23,7 @@ function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
 	this.pos = new Vector(x, y);
 	this.radius = {inner:innerRadius, outer:outerRadius};
 	this.angle = {start:startAngle, finish:finishAngle};
+	this.events = {rotationOnHit: 0};
 }
 
 function Player(p) // The part of the "user" that's used by the simulation
