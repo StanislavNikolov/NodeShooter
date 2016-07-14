@@ -19,3 +19,9 @@ function refreshScoreboard()
 		row.cells[2].innerHTML = '<center>' + users[i].deaths + '<center>';
 	}
 }
+
+function removeUserFromScoreboard(id)
+{
+	var row = document.getElementById('scoreboard-' + id);
+	row.parentNode.removeChild(row);
+}

@@ -178,8 +178,8 @@ function draw()
 			if(!users[i].dead)
 			{
 				context.fillStyle = "red";
-				if (myself.id == i)
-					context.fillStyle = "blue";
+				if(myself.id == i) context.fillStyle = "blue";
+
 				drawHpBar(users[i].player
 						, 20
 						, users[i].player.pos.x - offset.x - users[i].player.radius
@@ -187,6 +187,7 @@ function draw()
 						, 3);
 
 				context.strokeStyle = context.fillStyle;
+				context.font = "10px Monospace";
 				var textSize = 10 * users[i].name.length;
 				context.fillText(users[i].name, users[i].player.pos.x - offset.x - textSize/3
 						, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
@@ -222,7 +223,7 @@ function draw()
 		context.fillRect(0, 0, canvas.width, canvas.height);
 
 		context.fillStyle = "red";
-		context.font = "30px Arial";
+		context.font = "30px Monospace";
 		context.fillText("You were killed!", 50, 50);
 	}
 

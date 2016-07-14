@@ -98,7 +98,11 @@ socket.onmessage = function(event)
 		refreshScoreboard();
 	}
 	if(packID === 12) // remove user
-		delete users[message.getUint32(1)];
+	{
+		var id = message.getUint32(1);
+		removeUserFromScoreboard(id);
+		delete users[id];
+	}
 	if(packID === 13) // basic player info
 	{
 		var count = message.getUint32(1, false);
