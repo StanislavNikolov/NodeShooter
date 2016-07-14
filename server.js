@@ -149,7 +149,7 @@ wss.on('connection', function (socket)
 				cu.lastEvent.shoot = (new Date()).getTime();
 			}
 		}
-		if(data.getUint8(0) == 2 && cu != null && cu.player != null)
+		if(data.getUint8(0) == 2 && cu != null && cu.player != null && !cu.dead)
 		{
 			cu.player.direction = data.getUint8(1);
 		}

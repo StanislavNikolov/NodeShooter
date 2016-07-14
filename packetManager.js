@@ -55,7 +55,6 @@ module.exports.basicPlayerStatPacket = function (users)
 	let buffer = new ArrayBuffer(1 + 4 + users.length * (4 + 8 + 4 + 8));
 	let dv = new DataView(buffer);
 	dv.setUint8(0, 13);
-	//console.log(users.length);
 	dv.setUint32(1, users.length, false);
 
 	for(let i = 0;i < users.length;++ i)
@@ -169,7 +168,6 @@ module.exports.scoreboardUpdatePacket = function (user, value, y)
 	dv.setUint32(1, user.id, false);
 	dv.setInt32(5, value, false);
 	dv.setUint8(9, y);
-
 
 	return buffer;
 }

@@ -186,6 +186,9 @@ function sendShootRequest()
 var lastSentMoveDirection = 1;
 function sendMoveRequest()
 {
+	if(myself.dead)
+		return;
+
 	var data = 1;
 
 	if(keys[87] || keys[38]) // up
