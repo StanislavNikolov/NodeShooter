@@ -93,7 +93,10 @@ socket.onmessage = function(event)
 		var x = message.getInt32(2+name.length+4 + 0, false);
 		var y = message.getInt32(2+name.length+4 + 4, false);
 
-		var user = new User(name, id, new Player(new Vector(x, y)));
+		var kills = message.getInt32(2+name.length+4 + 8, false);
+		var deaths = message.getInt32(2+name.length+4 + 12, false);
+
+		var user = new User(name, id, new Player(new Vector(x, y)), kills, deaths);
 		users[user.id] = user;
 		refreshScoreboard();
 	}

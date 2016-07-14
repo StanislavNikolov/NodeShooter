@@ -61,12 +61,12 @@ function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
 	this.angle = {start:startAngle, finish:finishAngle};
 }
 
-function User(name, id, player)
+function User(name, id, player, kills, deaths)
 {
 	this.name = name;
 	this.id = id;
-	this.kills = 0;
-	this.deaths = 0;
+	this.kills = kills;
+	this.deaths = deaths;
 	this.lastEvent = {move: 0, shoot: 0, respawn: 0, getKilled: 0};
 	this.player = player;
 }

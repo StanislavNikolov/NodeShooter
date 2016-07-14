@@ -22,8 +22,8 @@ module.exports.initGamePacket = function (user)
 // 01 - users
 module.exports.createUserPacket = function (user)
 {
-	// pid, name length, name itself, id, pos_x, pos_y
-	let buffer = new ArrayBuffer(1 + 1 + user.name.length + 4 + 4 + 4);
+	// pid, name length, name itself, id, pos_x, pos_y, kills, deaths
+	let buffer = new ArrayBuffer(1 + 1 + user.name.length + 4 + 4 + 4 + 4 + 4);
 	let dv = new DataView(buffer);
 	dv.setUint8(0, 11); // pid
 
@@ -36,6 +36,9 @@ module.exports.createUserPacket = function (user)
 	let p1Offset = 1 + 1 + user.name.length + 4;
 	dv.setInt32(p1Offset + 0, user.player.pos.x, false);
 	dv.setInt32(p1Offset + 4, user.player.pos.y, false);
+
+	dv.setInt32(p1Offset + 8, user.kills, false);
+	dv.setInt32(p1Offset + 12, user.deaths, false);
 
 	return buffer;
 }
