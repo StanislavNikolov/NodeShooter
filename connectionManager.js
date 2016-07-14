@@ -58,9 +58,6 @@ module.exports.sendMap = function (user)
 {
 	for(let i in global.walls)
 		user.socket.send(global.pm.createWallPacket(i), function err(){});
-
-	for(let i in global.bullets)
-		user.socket.send(global.pm.createBulletPacket(i), function err(){});
 }
 
 module.exports.initGame = function (user)
