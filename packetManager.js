@@ -130,7 +130,11 @@ module.exports.basicBulletStatPacket = function (arr)
 // 03 - map
 module.exports.wallsPacket = function (obj)
 {
-	let len = Object.keys(obj).length;
+	let len = 0;
+	if(Array.isArray(obj))
+		len = obj.length;
+	else
+		len = Object.keys(obj).length;
 
 	// pid, count, {id, pos, radius, angle}
 	let buffer = new ArrayBuffer(1 + 4 + len * (4 + 8 + 8 + 8));
