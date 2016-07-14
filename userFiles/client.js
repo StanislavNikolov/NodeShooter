@@ -95,6 +95,7 @@ socket.onmessage = function(event)
 
 		var user = new User(name, id, new Player(new Vector(x, y)));
 		users[user.id] = user;
+		refreshScoreboard();
 	}
 	if(packID === 12) // remove user
 		delete users[message.getUint32(1)];
@@ -165,6 +166,7 @@ socket.onmessage = function(event)
 			users[id].kills = value;
 		if(y == 1)
 			users[id].deaths = value;
+		refreshScoreboard();
 	}
 }
 

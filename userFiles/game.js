@@ -127,32 +127,32 @@ function drawWall(current, offset)
 	}
 }
 
-function drawHpBar(p, ms, sx, sy, w)//player, maxsize, startx, starty, width
+function drawHpBar(p, ms, sx, sy, w) //player, maxsize, startx, starty, width
 {
-	var def = context.fillStyle, sDef = context.strokeStyle;
-	context.globalAlpha = 0.7; context.fillStyle = "red";
+	var def = context.fillStyle, sDef = context.strokeStyle, alpha = context.globalAlpha;
+
+	context.globalAlpha = 0.7;
+	context.fillStyle = "red";
 	var hpBarSize = (p.hp / p.maxhp) * ms;
 	context.fillRect(sx, sy, hpBarSize, w);
 	context.strokeStyle = "black";
 	context.strokeRect(sx, sy, ms, w);
+
 	context.strokeStyle = sDef;
-	context.globalAlpha = 1;
+	context.globalAlpha = alpha;
 	context.fillStyle = def;
 }
 
 function draw()
 {
-	if(myself == undefined)
+	if(myself == null)
 		return;
+
 	if(!myself.dead)
 	{
-		// Clear the screen and apply the "-put name here-" effect
-		context.globalAlpha = myself.hp / myself.maxhp;
+		context.globalAlpha = 1;
 		context.fillStyle = "white";
 		context.fillRect(0, 0, canvas.width, canvas.height);
-
-		context.globalAlpha = 1;
-		context.font = "10px Arial";
 
 		var offset = new Vector(myself.player.pos.x - canvas.width / 2, myself.player.pos.y - canvas.height / 2);
 
@@ -170,10 +170,10 @@ function draw()
 			context.closePath();
 		}
 
-		for (var i in walls)
+		for(var i in walls)
 			drawWall(walls[i], offset);
 
-		for ( var i in users )
+		for(var i in users)
 		{
 			if(!users[i].dead)
 			{
@@ -188,12 +188,18 @@ function draw()
 
 				context.strokeStyle = context.fillStyle;
 				var textSize = 10 * users[i].name.length;
-				context.fillText(users[i].name, users[i].player.pos.x - offset.x - textSize/3, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
+				context.fillText(users[i].name, users[i].player.pos.x - offset.x - textSize/3
+						, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
 
 				// draw the player
 				context.beginPath();
 
-				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y, users[i].player.radius, users[i].player.rotation, Math.PI * 2 + users[i].player.rotation); if (myself.id == i) context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
+				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y
+						, users[i].player.radius, users[i].player.rotation
+						, Math.PI * 2 + users[i].player.rotation);
+
+				if(myself.id == i)
+					context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
 
 				context.globalAlpha = 0.1; context.fill();
 				context.globalAlpha = 1; context.stroke();
@@ -202,7 +208,11 @@ function draw()
 			}
 		}
 
-		drawHpBar(myself.player, 200, 5, 5, 15);
+		drawHpBar(myself.player
+				, canvas.width / 6
+				, 0.02 * canvas.width
+				, 0.02 * canvas.height
+				, 15);
 	}
 
 	if(myself.dead) // :(
@@ -214,55 +224,6 @@ function draw()
 		context.fillStyle = "red";
 		context.font = "30px Arial";
 		context.fillText("You were killed!", 50, 50);
-	}
-
-	// Score board
-	context.font = "13px Arial";
-
-	var x = 0.80 * canvas.width;
-	var y = 0.05 * canvas.height;
-	var sizeX = 0.05 * canvas.width;
-	var sizeY = sizeX / 5;
-
-	context.globalAlpha = 0.5;
-	context.fillStyle = 'black';
-	context.fillRect(x + 0*(sizeX+5), y, sizeX, sizeY);
-	context.fillRect(x + 1*(sizeX+5), y, sizeX, sizeY);
-	context.fillRect(x + 2*(sizeX+5), y, sizeX, sizeY);
-
-	context.globalAlpha = 1;
-	context.fillStyle = 'yellow';
-	context.fillText('Name', x+ 0*(sizeX+5), y+sizeY - 2);
-	context.fillText('Kills', x+ 1*(sizeX+5), y+sizeY - 2);
-	context.fillText('Deaths', x+ 2*(sizeX+5), y+sizeY - 2);
-	var row = 0;
-	for(var i in users)
-	{
-		row ++;
-		context.globalAlpha = 0.5;
-		context.fillStyle = 'black';
-		context.fillRect(x + 0*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
-		context.fillRect(x + 1*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
-		context.fillRect(x + 2*(sizeX+5), y + row*(sizeY+2), sizeX, sizeY);
-
-		context.globalAlpha = 1;
-		context.fillStyle = 'yellow';
-		context.fillText(users[i].name, x+ 0*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
-		context.fillText(users[i].kills, x+ 1*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
-		context.fillText(users[i].deaths, x+ 2*(sizeX+5), y+sizeY + row*(sizeY+2) - 2);
-
-	}
-
-	var drawY = canvas.height - 75;
-	context.font = "14px Arial";
-	context.fillStyle = "black";
-	for(var i in messageBoard)
-	{
-		if(i > messageBoard.length - 5)
-		{
-			context.fillText(messageBoard[i], 10, drawY);
-			drawY += 15;
-		}
 	}
 
 	context.strokeStyle = "black";
