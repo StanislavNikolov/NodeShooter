@@ -33,6 +33,8 @@ function movePlayers()
 		if(Math.abs(users[i].player.d.y) < 0.05)
 			users[i].player.d.y = 0;
 
+		let change = users[i].player.d.y != 0 || users[i].player.d.x != 0;
+
 		for(let c = 0;c < 5;++ c)
 		{
 			users[i].player.pos.x += users[i].player.d.x;
@@ -40,6 +42,8 @@ function movePlayers()
 			let iw = geometry.inWall(users[i].player);
 			if(iw.index != -1)
 			{
+				change = true;
+
 				let index = iw.index;
 				let objectCollided = iw.partCollided;
 				let r1 = users[i].player.radius + 1, r2 = objectCollided.radius;
@@ -58,7 +62,8 @@ function movePlayers()
 				break;
 			}
 		}
-		toBroadcast.push(i);
+		if(change)
+			toBroadcast.push(i);
 	}
 	if(toBroadcast.length > 0)
 		cm.broadcastBasicPlayerStatPack(toBroadcast);
