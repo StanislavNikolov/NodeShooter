@@ -1,5 +1,8 @@
 'use strict';
 let walls = global.walls;
+let config = global.config;
+let classes = global.classes;
+let geometry = global.geometry;
 
 generateMap(Number(process.env.MAP_TYPE || 1));
 
@@ -26,22 +29,32 @@ function generateMap(type)
 						, 300 + Math.sin(angle) * (570 / 2 + 300) // y
 						, 170, 190, 0, 2 * Math.PI);
 			}
-			walls[generateID()] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
+			let id = generateID();
+			walls[id] = new classes.Wall(400, 300, 170, 290, 0, Math.PI);
+			walls[id].events.rotationOnHit = 1;
 			break;
 
 		case 2:
 			generateRandomMap(65);
 			break;
+		case 3:
+			for(let i = 1;i < 10;++ i)
+			{
+				let ang1 = Math.random() * Math.PI * 2;
+				let ang2 = ang1 + Math.PI / 180 * 120;
+				let id = generateID();
+				walls[id] = new classes.Wall(400, 300, i*80, i*80+20, ang1, ang2);
+				walls[id].events.rotationOnHit = 1;
+			}
+
+			let g = Math.PI / 180;
+			let x = 400, y = 300;
+			let ir = 10*80 + 120;
+			let diff = Math.floor(Math.abs(Math.cos(g*28) * ir));
+			walls[generateID()] = new classes.Wall(x, y, ir, ir + 40, g*30, g*30+g*300);
+			walls[generateID()] = new classes.Wall(x + 2*diff, y, ir, ir + 40, g*210, g*210+g*300);
+			break;
 	}
-}
-
-function isFree(x, y, r)
-{
-	for(let i in walls)
-		if(distanceBetween({x: x, y: y}, walls[i].pos) < walls[i].radius.outer + r)
-			return false;
-
-	return true;
 }
 
 function generateRandomMap(sp)
@@ -59,7 +72,7 @@ function generateRandomMap(sp)
 
 		if(ang < Math.PI / 180 * 45
 				|| (ang > Math.PI / 180 * 300 && ang < Math.PI / 180 * 360)
-				|| !isFree(x, y, r2))
+				|| !geometry.isFree(x, y, r2))
 		{
 			continue;
 		}

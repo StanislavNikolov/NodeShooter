@@ -60,6 +60,7 @@ function generateID()
 }
 global.generateID = generateID;
 
+global.geometry = require('./geometry.js');
 global.map = require('./map.js');
 
 wss.on('connection', function (socket)
@@ -119,7 +120,7 @@ wss.on('connection', function (socket)
 
 			cm.broadcastNewUser(cu);
 			cm.sendUsers(cu);
-			cm.sendMap(cu);
+			cm.sendWalls(cu, walls);
 			cm.initGame(cu);
 
 			cm.broadcastMessage('Player ' + cu.name + ' joined');

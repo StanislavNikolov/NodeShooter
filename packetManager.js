@@ -128,23 +128,47 @@ module.exports.basicBulletStatPacket = function (arr)
 }
 
 // 03 - map
-module.exports.createWallPacket = function (i)
+module.exports.wallsPacket = function (obj)
 {
-	// pid, id, pos, radius, angle
-	let buffer = new ArrayBuffer(1 + 4 + 8 + 8 + 8);
+	let len = 0;
+	if(Array.isArray(obj))
+		len = obj.length;
+	else
+		len = Object.keys(obj).length;
+
+	// pid, count, {id, pos, radius, angle}
+	let buffer = new ArrayBuffer(1 + 4 + len * (4 + 8 + 8 + 8));
 	let dv = new DataView(buffer);
 	dv.setUint8(0, 31);
 
-	dv.setUint32(1, i); // id = wall id
+	dv.setUint32(1, len, false);
 
-	dv.setInt32(5, global.walls[i].pos.x, false);
-	dv.setInt32(9, global.walls[i].pos.y, false);
+	let count = 0;
+	for(let i in obj)
+	{
+		let wall, id;
+		if(Array.isArray(obj))
+		{
+			wall = walls[obj[i]];
+			dv.setUint32(5 + count * 28, obj[i]);
+		}
+		else
+		{
+			wall = obj[i];
+			dv.setUint32(5 + count * 28, i);
+		}
 
-	dv.setFloat32(13, global.walls[i].radius.inner, false);
-	dv.setFloat32(17, global.walls[i].radius.outer, false);
+		dv.setInt32(9 + count * 28, wall.pos.x, false);
+		dv.setInt32(13 + count * 28, wall.pos.y, false);
 
-	dv.setFloat32(21, global.walls[i].angle.start, false);
-	dv.setFloat32(25, global.walls[i].angle.finish, false);
+		dv.setFloat32(17 + count * 28, wall.radius.inner, false);
+		dv.setFloat32(21 + count * 28, wall.radius.outer, false);
+
+		dv.setFloat32(25 + count * 28, wall.angle.start, false);
+		dv.setFloat32(29 + count * 28, wall.angle.finish, false);
+
+		count ++;
+	}
 
 	return buffer;
 }

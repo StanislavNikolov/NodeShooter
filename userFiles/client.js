@@ -143,18 +143,24 @@ socket.onmessage = function(event)
 			bullets[id].radius = message.getFloat32(17 + i * 16, false);
 		}
 	}
-	if(packID === 31) // add wall
+	if(packID === 31) // walls
 	{
-		var id = message.getUint32(1, false);
+		var count = message.getUint32(1, false);
 
-		var x = message.getInt32(5, false);
-		var y = message.getInt32(9, false);
-		var ir = message.getFloat32(13, false);
-		var or = message.getFloat32(17, false);
-		var sa = message.getFloat32(21, false);
-		var fa = message.getFloat32(25, false);
+		for(var i = 0;i < count;++ i)
+		{
+			var id = message.getUint32(5 + i * 28, false);
+			if(walls[id] == null)
+				walls[id] = new Wall();
 
-		walls[id] = new Wall(x, y, ir, or, sa, fa);
+			walls[id].pos.x = message.getInt32(9 + i * 28, false);
+			walls[id].pos.y = message.getInt32(13 + i * 28, false);
+			walls[id].radius.inner = message.getFloat32(17 + i * 28, false);
+			walls[id].radius.outer = message.getFloat32(21 + i * 28, false);
+			walls[id].angle.start = message.getFloat32(25 + i * 28, false);
+			walls[id].angle.finish = message.getFloat32(29 + i * 28, false);
+		}
+
 	}
 	if(packID === 41)
 	{
