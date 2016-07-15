@@ -38,13 +38,21 @@ function generateMap(type)
 			generateRandomMap(65);
 			break;
 		case 3:
-			for(var i = 1;i < 101;++ i)
+			for(let i = 1;i < 10;++ i)
 			{
-				var ang1 = Math.random() * Math.PI * 2;
-				var ang2 = ang1 + Math.PI;
-				walls[generateID()] = new classes.Wall(400, 300, i*50, i*50+20, ang1, ang2);
-				walls.events.onhit = movewall();
+				let ang1 = Math.random() * Math.PI * 2;
+				let ang2 = ang1 + Math.PI / 180 * 120;
+				let id = generateID();
+				walls[id] = new classes.Wall(400, 300, i*80, i*80+20, ang1, ang2);
+				walls[id].events.rotationOnHit = 1;
 			}
+
+			let g = Math.PI / 180;
+			let x = 400, y = 300;
+			let ir = 10*80 + 120;
+			let diff = Math.floor(Math.abs(Math.cos(g*28) * ir));
+			walls[generateID()] = new classes.Wall(x, y, ir, ir + 40, g*30, g*30+g*300);
+			walls[generateID()] = new classes.Wall(x + 2*diff, y, ir, ir + 40, g*210, g*210+g*300);
 			break;
 	}
 }
