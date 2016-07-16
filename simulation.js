@@ -146,6 +146,9 @@ function moveBullets()
 						wallActionArray.push(index);
 				}
 			}
+
+			if(bullets[i].radius > 4)
+				bullets[i].radius = 4;
 			if(bullets[i].radius <= 0.5)
 			{
 				cm.broadcastRemoveBullet(i);

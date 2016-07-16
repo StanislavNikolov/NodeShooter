@@ -9,7 +9,7 @@
 		"simStepsPerTick": 5,
 		"speedMultiplier": 1.2,
 		"decayRateMultiplier": 1,
-		"decayOnRicochetMultiplier": -0.2,
+		"decayOnRicochetMultiplier": -2.2,
 		"damage": 5
 	},
 	"players":
