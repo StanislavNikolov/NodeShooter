@@ -3,6 +3,7 @@ var messageboard = document.getElementById('messageboard');
 
 function refreshScoreboard()
 {
+	scoreboard.style.visibility = 'visible';
 	for(var i in users)
 	{
 		var row = document.getElementById('scoreboard-' + users[i].id);
@@ -29,6 +30,7 @@ function removeUserFromScoreboard(id)
 
 function addMessageToMessageboard(msg)
 {
+	messageboard.style.visibility = 'visible';
 	messageboard.innerHTML += msg + '<br>';
 	messageboard.scrollTop = messageboard.scrollTopMax
 }

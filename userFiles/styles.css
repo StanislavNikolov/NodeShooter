@@ -19,6 +19,7 @@ body {
 	top: 2%;
 	width: 20em;
 	height: auto;
+	visibility: hidden;
 }
 
 #messageboard {
@@ -29,6 +30,7 @@ body {
 	height: auto;
 	max-height: 15%;
 	overflow: hidden;
+	visibility: hidden;
 }
 
 #scoreboard, #messageboard {
