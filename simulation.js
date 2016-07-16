@@ -10,7 +10,8 @@ let geometry = global.geometry;
 let wallActionArray = [];
 
 // the final division is a constant to keep speedMultiplier setting "simpler"
-let playerSpeed = 1000 / config.players.ticksPerSecond * config.players.speedMultiplier / 10;
+let playerSpeed = 1000 / config.players.ticksPerSecond / config.players.simStepsPerTick
+					* config.players.speedMultiplier / 10;
 
 function movePlayers()
 {
@@ -28,14 +29,14 @@ function movePlayers()
 		if(users[i].player.direction % 7 == 0)
 			users[i].player.d.x += playerSpeed;
 
-		if(Math.abs(users[i].player.d.x) < 0.05)
+		if(Math.abs(users[i].player.d.x) < 0.005)
 			users[i].player.d.x = 0;
-		if(Math.abs(users[i].player.d.y) < 0.05)
+		if(Math.abs(users[i].player.d.y) < 0.005)
 			users[i].player.d.y = 0;
 
 		let change = users[i].player.d.y != 0 || users[i].player.d.x != 0;
 
-		for(let c = 0;c < 5;++ c)
+		for(let simStep = 0;simStep < config.players.simStepsPerTick;++ simStep)
 		{
 			users[i].player.pos.x += users[i].player.d.x;
 			users[i].player.pos.y += users[i].player.d.y;
@@ -57,10 +58,6 @@ function movePlayers()
 				else
 					geometry.putOutOf(users[i].player, objectCollided, r2-r1);
 			}
-			else
-			{
-				break;
-			}
 		}
 		if(change)
 			toBroadcast.push(i);
@@ -69,101 +66,103 @@ function movePlayers()
 		cm.broadcastBasicPlayerStatPack(toBroadcast);
 }
 
-let bulletSpeed = 1000 / config.bullets.ticksPerSecond * config.bullets.speedMultiplier;
+let bulletSpeed = 1000 / config.bullets.ticksPerSecond / config.bullets.simStepsPerTick
+					* config.bullets.speedMultiplier;
 
 // the final division is a constant to keep speedMultiplier setting "simpler"
-let bulletDecayRate = 1000 / config.bullets.ticksPerSecond
-					* config.bullets.decayRateMultiplier / 1000;
+let bulletDecayRate = 1000 / config.bullets.ticksPerSecond / config.bullets.simStepsPerTick
+					* config.bullets.decayRateMultiplier / 1000 * bulletSpeed;
 
-let bulletSimFrame = 0; // incremented every frame
 function moveBullets()
 {
 	let bulletsToBroadcast = [];
 	let usersToBroadcast = [];
 	for(let i in bullets)
 	{
-		let collision = false;
-		bullets[i].radius -= bulletDecayRate;
-		bullets[i].d.x = Math.cos(bullets[i].rotation) * bulletSpeed;
-		bullets[i].d.y = Math.sin(bullets[i].rotation) * bulletSpeed;
-		bullets[i].pos.x += bullets[i].d.x;
-		bullets[i].pos.y += bullets[i].d.y;
-
-		// Check if the bullet hit soembody
-		for(let j in users)
+		let deleted = false;
+		for(let simStep = 0;simStep < config.bullets.simStepsPerTick;simStep ++)
 		{
-			let cu = users[j];
-			if(j != bullets[i].shooter && !cu.dead
-					&& geometry.distanceBetween(bullets[i].pos, cu.player.pos)
-					< bullets[i].radius + cu.player.radius)
+			let collision = false;
+			bullets[i].radius -= bulletDecayRate;
+			bullets[i].d.x = Math.cos(bullets[i].rotation) * bulletSpeed;
+			bullets[i].d.y = Math.sin(bullets[i].rotation) * bulletSpeed;
+			bullets[i].pos.x += bullets[i].d.x;
+			bullets[i].pos.y += bullets[i].d.y;
+
+			// Check if the bullet hit soembody
+			for(let j in users)
 			{
-				// The first 5 seconds after respawn the user can't take damage
-				if((new Date()).getTime() - cu.lastEvent.respawn > 5000)
-					cu.player.hp -= bullets[i].damage;
-
-				if(cu.player.hp > 0)
-					usersToBroadcast.push(j);
-
-				if(cu.player.hp <= 0)
+				let cu = users[j];
+				if(j != bullets[i].shooter && !cu.dead
+						&& geometry.distanceBetween(bullets[i].pos, cu.player.pos)
+						< bullets[i].radius + cu.player.radius)
 				{
-					cu.dead = true;
-					cu.lastEvent.killed = (new Date()).getTime();
-					cu.deaths ++;
+					// The first 5 seconds after respawn the user can't take damage
+					if((new Date()).getTime() - cu.lastEvent.respawn > 5000)
+						cu.player.hp -= bullets[i].damage;
 
-					cm.broadcastPlayerDied(cu);
-					cm.broadcastScoreboardUpdate(cu, cu.deaths, 1);
+					if(cu.player.hp > 0)
+						usersToBroadcast.push(j);
 
-					let killer = users[bullets[i].shooter];
-					if(killer != null)
+					if(cu.player.hp <= 0)
 					{
-						killer.kills ++;
-						cm.broadcastMessage(killer.name + ' killed ' + cu.name);
-						cm.broadcastScoreboardUpdate(killer, killer.kills, 0);
+						cu.dead = true;
+						cu.lastEvent.killed = (new Date()).getTime();
+						cu.deaths ++;
+
+						cm.broadcastPlayerDied(cu);
+						cm.broadcastScoreboardUpdate(cu, cu.deaths, 1);
+
+						let killer = users[bullets[i].shooter];
+						if(killer != null)
+						{
+							killer.kills ++;
+							cm.broadcastMessage(killer.name + ' killed ' + cu.name);
+							cm.broadcastScoreboardUpdate(killer, killer.kills, 0);
+						}
 					}
+
+					collision = true;
 				}
-
-				collision = true;
 			}
-		}
 
-		if(!collision)
-		{
-			if(geometry.inWall(bullets[i]).index!=-1)
+			if(!collision)
 			{
-				let index = geometry.inWall(bullets[i]).index;
-				let objectCollided = geometry.inWall(bullets[i]).partCollided;
-				let r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
+				if(geometry.inWall(bullets[i]).index!=-1)
+				{
+					let index = geometry.inWall(bullets[i]).index;
+					let objectCollided = geometry.inWall(bullets[i]).partCollided;
+					let r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
 
-				if (!objectCollided.inIner)
-					geometry.putOutOf(bullets[i], objectCollided, r1+r2);
-				else
-					geometry.putOutOf(bullets[i], objectCollided, r2-r1);
+					if (!objectCollided.inIner)
+						geometry.putOutOf(bullets[i], objectCollided, r1+r2);
+					else
+						geometry.putOutOf(bullets[i], objectCollided, r2-r1);
 
-				bullets[i].rotation = geometry.findNewAngle(bullets[i], objectCollided);
-				bullets[i].radius -= config.bullets.decayOnRicochetMultiplier;
+					bullets[i].rotation = geometry.findNewAngle(bullets[i], objectCollided);
+					bullets[i].radius -= config.bullets.decayOnRicochetMultiplier;
 
-				if(walls[index].events.rotationOnHit != 0)
-					wallActionArray.push(index);
+					if(walls[index].events.rotationOnHit != 0)
+						wallActionArray.push(index);
+				}
+			}
+			if(bullets[i].radius <= 0.5)
+			{
+				cm.broadcastRemoveBullet(i);
+				delete bullets[i];
+				deleted = true;
+				break; // move on to the next bullet
 			}
 		}
 
-		if(bullets[i].radius <= 0.5)
-		{
-			cm.broadcastRemoveBullet(i);
-			delete bullets[i];
-		}
-		else
-		{
-			if(bulletSimFrame % config.bullets.sendTicksDivisor == 0)
-				bulletsToBroadcast.push(i);
-		}
+		if(!deleted)
+			bulletsToBroadcast.push(i);
 	}
+
 	if(bulletsToBroadcast.length > 0)
 		cm.broadcastBasicBulletStat(bulletsToBroadcast);
 	if(usersToBroadcast.length > 0)
 		cm.broadcastBasicPlayerStatPack(usersToBroadcast);
-
-	bulletSimFrame ++;
 }
 
 function respawnUsers()

@@ -13,15 +13,16 @@ if(config.server == null) { config.server = {}; }
 config.server.port = process.env.PORT || config.server.port || 5000;
 
 if(config.bullets == null) { config.bullets = {}; }
-config.bullets.ticksPerSecond = config.bullets.ticksPerSecond || 120;
-config.bullets.sendTicksDivisor = config.bullets.sendTicksDivisor || 2;
+config.bullets.ticksPerSecond = config.bullets.ticksPerSecond || 40;
+config.bullets.simStepsPerTick = config.bullets.simStepsPerTick || 5;
 config.bullets.speedMultiplier = config.bullets.speedMultiplier || 1.2;
-config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 2;
-config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || 0.4;
+config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 1;
+config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || -0.2;
 config.bullets.damage = config.bullets.damage || 5;
 
 if(config.players == null) { config.players = {}; }
 config.players.ticksPerSecond = config.players.ticksPerSecond || 40;
+config.players.simStepsPerTick = config.players.simStepsPerTick || 4;
 config.players.speedMultiplier = config.players.speedMultiplier || 1;
 config.players.bulletsPerSecond = config.players.bulletsPerSecond || 10;
 
