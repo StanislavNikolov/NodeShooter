@@ -58,8 +58,8 @@ function inWall(p)
 
 function putOutOf(o1, o2, distance)
 {
-	o1.pos.x = o2.pos.x + (o1.pos.x-o2.pos.x) * distance / (distanceBetween(o1.pos,o2.pos));
-	o1.pos.y = o2.pos.y + (o1.pos.y-o2.pos.y) * distance / (distanceBetween(o1.pos,o2.pos));
+	o1.pos.x = o2.pos.x + (o1.pos.x - o2.pos.x) * distance / (distanceBetween(o1.pos, o2.pos));
+	o1.pos.y = o2.pos.y + (o1.pos.y - o2.pos.y) * distance / (distanceBetween(o1.pos, o2.pos));
 }
 
 function findNewAngle(p, w)

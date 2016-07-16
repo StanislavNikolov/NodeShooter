@@ -70,8 +70,8 @@ let bulletSpeed = 1000 / config.bullets.ticksPerSecond / config.bullets.simSteps
 					* config.bullets.speedMultiplier;
 
 // the final division is a constant to keep speedMultiplier setting "simpler"
-let bulletDecayRate = 1000 / config.bullets.ticksPerSecond / config.bullets.simStepsPerTick
-					* config.bullets.decayRateMultiplier / 1000 * bulletSpeed;
+let bulletDecayRate = 1000 / config.bullets.ticksPerSecond
+					* config.bullets.decayRateMultiplier * bulletSpeed / 1000 ;
 
 function moveBullets()
 {
@@ -128,19 +128,20 @@ function moveBullets()
 
 			if(!collision)
 			{
-				if(geometry.inWall(bullets[i]).index!=-1)
+				if(geometry.inWall(bullets[i]).index != -1)
 				{
 					let index = geometry.inWall(bullets[i]).index;
 					let objectCollided = geometry.inWall(bullets[i]).partCollided;
 					let r1 = bullets[i].radius + 1, r2 = objectCollided.radius;
 
-					if (!objectCollided.inIner)
+					bullets[i].radius -= config.bullets.decayOnRicochetMultiplier;
+
+					if(!objectCollided.inIner)
 						geometry.putOutOf(bullets[i], objectCollided, r1+r2);
 					else
 						geometry.putOutOf(bullets[i], objectCollided, r2-r1);
 
 					bullets[i].rotation = geometry.findNewAngle(bullets[i], objectCollided);
-					bullets[i].radius -= config.bullets.decayOnRicochetMultiplier;
 
 					if(walls[index].events.rotationOnHit != 0)
 						wallActionArray.push(index);

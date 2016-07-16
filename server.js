@@ -14,9 +14,9 @@ config.server.port = process.env.PORT || config.server.port || 5000;
 
 if(config.bullets == null) { config.bullets = {}; }
 config.bullets.ticksPerSecond = config.bullets.ticksPerSecond || 40;
-config.bullets.simStepsPerTick = config.bullets.simStepsPerTick || 5;
+config.bullets.simStepsPerTick = config.bullets.simStepsPerTick || 3;
 config.bullets.speedMultiplier = config.bullets.speedMultiplier || 1.2;
-config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 1;
+config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 0.2;
 config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || -0.2;
 config.bullets.damage = config.bullets.damage || 5;
 
