@@ -46,7 +46,7 @@ userFiles.map(function (file)
 	});
 });
 
-const MAX_BUFF_SIZE = [1+12, 5, 2];
+const MAX_BUFF_SIZE = [1+144, 5, 2];
 const MIN_BUFF_SIZE = [2, 5, 2];
 
 global.users = {};
@@ -77,7 +77,6 @@ wss.on('connection', function (socket)
 		 * The conversion is expensive to the CPU, so it would be pretty easy to hog the whole server
 		 * by sending a huge packet.  This is what this 'if' is for, pun not intended.
 		 */
-
 		if(rawData.length > MAX_BUFF_SIZE[rawData[0]] + 1
 			|| rawData.length < MIN_BUFF_SIZE[rawData[0]])
 			return;
@@ -92,23 +91,25 @@ wss.on('connection', function (socket)
 			if(cu != null && cu.name != null) // This user already has a name
 				return;
 
-			if(data.byteLength > 12 || data.byteLength <= 0) // Invalid name
+			let name = "";
+			for(let i = 0;i < data.byteLength-1;++ i)
+				name += String.fromCharCode(data.getUint8(1+i));
+			name = decodeURI(name);
+
+			// Name too long
+			if(name.length > 12)
 			{
 				let authRequest = new Uint8Array([1]);
 				socket.send(authRequest.buffer);
 				return;
 			}
 
-			let name = "";
-			for(let i = 0;i < data.byteLength-1;++ i)
-				name += String.fromCharCode(data.getUint8(1+i));
-
 			// Check if there's already a user with that name
 			for(let i in global.users)
 			{
 				if(global.users[i].name == name)
 				{
-					let authRequest = new Uint8Array(1);
+					let authRequest = new Uint8Array([1]);
 					socket.send(authRequest.buffer);
 					return;
 				}

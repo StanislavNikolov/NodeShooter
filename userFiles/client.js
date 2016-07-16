@@ -12,40 +12,6 @@ for(var i = 0;i < 256;++ i)
 
 var bulletsPerSecond = 1;
 
-/*
-// by "Joni", http://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
-function toUTF8Array(str) {
-    var utf8 = [];
-    for (var i=0; i < str.length; i++) {
-        var charcode = str.charCodeAt(i);
-        if (charcode < 0x80) utf8.push(charcode);
-        else if (charcode < 0x800) {
-            utf8.push(0xc0 | (charcode >> 6),
-                      0x80 | (charcode & 0x3f));
-        }
-        else if (charcode < 0xd800 || charcode >= 0xe000) {
-            utf8.push(0xe0 | (charcode >> 12),
-                      0x80 | ((charcode>>6) & 0x3f),
-                      0x80 | (charcode & 0x3f));
-        }
-        // surrogate pair
-        else {
-            i++;
-            // UTF-16 encodes 0x10000-0x10FFFF by
-            // subtracting 0x10000 and splitting the
-            // 20 bits of 0x0-0xFFFFF into two halves
-            charcode = 0x10000 + (((charcode & 0x3ff)<<10)
-                      | (str.charCodeAt(i) & 0x3ff));
-            utf8.push(0xf0 | (charcode >>18),
-                      0x80 | ((charcode>>12) & 0x3f),
-                      0x80 | ((charcode>>6) & 0x3f),
-                      0x80 | (charcode & 0x3f));
-        }
-    }
-    return utf8;
-}
-*/
-
 socket.onmessage = function(event)
 {
 	var message = new DataView(event.data);
@@ -58,13 +24,9 @@ socket.onmessage = function(event)
 		var loginName = "";
 		do
 		{
-			loginName = prompt("Enter you username", "The maximal size is 12 characters!");
-		} while(loginName.length > 12 || loginName == "");
-		/* TODO
-		* Javascript stores strings in UTF-16
-		* We convert it to UTF-8 and send it back to the server
-		* var utf8LoginName = toUTF8Array(loginName);
-		*/
+			loginName = prompt("Enter your nickname", "12 characters max");
+		} while(loginName.length > 12 || loginName.length < 1);
+		loginName = encodeURI(loginName);
 
 		var response_b = new ArrayBuffer(1 + loginName.length);
 		var response = new DataView(response_b);
@@ -85,16 +47,17 @@ socket.onmessage = function(event)
 	}
 	if(packID === 11) // add user
 	{
-		var name = "";
-		for(var i = 0;i < message.getUint8(1);++ i)
+		var name = "", nameRawLen = message.getUint8(1);
+		for(var i = 0;i < nameRawLen;++ i)
 			name += String.fromCharCode(message.getUint8(2+i));
+		name = decodeURI(name);
 
-		var id = message.getUint32(2+name.length, false);
-		var x = message.getInt32(2+name.length+4 + 0, false);
-		var y = message.getInt32(2+name.length+4 + 4, false);
+		var id = message.getUint32(2+nameRawLen, false);
+		var x = message.getInt32(2+nameRawLen+4 + 0, false);
+		var y = message.getInt32(2+nameRawLen+4 + 4, false);
 
-		var kills = message.getInt32(2+name.length+4 + 8, false);
-		var deaths = message.getInt32(2+name.length+4 + 12, false);
+		var kills = message.getInt32(2+nameRawLen+4 + 8, false);
+		var deaths = message.getInt32(2+nameRawLen+4 + 12, false);
 
 		var user = new User(name, id, new Player(new Vector(x, y)), kills, deaths);
 		users[user.id] = user;
@@ -168,6 +131,7 @@ socket.onmessage = function(event)
 		var s = message.getUint32(1, false);
 		for(var i = 0;i < s;++ i)
 			msg += String.fromCharCode(message.getUint8(5+i));
+		msg = decodeURI(msg);
 		addMessageToMessageboard(msg);
 	}
 	if(packID === 42)

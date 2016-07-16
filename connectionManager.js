@@ -72,7 +72,7 @@ module.exports.initGame = function (user)
 
 module.exports.broadcastMessage = function (msg)
 {
-	let packet = global.pm.addMessagePacket(msg);
+	let packet = global.pm.addMessagePacket(encodeURI(msg));
 	broadcastPacket(packet);
 }
 
