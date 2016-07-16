@@ -47,7 +47,7 @@ function User(socket, name, id)
 	this.dead = false;
 	this.lastEvent = {shoot: 0, killed: 0, respawn: 0};
 
-	this.player = new Player(new Vector(400, 300));
+	this.player = new Player(new Vector(0, 0));
 }
 
 function Bullet(x, y, r, shr, damage)
