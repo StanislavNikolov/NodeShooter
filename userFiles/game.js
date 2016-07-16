@@ -72,26 +72,21 @@ window.addEventListener("keyup", function (args)
     keys[args.keyCode] = false;
 }, false);
 
-function drawWall(current, offset)
+function drawWall(current)
 {
-	if(offset != undefined)
-	{
-		current.pos.x -= offset.x;
-		current.pos.y -= offset.y;
-	}
+	context.save();
 
 	context.fillStyle = "green";
 	context.beginPath();
 
-	context.moveTo(current.pos.x+Math.cos(current.angle.start)*current.radius.inner,current.pos.y+Math.sin(i+current.angle.start)*current.radius.inner);
-	for (var i = current.angle.start ; i < current.angle.finish;i += Math.abs(current.angle.finish-current.angle.start)/50) {
-		context.lineTo(current.pos.x+Math.cos(i)*current.radius.inner,current.pos.y+Math.sin(i)*current.radius.inner);
-	}
-	context.lineTo(current.pos.x+Math.cos(current.angle.finish)*current.radius.inner,current.pos.y+Math.sin(current.angle.finish)*current.radius.inner);
-	for (var i = current.angle.finish ; i > current.angle.start;i -= Math.abs(current.angle.finish-current.angle.start)/50) {
-		context.lineTo(current.pos.x+Math.cos(i)*current.radius.outer,current.pos.y+Math.sin(i)*current.radius.outer);
-	}
-	context.lineTo(current.pos.x+Math.cos(current.angle.start)*current.radius.outer,current.pos.y+Math.sin(current.angle.start)*current.radius.outer);
+	context.arc(current.pos.x, current.pos.y, current.radius.inner,
+			current.angle.start, current.angle.finish);
+
+	context.lineTo(current.pos.x + Math.cos(current.angle.finish) * current.radius.outer,
+			current.pos.y + Math.sin(current.angle.finish) * current.radius.outer);
+
+	context.arc(current.pos.x, current.pos.y, current.radius.outer,
+			current.angle.finish, current.angle.start, true);
 
 	context.closePath();
 	context.fill();
@@ -109,27 +104,22 @@ function drawWall(current, offset)
 	context.closePath();
 	context.fill();
 
-	if(offset != undefined)
-	{
-		current.pos.x += offset.x;
-		current.pos.y += offset.y;
-	}
+	context.restore();
 }
 
 function drawHpBar(p, ms, sx, sy, w) //player, maxsize, startx, starty, width
 {
-	var def = context.fillStyle, sDef = context.strokeStyle, alpha = context.globalAlpha;
+	context.save();
 
 	context.globalAlpha = 0.7;
 	context.fillStyle = "red";
+	context.strokeStyle = "black";
+
 	var hpBarSize = (p.hp / p.maxhp) * ms;
 	context.fillRect(sx, sy, hpBarSize, w);
-	context.strokeStyle = "black";
 	context.strokeRect(sx, sy, ms, w);
 
-	context.strokeStyle = sDef;
-	context.globalAlpha = alpha;
-	context.fillStyle = def;
+	context.restore();
 }
 
 function draw()
@@ -143,60 +133,64 @@ function draw()
 		context.fillStyle = "white";
 		context.fillRect(0, 0, canvas.width, canvas.height);
 
-		var offset = new Vector(myself.player.pos.x - canvas.width / 2, myself.player.pos.y - canvas.height / 2);
+		context.save();
+		context.translate(-myself.player.pos.x + canvas.width / 2,
+				-myself.player.pos.y + canvas.height / 2);
 
 		context.fillStyle = "black";
 		for(var i in bullets)
 		{
 			context.beginPath();
 
-			context.arc(bullets[i].pos.x - offset.x,
-					bullets[i].pos.y - offset.y,
-					bullets[i].radius,
-					0, Math.PI * 2);
-			context.fill();
+			context.arc(bullets[i].pos.x
+					, bullets[i].pos.y
+					, bullets[i].radius
+					, 0, Math.PI * 2);
 
+			context.fill();
 			context.closePath();
 		}
 
 		for(var i in walls)
-			drawWall(walls[i], offset);
+			drawWall(walls[i]);
 
 		for(var i in users)
 		{
-			if(!users[i].dead)
-			{
-				context.fillStyle = "red";
-				if(myself.id == i) context.fillStyle = "blue";
+			if(users[i].dead)
+				continue;
 
-				drawHpBar(users[i].player
-						, 20
-						, users[i].player.pos.x - offset.x - users[i].player.radius
-						, users[i].player.pos.y - offset.y + users[i].player.radius + 2
-						, 3);
+			context.fillStyle = "red";
+			if(myself.id == i) context.fillStyle = "blue";
 
-				context.strokeStyle = context.fillStyle;
-				context.font = "10px Monospace";
-				var textSize = 10 * users[i].name.length;
-				context.fillText(users[i].name, users[i].player.pos.x - offset.x - textSize/3
-						, users[i].player.pos.y - offset.y - users[i].player.radius - 2);
+			drawHpBar(users[i].player
+					, 20
+					, users[i].player.pos.x - users[i].player.radius
+					, users[i].player.pos.y + users[i].player.radius + 2
+					, 3);
 
-				// draw the player
-				context.beginPath();
+			context.strokeStyle = context.fillStyle;
+			context.font = "10px Monospace";
+			context.textAlign = "center";
+			context.fillText(users[i].name, users[i].player.pos.x + 0.001
+					, users[i].player.pos.y - users[i].player.radius - 2);
 
-				context.arc(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y
-						, users[i].player.radius, users[i].player.rotation
-						, Math.PI * 2 + users[i].player.rotation);
+			// draw the player
+			context.beginPath();
 
-				if(myself.id == i)
-					context.lineTo(users[i].player.pos.x - offset.x, users[i].player.pos.y - offset.y);
+			context.arc(users[i].player.pos.x, users[i].player.pos.y
+					, users[i].player.radius, users[i].player.rotation
+					, Math.PI * 2 + users[i].player.rotation);
 
-				context.globalAlpha = 0.1; context.fill();
-				context.globalAlpha = 1; context.stroke();
+			if(myself.id == i)
+				context.lineTo(users[i].player.pos.x, users[i].player.pos.y);
 
-				context.closePath();
-			}
+			context.globalAlpha = 0.1; context.fill();
+			context.globalAlpha = 1; context.stroke();
+
+			context.closePath();
 		}
+
+		context.restore();
 
 		drawHpBar(myself.player
 				, canvas.width / 6
