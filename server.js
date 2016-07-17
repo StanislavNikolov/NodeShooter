@@ -16,13 +16,13 @@ if(config.bullets == null) { config.bullets = {}; }
 config.bullets.ticksPerSecond = config.bullets.ticksPerSecond || 40;
 config.bullets.simStepsPerTick = config.bullets.simStepsPerTick || 3;
 config.bullets.speedMultiplier = config.bullets.speedMultiplier || 1.2;
-config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 0.2;
-config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || -0.2;
+config.bullets.decayRateMultiplier = config.bullets.decayRateMultiplier || 0.4;
+config.bullets.decayOnRicochetMultiplier = config.bullets.decayOnRicochetMultiplier || -0.4;
 config.bullets.damage = config.bullets.damage || 5;
 
 if(config.players == null) { config.players = {}; }
-config.players.ticksPerSecond = config.players.ticksPerSecond || 40;
-config.players.simStepsPerTick = config.players.simStepsPerTick || 4;
+config.players.ticksPerSecond = config.players.ticksPerSecond || 30;
+config.players.simStepsPerTick = config.players.simStepsPerTick || 5;
 config.players.speedMultiplier = config.players.speedMultiplier || 1;
 config.players.bulletsPerSecond = config.players.bulletsPerSecond || 10;
 
@@ -38,7 +38,7 @@ app.get('/', function (req, res)
 	res.sendfile(__dirname + '/userFiles/index.html');
 });
 
-let userFiles = ['client.js', 'game.js', 'styles.css', 'ui.js', 'index.html'];
+let userFiles = ['client.js', 'game.js', 'simulation.js', 'ui.js', 'styles.css', 'index.html'];
 userFiles.map(function (file)
 {
 	app.get('/userFiles/' + file, function (req, res)

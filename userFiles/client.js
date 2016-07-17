@@ -97,12 +97,23 @@ socket.onmessage = function(event)
 		for(var i = 0;i < count;++ i)
 		{
 			var id = message.getUint32(5 + i * 16, false);
+			var x = message.getInt32(9 + i * 16, false);
+			var y = message.getInt32(13 + i * 16, false);
 
 			if(bullets[id] == null)
-				bullets[id] = new Bullet('');
+			{
+				bullets[id] = new Bullet();
+				bullets[id].pos.x = x;
+				bullets[id].pos.y = y;
+			}
+			else
+			{
+				bullets[id].pos.x = bullets[id].target.pos.x;
+				bullets[id].pos.y = bullets[id].target.pos.y;
+			}
+			bullets[id].target.pos.x = x;
+			bullets[id].target.pos.y = y;
 
-			bullets[id].pos.x = message.getInt32(9 + i * 16, false);
-			bullets[id].pos.y = message.getInt32(13 + i * 16, false);
 			bullets[id].radius = message.getFloat32(17 + i * 16, false);
 		}
 	}
@@ -207,4 +218,4 @@ function debugLog()
 	}
 	console.log('sum: ', sum);
 }
-setInterval(debugLog, 1000);
+//setInterval(debugLog, 1000);

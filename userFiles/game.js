@@ -22,14 +22,22 @@ var myself; // reference to the 'current' player
 
 function Bullet()
 {
+	// The values used for rendering
 	this.pos = new Vector(0, 0);
 	this.radius = 0;
+
+	// The values last received by the server
+	this.target = {pos: new Vector(0, 0), radius: 0};
 }
 
 function Vector(x, y)
 {
 	this.x = x;
 	this.y = y;
+}
+Vector.prototype.length = function()
+{
+	return Math.sqrt(this.x * this.x + this.y * this.y);
 }
 
 function Player(p)
@@ -150,6 +158,7 @@ function draw()
 			context.fill();
 			context.closePath();
 		}
+		context.globalAlpha = 1;
 
 		for(var i in walls)
 			drawWall(walls[i]);

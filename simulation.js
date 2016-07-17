@@ -70,8 +70,7 @@ let bulletSpeed = 1000 / config.bullets.ticksPerSecond / config.bullets.simSteps
 					* config.bullets.speedMultiplier;
 
 // the final division is a constant to keep speedMultiplier setting "simpler"
-let bulletDecayRate = 1000 / config.bullets.ticksPerSecond
-					* config.bullets.decayRateMultiplier * bulletSpeed / 1000 ;
+let bulletDecayRate = config.bullets.decayRateMultiplier * bulletSpeed / 100;
 
 function moveBullets()
 {
