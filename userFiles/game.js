@@ -212,6 +212,13 @@ function draw()
 
 	context.strokeStyle = "black";
 	context.strokeRect(0, 0, canvas.width, canvas.height);
+
 }
 
-setInterval(draw, 1000/60);
+function animate()
+{
+	draw();
+	window.requestAnimationFrame(animate);
+}
+
+window.requestAnimationFrame(animate);

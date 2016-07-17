@@ -14,8 +14,8 @@
 	},
 	"players":
 	{
-		"ticksPerSecond": 40,
-		"simStepsPerTick": 2,
+		"ticksPerSecond": 30,
+		"simStepsPerTick": 5,
 		"speedMultiplier": 1,
 		"bulletsPerSecond": 10
 	}
