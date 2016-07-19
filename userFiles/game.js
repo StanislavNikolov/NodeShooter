@@ -8,7 +8,7 @@ function getPlayerRotation(event)
 		var dx = event.clientX - canvas.width / 2;
 		var dy = event.clientY - canvas.height / 2;
 		var angle = Math.atan2(dy, dx);
-		myself.player.rotation = angle;
+		rotation = angle;
 	}
 }
 window.addEventListener("mousemove", getPlayerRotation, false);
@@ -19,6 +19,7 @@ var bullets = {};
 
 var keys = []; // saves the keyboard state
 var myself; // reference to the 'current' player
+var rotation = 0;
 
 function Bullet()
 {
@@ -44,7 +45,6 @@ function Player(p)
 {
 	this.pos = p; // must be Vector
 	this.radius = 10;
-	this.rotation = 0;
 	this.speed = 0;
 	this.hp = 100;
 	this.maxhp = 100;
@@ -82,9 +82,6 @@ window.addEventListener("keyup", function (args)
 
 function drawWall(current)
 {
-	context.save();
-
-	context.fillStyle = "green";
 	context.beginPath();
 
 	context.arc(current.pos.x, current.pos.y, current.radius.inner,
@@ -105,20 +102,17 @@ function drawWall(current)
 									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
+
 	context.beginPath();
 	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
 						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
 									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
 	context.closePath();
 	context.fill();
-
-	context.restore();
 }
 
 function drawHpBar(p, ms, sx, sy, w) //player, maxsize, startx, starty, width
 {
-	context.save();
-
 	context.globalAlpha = 0.7;
 	context.fillStyle = "red";
 	context.strokeStyle = "black";
@@ -126,8 +120,28 @@ function drawHpBar(p, ms, sx, sy, w) //player, maxsize, startx, starty, width
 	var hpBarSize = (p.hp / p.maxhp) * ms;
 	context.fillRect(sx, sy, hpBarSize, w);
 	context.strokeRect(sx, sy, ms, w);
+}
 
-	context.restore();
+function drawUser(user)
+{
+	context.strokeStyle = context.fillStyle;
+	context.font = "10px Monospace";
+	context.textAlign = "center";
+
+	context.fillText(user.name, user.player.pos.x + 0.001
+			, user.player.pos.y - user.player.radius - 2);
+
+	// draw the player
+	context.beginPath();
+
+	context.arc(user.player.pos.x, user.player.pos.y
+			, user.player.radius, 0
+			, Math.PI * 2);
+
+	context.globalAlpha = 0.1; context.fill();
+	context.globalAlpha = 1; context.stroke();
+
+	context.closePath();
 }
 
 function draw()
@@ -158,8 +172,8 @@ function draw()
 			context.fill();
 			context.closePath();
 		}
-		context.globalAlpha = 1;
 
+		context.fillStyle = "green";
 		for(var i in walls)
 			drawWall(walls[i]);
 
@@ -168,8 +182,22 @@ function draw()
 			if(users[i].dead)
 				continue;
 
-			context.fillStyle = "red";
-			if(myself.id == i) context.fillStyle = "blue";
+			if(i == myself.id) // Change the color and draw the helper line for aiming
+			{
+				context.fillStyle = "blue";
+				context.strokeStyle = "blue";
+				context.beginPath();
+				context.moveTo(myself.player.pos.x, myself.player.pos.y);
+				context.lineTo(Math.cos(rotation) * myself.player.radius + myself.player.pos.x,
+						Math.sin(rotation) * myself.player.radius + myself.player.pos.y);
+				context.closePath();
+				context.stroke();
+			}
+			else
+			{
+				context.fillStyle = "red";
+			}
+			drawUser(users[i]);
 
 			drawHpBar(users[i].player
 					, 20
@@ -177,26 +205,6 @@ function draw()
 					, users[i].player.pos.y + users[i].player.radius + 2
 					, 3);
 
-			context.strokeStyle = context.fillStyle;
-			context.font = "10px Monospace";
-			context.textAlign = "center";
-			context.fillText(users[i].name, users[i].player.pos.x + 0.001
-					, users[i].player.pos.y - users[i].player.radius - 2);
-
-			// draw the player
-			context.beginPath();
-
-			context.arc(users[i].player.pos.x, users[i].player.pos.y
-					, users[i].player.radius, users[i].player.rotation
-					, Math.PI * 2 + users[i].player.rotation);
-
-			if(myself.id == i)
-				context.lineTo(users[i].player.pos.x, users[i].player.pos.y);
-
-			context.globalAlpha = 0.1; context.fill();
-			context.globalAlpha = 1; context.stroke();
-
-			context.closePath();
 		}
 
 		context.restore();

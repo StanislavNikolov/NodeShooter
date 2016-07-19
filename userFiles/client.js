@@ -166,7 +166,7 @@ function sendShootRequest()
 		var packet_b = new ArrayBuffer(5);
 		var packet = new DataView(packet_b);
 		packet.setUint8(0, 1);
-		packet.setFloat32(1, myself.player.rotation, false);
+		packet.setFloat32(1, rotation, false);
 		socket.send(packet_b);
 
 		lastShootTime = (new Date).getTime();
