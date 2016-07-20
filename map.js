@@ -4,6 +4,8 @@ let config = global.config;
 let classes = global.classes;
 let geometry = global.geometry;
 
+let g = Math.PI / 180;
+
 generateMap(process.env.MAP_TYPE || 1);
 
 function generateMap(type)
@@ -11,7 +13,7 @@ function generateMap(type)
 	if(!Number.isInteger(type))
 	{
 		if(type == "random")
-			type = Math.floor(Math.random() * 4);
+			type = Math.floor(Math.random() * 5);
 		else
 			type = Number(type);
 
@@ -19,7 +21,6 @@ function generateMap(type)
 			type = 3;
 	}
 
-	let g = Math.PI / 180;
 	if(type == 0)
 	{
 		let ir = 130, or = 130+30;
@@ -67,6 +68,106 @@ function generateMap(type)
 		let diff = Math.floor(Math.abs(Math.cos(g*30) * or)) - (or - ir) / 3;
 		walls[generateID()] = new classes.Wall(0, 0,		ir, or, g*30,	g*30+g*300);
 		walls[generateID()] = new classes.Wall(2*diff, 0,	ir, or, g*210,	g*210+g*300);
+	}
+	if(type == 4)
+	{
+		createSecotor_1(0, 0, true, false, false, false);
+		createSecotor_1(1790, 0, false, true, true, true);
+		createSecotor_1(1790, -1790, false, true, false, false);
+		createSecotor_1(1790, 1790, false, false, true, true);
+		createSecotor_1(0, 1790, true, false, false, false);
+	}
+}
+
+function createSecotor_1(x, y, h1, h2, h3, h4) // h1..4 -> hole 1, 2, 3, 4
+{
+	let lenSmall = g*0.0399;
+	let saSmall = g*360 - lenSmall;
+	let faSmall = saSmall + lenSmall * 2;
+
+	let lenBig = g*0.097;
+	let saBig = g*360 - lenBig;
+	let faBig = saBig + lenBig * 2;
+
+	let w = 20;
+
+	if(h1)
+	{
+		walls[generateID()] = new classes.Wall(-199500 + x, -200 + y, 200000, 200000 + w, saSmall, faSmall);
+		walls[generateID()] = new classes.Wall(-199500 + x, 200 + y, 200000, 200000 + w, saSmall, faSmall);
+	}
+	else
+	{
+		walls[generateID()] = new classes.Wall(-199500 + x, 0 + y, 200000, 200000 + w, saBig, faBig);
+	}
+
+	saSmall += g*90; faSmall += g*90;
+	saBig += g*90; faBig += g*90;
+	if(h2)
+	{
+		walls[generateID()] = new classes.Wall(-200 + x, -199500 + y, 200000, 200000 + w, saSmall, faSmall);
+		walls[generateID()] = new classes.Wall(200 + x, -199500 + y, 200000, 200000 + w, saSmall, faSmall);
+	}
+	else
+	{
+		walls[generateID()] = new classes.Wall(0 + x, -199500 + y, 200000, 200000 + w, saBig, faBig);
+	}
+
+	saSmall += g*90; faSmall += g*90;
+	saBig += g*90; faBig += g*90;
+	if(h3)
+	{
+		walls[generateID()] = new classes.Wall(199500 + x, -200 + y, 200000, 200000 + w, saSmall, faSmall);
+		walls[generateID()] = new classes.Wall(199500 + x, 200 + y, 200000, 200000 + w, saSmall, faSmall);
+	}
+	else
+	{
+		walls[generateID()] = new classes.Wall(199500 + x, 0 + y, 200000, 200000 + w, saBig, faBig);
+	}
+
+	saSmall += g*90; faSmall += g*90;
+	saBig += g*90; faBig += g*90;
+	if(h4)
+	{
+		walls[generateID()] = new classes.Wall(-200 + x, 199500 + y, 200000, 200000 + w, saSmall, faSmall);
+		walls[generateID()] = new classes.Wall(200 + x, 199500 + y, 200000, 200000 + w, saSmall, faSmall);
+	}
+	else
+	{
+		walls[generateID()] = new classes.Wall(0 + x, 199500 + y, 200000, 200000 + w, saBig, faBig);
+	}
+
+	// The corner circles
+	walls[generateID()] = new classes.Wall(-425 + x, 425 + y, 110, 110+w, g*45, g*45 + g*180);
+	walls[generateID()] = new classes.Wall(-425 + x, -425 + y, 110, 110+w, g*135, g*135 + g*180);
+	walls[generateID()] = new classes.Wall(425 + x, -425 + y, 110, 110+w, g*225, g*225 + g*180);
+	walls[generateID()] = new classes.Wall(425 + x, 425 + y, 110, 110+w, g*315, g*315 + g*180);
+
+	let len = g*0.055;
+	let sa = g*360 - len;
+	let fa = sa + len * 2;
+	if(h2)
+	{
+		walls[generateID()] = new classes.Wall(-199950 + x, 705 + y, 200000, 200000 + w, sa, fa);
+		walls[generateID()] = new classes.Wall(-200070 + x, 705 + y, 200000, 200000 + w, sa, fa);
+	}
+	if(h4)
+	{
+		walls[generateID()] = new classes.Wall(-199950 + x, -705 + y, 200000, 200000 + w, sa, fa);
+		walls[generateID()] = new classes.Wall(-200070 + x, -705 + y, 200000, 200000 + w, sa, fa);
+	}
+
+	sa += g*90;
+	fa += g*90;
+	if(h1)
+	{
+		walls[generateID()] = new classes.Wall(705 + x, -199950 + y, 200000, 200000 + w, sa, fa);
+		walls[generateID()] = new classes.Wall(705 + x, -200070 + y, 200000, 200000 + w, sa, fa);
+	}
+	if(h3)
+	{
+		walls[generateID()] = new classes.Wall(-705 + x, -199950 + y, 200000, 200000 + w, sa, fa);
+		walls[generateID()] = new classes.Wall(-705 + x, -200070 + y, 200000, 200000 + w, sa, fa);
 	}
 }
 
