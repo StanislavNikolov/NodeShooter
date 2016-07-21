@@ -1,6 +1,10 @@
 var canvas = document.getElementById("mainCanvas");
 var context = canvas.getContext("2d");
 
+var minimap = document.getElementById("minimap");
+var mmContext = minimap.getContext("2d");
+var minimapScale = 20;
+
 function getPlayerRotation(event)
 {
 	if(myself != null)
@@ -80,35 +84,35 @@ window.addEventListener("keyup", function (args)
     keys[args.keyCode] = false;
 }, false);
 
-function drawWall(current)
+function drawWall(current, ctx)
 {
-	context.beginPath();
+	ctx.beginPath();
 
-	context.arc(current.pos.x, current.pos.y, current.radius.inner,
+	ctx.arc(current.pos.x, current.pos.y, current.radius.inner,
 			current.angle.start, current.angle.finish);
 
-	context.lineTo(current.pos.x + Math.cos(current.angle.finish) * current.radius.outer,
+	ctx.lineTo(current.pos.x + Math.cos(current.angle.finish) * current.radius.outer,
 			current.pos.y + Math.sin(current.angle.finish) * current.radius.outer);
 
-	context.arc(current.pos.x, current.pos.y, current.radius.outer,
+	ctx.arc(current.pos.x, current.pos.y, current.radius.outer,
 			current.angle.finish, current.angle.start, true);
 
-	context.closePath();
-	context.fill();
+	ctx.closePath();
+	ctx.fill();
 
-	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
-						current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
-									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
-	context.closePath();
-	context.fill();
+	ctx.beginPath();
+	ctx.arc(current.pos.x+(Math.cos(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
+			current.pos.y+Math.sin(current.angle.start)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
+			Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
+	ctx.closePath();
+	ctx.fill();
 
-	context.beginPath();
-	context.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
-						current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
-									Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
-	context.closePath();
-	context.fill();
+	ctx.beginPath();
+	ctx.arc(current.pos.x+(Math.cos(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner)),
+			current.pos.y+Math.sin(current.angle.finish)*(Math.abs(current.radius.outer-current.radius.inner)/2+current.radius.inner),
+			Math.abs(current.radius.outer-current.radius.inner)/2,0,2*Math.PI);
+	ctx.closePath();
+	ctx.fill();
 }
 
 function drawHpBar(p, ms, sx, sy, w) //player, maxsize, startx, starty, width
@@ -149,6 +153,7 @@ function draw()
 	if(myself == null)
 		return;
 
+
 	if(!myself.dead)
 	{
 		context.globalAlpha = 1;
@@ -158,6 +163,15 @@ function draw()
 		context.save();
 		context.translate(-myself.player.pos.x + canvas.width / 2,
 				-myself.player.pos.y + canvas.height / 2);
+
+		mmContext.globalAlpha = 1;
+		mmContext.fillStyle = "white";
+		mmContext.fillRect(0, 0, minimap.width, minimap.height);
+
+		mmContext.save();
+		mmContext.translate(-myself.player.pos.x / minimapScale + minimap.width / 2,
+				-myself.player.pos.y / minimapScale + minimap.height / 2);
+		mmContext.scale(1 / minimapScale, 1 / minimapScale);
 
 		context.fillStyle = "black";
 		for(var i in bullets)
@@ -174,18 +188,27 @@ function draw()
 		}
 
 		context.fillStyle = "green";
+		mmContext.fillStyle = "green";
 		for(var i in walls)
-			drawWall(walls[i]);
+		{
+			drawWall(walls[i], mmContext, 0.1);
+			drawWall(walls[i], context, 1);
+		}
 
+		mmContext.fillStyle = "black";
 		for(var i in users)
 		{
 			if(users[i].dead)
 				continue;
+			mmContext.beginPath();
+			mmContext.arc(users[i].player.pos.x, users[i].player.pos.y, 40, 0, Math.PI*2);
+			mmContext.fill();
+			mmContext.closePath();
 
 			if(i == myself.id) // Change the color and draw the helper line for aiming
 			{
 				context.fillStyle = "blue";
-				context.strokeStyle = "blue";
+
 				context.beginPath();
 				context.moveTo(myself.player.pos.x, myself.player.pos.y);
 				context.lineTo(Math.cos(rotation) * myself.player.radius + myself.player.pos.x,
@@ -208,6 +231,7 @@ function draw()
 		}
 
 		context.restore();
+		mmContext.restore();
 
 		drawHpBar(myself.player
 				, canvas.width / 6

@@ -39,6 +39,8 @@ function resizeCanvas()
 {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
+	minimap.width = 0.2 * window.innerWidth;
+	minimap.height = 0.2 * window.innerHeight;
 	draw();
 }
 
