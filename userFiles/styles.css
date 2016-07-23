@@ -16,7 +16,6 @@ body {
 #minimap {
 	position: fixed;
 	bottom: 2%;
-	right: 2%;
 	border-width: 0.1em;
 	border-style: solid;
 }

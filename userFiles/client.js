@@ -201,7 +201,6 @@ function sendMoveRequest()
 		lastSentMoveDirection = data;
 	}
 }
-setInterval(sendMoveRequest, 50);
 
 function debugLog()
 {
@@ -218,4 +217,3 @@ function debugLog()
 	}
 	console.log('sum: ', sum);
 }
-//setInterval(debugLog, 1000);

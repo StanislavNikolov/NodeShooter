@@ -1,89 +1,3 @@
-var canvas = document.getElementById("mainCanvas");
-var context = canvas.getContext("2d");
-
-var minimap = document.getElementById("minimap");
-var mmContext = minimap.getContext("2d");
-var minimapScale = 20;
-
-function getPlayerRotation(event)
-{
-	if(myself != null)
-	{
-		var dx = event.clientX - canvas.width / 2;
-		var dy = event.clientY - canvas.height / 2;
-		var angle = Math.atan2(dy, dx);
-		rotation = angle;
-	}
-}
-window.addEventListener("mousemove", getPlayerRotation, false);
-
-var walls = {};
-var users = {};
-var bullets = {};
-
-var keys = []; // saves the keyboard state
-var myself; // reference to the 'current' player
-var rotation = 0;
-
-function Bullet()
-{
-	// The values used for rendering
-	this.pos = new Vector(0, 0);
-	this.radius = 0;
-
-	// The values last received by the server
-	this.target = {pos: new Vector(0, 0), radius: 0};
-}
-
-function Vector(x, y)
-{
-	this.x = x;
-	this.y = y;
-}
-Vector.prototype.length = function()
-{
-	return Math.sqrt(this.x * this.x + this.y * this.y);
-}
-
-function Player(p)
-{
-	this.pos = p; // must be Vector
-	this.radius = 10;
-	this.speed = 0;
-	this.hp = 100;
-	this.maxhp = 100;
-	this.d = new Vector(0, 0);
-}
-
-function Wall(x, y, innerRadius, outerRadius, startAngle, finishAngle)
-{
-	this.pos = new Vector(x, y);
-	this.radius = {inner:innerRadius, outer:outerRadius};
-	this.angle = {start:startAngle, finish:finishAngle};
-}
-
-function User(name, id, player, kills, deaths)
-{
-	this.name = name;
-	this.id = id;
-	this.kills = kills;
-	this.deaths = deaths;
-	this.lastEvent = {move: 0, shoot: 0, respawn: 0, getKilled: 0};
-	this.player = player;
-}
-
-for(var i = 0;i < 200;i ++){keys[i] = false;}
-
-window.addEventListener("keydown", function (args)
-{
-    keys[args.keyCode] = true;
-}, false);
-
-window.addEventListener("keyup", function (args)
-{
-    keys[args.keyCode] = false;
-}, false);
-
 function drawWall(current, ctx)
 {
 	ctx.beginPath();
@@ -152,7 +66,6 @@ function draw()
 {
 	if(myself == null)
 		return;
-
 
 	if(!myself.dead)
 	{
@@ -251,6 +164,9 @@ function draw()
 		context.fillText("You were killed!", 50, 50);
 	}
 
+	if(touchDevice)
+		renderOnscreenCotrollUI();
+
 	context.strokeStyle = "black";
 	context.strokeRect(0, 0, canvas.width, canvas.height);
 
@@ -261,5 +177,3 @@ function animate()
 	draw();
 	window.requestAnimationFrame(animate);
 }
-
-window.requestAnimationFrame(animate);
