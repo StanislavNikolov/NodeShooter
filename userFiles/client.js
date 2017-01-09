@@ -176,7 +176,7 @@ function sendShootRequest()
 var lastSentMoveDirection = 1;
 function sendMoveRequest()
 {
-	if(myself.dead)
+	if(myself == null || myself.dead)
 		return;
 
 	var data = 1;
